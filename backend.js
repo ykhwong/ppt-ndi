@@ -40,7 +40,7 @@ app.on('ready', function() {
 	mainWindow.focus();
 
 	//For debugging:
-	mainWindow.webContents.openDevTools();
+	//mainWindow.webContents.openDevTools();
 
 	mainWindow.on('close', function(e) {
 		e.preventDefault();
