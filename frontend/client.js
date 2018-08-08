@@ -131,7 +131,6 @@ $(document).ready(function() {
 				$("select").find('option[value="Next"]').data('img-src', next_sli);
 				init_imgpicker();
 				child.stdin.write(cur_sli + "\n");
-				//child.stdin.end();
 			}
 		});
 	}
@@ -182,13 +181,16 @@ $(document).ready(function() {
 						re = new RegExp("^Slide(\\d+)\\.png\$", "i");
 						if (re.exec(file2)) {
 							var rpc = file2.replace(re, "\$1");
-							options += '<option data-img-label="' + rpc + '" data-img-src="' + tmp_dir + '/Slide' + rpc + '.png" value="' + rpc + '">Slide ' + rpc + "\n";
+							options +=
+							'<option data-img-label="' + rpc +
+							'" data-img-src="' + tmp_dir + '/Slide' + rpc
+							+ '.png" value="' + rpc + '">Slide ' + rpc + "\n";
 							$("#slides_grp").html(options);
-							$("select").find('option[value="Current"]').attr('img-src', tmp_dir + "/Slide1.png");
+							$("select").find('option[value="Current"]').prop('img-src', tmp_dir + "/Slide1.png");
 							if (!fs.existsSync(tmp_dir + "/Slide2.png")) {
-								$("select").find('option[value="Next"]').attr('img-src', tmp_dir + "/Slide1.png");
+								$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide1.png");
 							} else {
-								$("select").find('option[value="Next"]').attr('img-src', tmp_dir + "/Slide2.png");
+								$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide2.png");
 							}
 							init_imgpicker();
 						}
@@ -201,9 +203,28 @@ $(document).ready(function() {
 		})
 	});
 
+	$('#prev').click(function() {
+	});
+
+	$('#next').click(function() {
+	});
+
+	function cleanup_temp() {
+		if (fs.existsSync(tmp_dir)) {
+			fs.removeSync(tmp_dir);
+		}
+	}
+
+	ipc.on('remote' , function(event, data){
+		if (data.msg == "exit") {
+			cleanup_temp();
+			ipc.send('remote', "exit");
+		}
+	});
+
 	$('#exit').click(function() {
-	   fs.removeSync(tmp_dir);
-       window.close();
+	   cleanup_temp();
+	   ipc.send('remote', "exit");
 	});
 
 	init_imgpicker();

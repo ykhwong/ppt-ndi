@@ -9,29 +9,21 @@ const fs = require("fs");
 
 let mainWindow;
 
-function LOG_TERM(data) {
-	console.log(data);
-	mainWindow.webContents.send('log_term', {
-		msg: data
-	});
-	fs.appendFile(logfile, data + "\n", function (err) {});
-}
-
-app.on('window-all-closed', () => {
+app.on('window-all-closed', (e) => {
 	if (process.platform != 'darwin')
 		app.quit();
 });
 
 var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.focus();
-  }
+	if (mainWindow) {
+		if (mainWindow.isMinimized()) mainWindow.restore();
+		mainWindow.focus();
+	}
 });
 
 if (shouldQuit) {
-  app.quit();
-  return;
+	app.quit();
+	return;
 }
 
 app.on('ready', function() {
@@ -47,25 +39,23 @@ app.on('ready', function() {
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	mainWindow.focus();
 
-	var application_menu;
-
-	application_menu = [{
-		label: '&File',
-		submenu: [{
-			label: 'Exit',
-			click: () => {
-				app.quit();
-			}
-		}]
-	}, ];
-
-	menu = Menu.buildFromTemplate(application_menu);
-	Menu.setApplicationMenu(menu);
-
 	//For debugging:
-	//mainWindow.webContents.openDevTools();
+	mainWindow.webContents.openDevTools();
+
+	mainWindow.on('close', function(e) {
+		e.preventDefault();
+		mainWindow.webContents.send('remote', {
+			msg: 'exit'
+		});
+	});
 
 	mainWindow.on('closed', function() {
 		mainWindow = null;
+	});
+
+	ipc.on('remote', (event, data) => {
+		if (data == "exit") {
+			mainWindow.destroy();
+		}
 	});
 });
