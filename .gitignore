@@ -1,0 +1,6 @@
+[Tt]humbs.db
+*.DS_Store
+*.exe
+*.bat
+*.dll
+/node_modules
