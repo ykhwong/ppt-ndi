@@ -109,28 +109,40 @@ Main
 
 $(document).ready(function() {
 	var child = spawn('./bin/PPTNDI');
+	var max_slide_num = 0;
+	var repo;
+	var selected_by_user = false;
 	child.stdin.setEncoding('utf-8');
 	child.stdout.pipe(process.stdout);
+
+	function update_screen() {
+		var cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
+		var re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
+		var rpc = cur_sli.replace(re, "\$1");
+		var next_sli = rpc;
+		var next_num = parseInt(cur_sli.replace(re, "\$2"), 10);
+		next_num++;
+		next_sli += next_num.toString() + '.png';
+		$("select").find('option[value="Current"]').data('img-src', cur_sli);
+		if (!fs.existsSync(next_sli)) {
+			next_sli = rpc + '1.png';
+		}
+		$("select").find('option[value="Next"]').data('img-src', next_sli);
+		init_imgpicker();
+		child.stdin.write(cur_sli + "\n");
+	}
 
 	function init_imgpicker() {
 		$("select").imagepicker({
 			hide_select: true,
 			show_label  : true,
+			initialized: function(imagePicker){
+				// don't do this
+			},
 			selected:function(select, picker_option, event) {
-				var cur_sli = $(this).find("option[value='" + $(this).val() + "']").data('img-src');
-				var re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
-				var rpc = cur_sli.replace(re, "\$1");
-				var next_sli = rpc;
-				var next_num = parseInt(cur_sli.replace(re, "\$2"), 10);
-				next_num++;
-				next_sli += next_num.toString() + '.png';
-				$("select").find('option[value="Current"]').data('img-src', cur_sli);
-				if (!fs.existsSync(next_sli)) {
-					next_sli = rpc + '1.png';
-				}
-				$("select").find('option[value="Next"]').data('img-src', next_sli);
-				init_imgpicker();
-				child.stdin.write(cur_sli + "\n");
+				repo = $(this);
+				selected_by_user=true;
+				update_screen();
 			}
 		});
 	}
@@ -149,6 +161,7 @@ $(document).ready(function() {
 				if (re.exec(file)) {
 					var now = new Date().getTime();
 					var new_vbs_content;
+					cleanup_temp();
 					tmp_dir = process.env.TEMP + '/ppt_ndi';
 					if (!fs.existsSync(tmp_dir)) {
 						fs.mkdirSync(tmp_dir);
@@ -177,6 +190,7 @@ $(document).ready(function() {
 						return;
 					}
 					var options = "";
+					max_slide_num = 0;
 					fs.readdirSync(tmp_dir).forEach(file2 => {
 						re = new RegExp("^Slide(\\d+)\\.png\$", "i");
 						if (re.exec(file2)) {
@@ -192,10 +206,11 @@ $(document).ready(function() {
 							} else {
 								$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide2.png");
 							}
-							init_imgpicker();
+							max_slide_num++;
 						}
 					})
-
+					selected_by_user=false;
+					init_imgpicker();
 				} else {
 					alert("PPTX file is only allowed.");
 				}
@@ -203,10 +218,42 @@ $(document).ready(function() {
 		})
 	});
 
+	function select_slide(num) {
+		$('optgroup[label="Slides"] option[value="' + num + '"]').prop('selected',true);
+		$('optgroup[label="Slides"] option[value="' + num + '"]').change();
+		update_screen();
+	}
+
+	function goto_prev() {
+		if (selected_by_user == false) { return; }
+		var cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
+		var re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
+		cur_sli = cur_sli.replace(re, "\$2");
+		cur_sli--;
+		if (cur_sli == 0) {
+			cur_sli = max_slide_num;
+		}
+		select_slide(cur_sli.toString());
+	}
+	
+	function goto_next() {
+		if (selected_by_user == false) { return; }
+		var cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
+		var re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
+		cur_sli = cur_sli.replace(re, "\$2");
+		cur_sli++;
+		if (cur_sli > max_slide_num) {
+			cur_sli = 1;
+		}
+		select_slide(cur_sli.toString());
+	}
+	
 	$('#prev').click(function() {
+		goto_prev();
 	});
 
 	$('#next').click(function() {
+		goto_next();
 	});
 
 	function cleanup_temp() {
