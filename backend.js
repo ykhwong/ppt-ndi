@@ -29,7 +29,7 @@ if (shouldQuit) {
 app.on('ready', function() {
 	mainWindow = new BrowserWindow({
 		width: 1200,
-		height: 640,
+		height: 680,
 		title: "",
 		icon: __dirname + '/icon.png',
 		resize: true,
