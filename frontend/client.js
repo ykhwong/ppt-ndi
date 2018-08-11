@@ -256,6 +256,36 @@ $(document).ready(function() {
 		goto_next();
 	});
 
+	$(document).keydown(function(e) {
+		$("#below").trigger('click');
+		if(e.which == 13 || e.which == 32 || e.which == 39 || e.which == 40) {
+			// Enter, spacebar, right arrow or down
+			goto_next();
+		}
+		if(e.which == 37 || e.which == 8 || e.which == 38) {
+			// Left arrow, backspace or up
+			goto_prev();
+		}
+		if(e.which == 36) {
+			// Home
+			select_slide(1);
+		}
+		if(e.which == 35) {
+			// End
+			select_slide(max_slide_num);
+		}
+
+	});
+
+	$('.button').keydown(function(e){
+		if (e.which == 13 || e.which == 32) {
+			// Enter or spacebar
+			e.preventDefault();
+			e.stopPropagation();
+			goto_next();
+		}
+	});
+
 	function cleanup_temp() {
 		if (fs.existsSync(tmp_dir)) {
 			fs.removeSync(tmp_dir);
