@@ -154,11 +154,11 @@ $(document).ready(function() {
 	}
 
 	$("#load_pptx").click(function() {
-		dialog.showOpenDialog({
+		dialog.showOpenDialog(require('electron').remote.getCurrentWindow(),{
 			properties: ['openFile'],
 			filters: [
-			  {name: 'PowerPoint Presentations', extensions: ['pptx', 'ppt']},
-			  {name: 'All Files', extensions: ['*']}
+				{name: 'PowerPoint Presentations', extensions: ['pptx', 'ppt']},
+				{name: 'All Files', extensions: ['*']}
 			]
 		}, function (file) {
 			if (file !== undefined) {
@@ -325,6 +325,16 @@ $(document).ready(function() {
 	$('#exit').click(function() {
 		cleanup_for_exit();
 	});
+
+	document.addEventListener('dragover',function(event){
+		event.preventDefault();
+		return false;
+	},false);
+	
+	document.addEventListener('drop',function(event){
+		event.preventDefault();
+		return false;
+	},false);
 
 	init_imgpicker();
 });
