@@ -143,7 +143,7 @@ $(document).ready(function() {
 		}
 	});
 
-	function init_imgpicker(target) {
+	function init_imgpicker() {
 		$("select").imagepicker({
 			hide_select: true,
 			show_label: true,
