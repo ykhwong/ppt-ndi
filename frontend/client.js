@@ -151,17 +151,17 @@ $(document).ready(function() {
 		dialog.showOpenDialog({
 			properties: ['openFile'],
 			filters: [
-			  {name: 'PowerPoint Presentations', extensions: ['pptx']},
+			  {name: 'PowerPoint Presentations', extensions: ['pptx', 'ppt']},
 			  {name: 'All Files', extensions: ['*']}
 			]
 		}, function (file) {
 			if (file !== undefined) {
-				var re = new RegExp("\\.pptx\$", "i");
+				var re = new RegExp("\\.pptx*\$", "i");
 				var vbs_dir;
 				if (re.exec(file)) {
 					var now = new Date().getTime();
 					var new_vbs_content;
-					cleanup_temp();
+					cleanup_for_temp();
 					tmp_dir = process.env.TEMP + '/ppt_ndi';
 					if (!fs.existsSync(tmp_dir)) {
 						fs.mkdirSync(tmp_dir);
@@ -212,7 +212,7 @@ $(document).ready(function() {
 					selected_by_user=false;
 					init_imgpicker();
 				} else {
-					alert("PPTX file is only allowed.");
+					alert("Only allowed filename extensions are PPT and PPTX.");
 				}
 			}
 		})
@@ -288,24 +288,26 @@ $(document).ready(function() {
 		}
 	});
 
-	function cleanup_temp() {
+	function cleanup_for_temp() {
 		if (fs.existsSync(tmp_dir)) {
 			fs.removeSync(tmp_dir);
 		}
 	}
 
+	function cleanup_for_exit() {
+		child.stdin.write("destroy\n");
+		cleanup_for_temp();
+		ipc.send('remote', "exit");
+	}
+
 	ipc.on('remote' , function(event, data){
 		if (data.msg == "exit") {
-			child.stdin.write("destroy\n");
-			cleanup_temp();
-			ipc.send('remote', "exit");
+			cleanup_for_exit();
 		}
 	});
 
 	$('#exit').click(function() {
-		child.stdin.write("destroy\n");
-		cleanup_temp();
-		ipc.send('remote', "exit");
+		cleanup_for_exit();
 	});
 
 	init_imgpicker();
