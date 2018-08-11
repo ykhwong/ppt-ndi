@@ -1,10 +1,10 @@
 {
-  "name": "PPTNDI",
-  "version": "1.0.0",
-  "main": "backend.js",
-  "dependencies": {
-    "fs-extra": "^7.0.0"
-  },
-  "devDependencies": {},
-  "scripts": {}
+	"name": "PPTNDI",
+	"version": "1.0.0",
+	"main": "backend.js",
+	"dependencies": {
+		"fs-extra": "^7.0.0"
+	},
+	"devDependencies": {},
+	"scripts": {}
 }
