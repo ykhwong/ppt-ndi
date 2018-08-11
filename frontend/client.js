@@ -163,7 +163,9 @@ $(document).ready(function() {
 		}, function (file) {
 			if (file !== undefined) {
 				var re = new RegExp("\\.pptx*\$", "i");
-				var vbs_dir;
+				var vbs_dir, res;
+				var file_arr = [];
+				var options = "";
 				if (re.exec(file)) {
 					var now = new Date().getTime();
 					var new_vbs_content;
@@ -190,29 +192,33 @@ $(document).ready(function() {
 						alert('Failed to access the temporary directory!');
 						return;
 					}
-					var res = spawnSync( 'cscript.exe', [ vbs_dir, '' ] );
+					res = spawnSync( 'cscript.exe', [ vbs_dir, '' ] );
 					if ( res.status !== 0 ) {
 						alert('Failed to parse the presentation!');
 						return;
 					}
-					var options = "";
 					max_slide_num = 0;
 					fs.readdirSync(tmp_dir).forEach(file2 => {
 						re = new RegExp("^Slide(\\d+)\\.png\$", "i");
 						if (re.exec(file2)) {
 							var rpc = file2.replace(re, "\$1");
-							options +=
-							'<option data-img-label="' + rpc +
-							'" data-img-src="' + tmp_dir + '/Slide' + rpc
-							+ '.png" value="' + rpc + '">Slide ' + rpc + "\n";
-							$("#slides_grp").html(options);
-							$("select").find('option[value="Current"]').prop('img-src', tmp_dir + "/Slide1.png");
-							if (!fs.existsSync(tmp_dir + "/Slide2.png")) {
-								$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide1.png");
-							} else {
-								$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide2.png");
-							}
+							file_arr.push(rpc);
 							max_slide_num++;
+						}
+					})
+
+					file_arr.sort((a, b) => a - b).forEach(file2 => {
+						var rpc = file2;
+						options +=
+						'<option data-img-label="' + rpc +
+						'" data-img-src="' + tmp_dir + '/Slide' + rpc
+						+ '.png" value="' + rpc + '">Slide ' + rpc + "\n";
+						$("#slides_grp").html(options);
+						$("select").find('option[value="Current"]').prop('img-src', tmp_dir + "/Slide1.png");
+						if (!fs.existsSync(tmp_dir + "/Slide2.png")) {
+							$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide1.png");
+						} else {
+							$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide2.png");
 						}
 					})
 					init_imgpicker();
