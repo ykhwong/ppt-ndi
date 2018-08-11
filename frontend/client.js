@@ -261,23 +261,25 @@ $(document).ready(function() {
 		if(e.which == 13 || e.which == 32 || e.which == 39 || e.which == 40) {
 			// Enter, spacebar, right arrow or down
 			goto_next();
-		}
-		if(e.which == 37 || e.which == 8 || e.which == 38) {
+		} else if(e.which == 37 || e.which == 8 || e.which == 38) {
 			// Left arrow, backspace or up
 			goto_prev();
-		}
-		if(e.which == 36) {
+		} else if(e.which == 36) {
 			// Home
 			select_slide(1);
-		}
-		if(e.which == 35) {
+		} else if(e.which == 35) {
 			// End
 			select_slide(max_slide_num);
+		} else if (e.ctrlKey) {
+			if (e.which == 87) {
+				// Prevents Ctrl-W
+				e.preventDefault();
+				e.stopPropagation();
+			}
 		}
-
 	});
 
-	$('.button').keydown(function(e){
+	$('.button, .checkbox').keydown(function(e){
 		if (e.which == 13 || e.which == 32) {
 			// Enter or spacebar
 			e.preventDefault();
@@ -294,14 +296,16 @@ $(document).ready(function() {
 
 	ipc.on('remote' , function(event, data){
 		if (data.msg == "exit") {
+			child.stdin.write("destroy\n");
 			cleanup_temp();
 			ipc.send('remote', "exit");
 		}
 	});
 
 	$('#exit').click(function() {
-	   cleanup_temp();
-	   ipc.send('remote', "exit");
+		child.stdin.write("destroy\n");
+		cleanup_temp();
+		ipc.send('remote', "exit");
 	});
 
 	init_imgpicker();
