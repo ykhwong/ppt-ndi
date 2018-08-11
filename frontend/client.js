@@ -147,6 +147,7 @@ $(document).ready(function() {
 			hide_select: true,
 			show_label: true,
 			selected:function(select, picker_option, event) {
+				current_slide=$('.selected').text();
 				update_screen();
 			}
 		});
