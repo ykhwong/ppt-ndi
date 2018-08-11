@@ -4,3 +4,4 @@
 *.bat
 *.dll
 /node_modules
+/bin
