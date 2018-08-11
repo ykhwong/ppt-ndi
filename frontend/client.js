@@ -110,6 +110,7 @@ Main
 $(document).ready(function() {
 	var child = spawn('./bin/PPTNDI');
 	var max_slide_num = 0;
+	var current_slide = 1;
 	var repo;
 	child.stdin.setEncoding('utf-8');
 	child.stdout.pipe(process.stdout);
@@ -121,13 +122,11 @@ $(document).ready(function() {
 		if(!repo) {
 			return;
 		}
-		cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
-		re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
-		rpc = cur_sli.replace(re, "\$1");
-		next_sli = rpc;
-		next_num = parseInt(cur_sli.replace(re, "\$2"), 10);
+		rpc = tmp_dir + "/Slide";
+		cur_sli = rpc + current_slide.toString() + '.png';
+		next_num = current_slide;
 		next_num++;
-		next_sli += next_num.toString() + '.png';
+		next_sli = rpc + next_num.toString() + '.png';
 		$("select").find('option[value="Current"]').data('img-src', cur_sli);
 		if (!fs.existsSync(next_sli)) {
 			next_sli = rpc + '1.png';
@@ -221,8 +220,7 @@ $(document).ready(function() {
 							$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide2.png");
 						}
 					})
-					init_imgpicker();
-					select_slide(1);
+					select_slide('1');
 				} else {
 					alert("Only allowed filename extensions are PPT and PPTX.");
 				}
@@ -231,8 +229,9 @@ $(document).ready(function() {
 	});
 
 	function select_slide(num) {
-		$('optgroup[label="Slides"] option[value="' + num + '"]').prop('selected',true);
-		$('optgroup[label="Slides"] option[value="' + num + '"]').change();
+		$('optgroup[label="Slides"] option[value="' + num.toString() + '"]').prop('selected',true);
+		$('optgroup[label="Slides"] option[value="' + num.toString() + '"]').change();
+		current_slide = num;
 		update_screen();
 	}
 
@@ -242,9 +241,7 @@ $(document).ready(function() {
 		if (!repo) {
 			return;
 		}
-		cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
-		re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
-		cur_sli = cur_sli.replace(re, "\$2");
+		cur_sli = current_slide;
 		cur_sli--;
 		if (cur_sli == 0) {
 			cur_sli = max_slide_num;
@@ -258,9 +255,7 @@ $(document).ready(function() {
 		if (!repo) {
 			return;
 		}
-		cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
-		re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
-		cur_sli = cur_sli.replace(re, "\$2");
+		cur_sli = current_slide;
 		cur_sli++;
 		if (cur_sli > max_slide_num) {
 			cur_sli = 1;
@@ -286,10 +281,10 @@ $(document).ready(function() {
 			goto_prev();
 		} else if(e.which == 36) {
 			// Home
-			select_slide(1);
+			select_slide('1');
 		} else if(e.which == 35) {
 			// End
-			select_slide(max_slide_num);
+			select_slide(max_slide_num.toString());
 		} else if (e.ctrlKey) {
 			if (e.which == 87) {
 				// Prevents Ctrl-W
