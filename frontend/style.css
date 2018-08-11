@@ -93,8 +93,9 @@ html, body {
 	position: fixed;
 	left: 0px;
 	bottom: 0px;
-	width: 100%;
+	right: 0px;
 	top: 470px;
+	padding-left: 10px;
 	overflow-x: hidden;
     overflow-y: scroll;
 	white-space: nowrap;

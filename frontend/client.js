@@ -111,16 +111,21 @@ $(document).ready(function() {
 	var child = spawn('./bin/PPTNDI');
 	var max_slide_num = 0;
 	var repo;
-	var selected_by_user = false;
 	child.stdin.setEncoding('utf-8');
 	child.stdout.pipe(process.stdout);
 
 	function update_screen() {
-		var cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
-		var re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
-		var rpc = cur_sli.replace(re, "\$1");
-		var next_sli = rpc;
-		var next_num = parseInt(cur_sli.replace(re, "\$2"), 10);
+		var cur_sli, next_sli;
+		var next_num;
+		var re, rpc;
+		if(!repo) {
+			return;
+		}
+		cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
+		re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
+		rpc = cur_sli.replace(re, "\$1");
+		next_sli = rpc;
+		next_num = parseInt(cur_sli.replace(re, "\$2"), 10);
 		next_num++;
 		next_sli += next_num.toString() + '.png';
 		$("select").find('option[value="Current"]').data('img-src', cur_sli);
@@ -132,18 +137,16 @@ $(document).ready(function() {
 		child.stdin.write(cur_sli + "\n");
 	}
 
-	function init_imgpicker() {
+	$("select").change(function() {
+		if (repo == null) {
+			repo = $(this);
+		}
+	});
+
+	function init_imgpicker(target) {
 		$("select").imagepicker({
 			hide_select: true,
-			show_label  : true,
-			initialized: function(imagePicker){
-				// don't do this
-			},
-			selected:function(select, picker_option, event) {
-				repo = $(this);
-				selected_by_user=true;
-				update_screen();
-			}
+			show_label: true,
 		});
 	}
 
@@ -209,8 +212,8 @@ $(document).ready(function() {
 							max_slide_num++;
 						}
 					})
-					selected_by_user=false;
 					init_imgpicker();
+					select_slide(1);
 				} else {
 					alert("Only allowed filename extensions are PPT and PPTX.");
 				}
@@ -225,9 +228,13 @@ $(document).ready(function() {
 	}
 
 	function goto_prev() {
-		if (selected_by_user == false) { return; }
-		var cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
-		var re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
+		var cur_sli;
+		var re;
+		if (!repo) {
+			return;
+		}
+		cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
+		re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
 		cur_sli = cur_sli.replace(re, "\$2");
 		cur_sli--;
 		if (cur_sli == 0) {
@@ -235,11 +242,15 @@ $(document).ready(function() {
 		}
 		select_slide(cur_sli.toString());
 	}
-	
+
 	function goto_next() {
-		if (selected_by_user == false) { return; }
-		var cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
-		var re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
+		var cur_sli;
+		var re;
+		if (!repo) {
+			return;
+		}
+		cur_sli = repo.find("option[value='" + repo.val() + "']").data('img-src');
+		re = new RegExp("^(.*)(\\d+)\\.png\$", "i");
 		cur_sli = cur_sli.replace(re, "\$2");
 		cur_sli++;
 		if (cur_sli > max_slide_num) {
