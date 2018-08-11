@@ -147,6 +147,9 @@ $(document).ready(function() {
 		$("select").imagepicker({
 			hide_select: true,
 			show_label: true,
+			selected:function(select, picker_option, event) {
+				update_screen();
+			}
 		});
 	}
 
