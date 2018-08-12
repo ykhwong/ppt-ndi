@@ -112,21 +112,6 @@ html, body {
 	/*border: 2px solid black;*/
 }
 
-
-#statement {
-	background-color: white;
-	color: #27293E;
-	width: 500px;
-	height: 100px;
-	margin-top: 10px;
-}
-
-#screen {
-	position: fixed;
-	align: center;
-	width: 800px;
-}
-
 .menu_item {
 	color: white;
 	font-size: 15px;
@@ -182,6 +167,10 @@ html, body {
 	filter: invert(100%) hue-rotate(18deg) brightness(1.7);
 	width: 15px;
 	height: 15px;
+}
+
+.group_title {
+	display: none;
 }
 
 .green_small_txt {
