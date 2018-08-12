@@ -111,6 +111,15 @@ html, body {
     width:400px;
 }
 
+#slide_cnt, #progress, #current_time {
+	display:inline;
+}
+
+#progress, #current_time {
+	position: relative;
+	margin-left: 20px;
+}
+
 #below {
 	position: fixed;
 	left: 0px;
