@@ -1,3 +1,4 @@
+const { remote } = require('electron');
 const ipc = require('electron').ipcRenderer;
 const fs = require("fs-extra");
 const {dialog} = require('electron').remote;
@@ -111,6 +112,7 @@ $(document).ready(function() {
 	var child = spawn('./bin/PPTNDI');
 	var max_slide_num = 0;
 	var current_slide = 1;
+	var current_window = remote.getCurrentWindow();
 	var repo;
 	child.stdin.setEncoding('utf-8');
 	child.stdout.pipe(process.stdout);
@@ -154,7 +156,7 @@ $(document).ready(function() {
 	}
 
 	$("#load_pptx").click(function() {
-		dialog.showOpenDialog(require('electron').remote.getCurrentWindow(),{
+		dialog.showOpenDialog(current_window,{
 			properties: ['openFile'],
 			filters: [
 				{name: 'PowerPoint Presentations', extensions: ['pptx', 'ppt']},
@@ -328,6 +330,26 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#minimize').click(function() {
+		remote.BrowserWindow.getFocusedWindow().minimize();
+	});
+
+	$('#max_restore').click(function() {
+		if(current_window.isMaximized()) {
+			remote.BrowserWindow.getFocusedWindow().unmaximize();
+		} else {
+			remote.BrowserWindow.getFocusedWindow().maximize();
+		}
+	});
+
+	current_window.on('maximize', function (){
+		$("#max_restore").html('&nbsp;v&nbsp;');
+    });
+
+	current_window.on('unmaximize', function (){
+		$("#max_restore").html('&nbsp;^&nbsp;');
+    });
+	
 	$('#exit').click(function() {
 		cleanup_for_exit();
 	});
