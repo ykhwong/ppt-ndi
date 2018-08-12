@@ -239,7 +239,10 @@ $(document).ready(function() {
 
 		var selected = $('.selected:eq( 0 )');
 		if (selected.length) {
-			$("#below").scrollTop(selected.position().top + $("#below").scrollTop());
+			$("#below").stop().animate(
+			{ scrollTop: selected.position().top + $("#below").scrollTop() },
+			  500, 'swing', function() {
+			  });
 		}
 
 		update_screen();
