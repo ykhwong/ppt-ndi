@@ -1,5 +1,4 @@
 # PPT NDI
-- Author: Taewoong Yoo
 
 ## INTRODUCTION
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Can be also used as a character generator because it supports transparency.
