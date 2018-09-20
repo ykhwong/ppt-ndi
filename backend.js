@@ -14,18 +14,6 @@ app.on('window-all-closed', (e) => {
 		app.quit();
 });
 
-var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-	if (mainWindow) {
-		if (mainWindow.isMinimized()) mainWindow.restore();
-		mainWindow.focus();
-	}
-});
-
-if (shouldQuit) {
-	app.quit();
-	return;
-}
-
 app.on('ready', function() {
 	mainWindow = new BrowserWindow({
 		width: 1200,
