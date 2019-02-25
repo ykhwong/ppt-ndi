@@ -45,23 +45,18 @@ Dim TestFile
 Dim opres
 Set objPPT = CreateObject("PowerPoint.Application")
 
-Sub Proc()
-	Dim ap
-	Set ap = objPPT.ActivePresentation
+Sub Proc(ap)
 	Dim sl
 	Dim shGroup
 	Dim sngWidth
 	Dim sngHeight
 
-	'objPPT.ActiveWindow.WindowState = 2 'ppWindowMinimized
-	With objPPT.ActivePresentation.PageSetup
+	With ap.PageSetup
 		sngWidth = .SlideWidth
 		sngHeight = .SlideHeight
 	End With
 
-	objPPT.ActiveWindow.ViewType = 1
 	For Each sl In ap.Slides
-		objPPT.ActiveWindow.View.GotoSlide (sl.SlideIndex)
 		With sl.Shapes.AddShape( 1, 0, 0, sngWidth, sngHeight)
 			With .Fill
 			.Visible = msoTrue
@@ -75,23 +70,16 @@ Sub Proc()
 			End With
 		End With
 
-		sl.Shapes.SelectAll
-		Set shGroup = objPPT.ActiveWindow.Selection.ShapeRange
-		shGroup.Export "TEMPPATH_PLACEHOLDER" & "/Slide" & sl.SlideIndex & ".png", _
+		Set shpGroup = sl.Shapes.Range().Group
+		shpGroup.Export "TEMPPATH_PLACEHOLDER" & "/Slide" & sl.SlideIndex & ".png", _
 							2, , , 1
 	Next
 End Sub
 
 sub Main()
 	objPPT.DisplayAlerts = False
-	With objPPT.Presentations.Open("FILENAME_PLACEHOLDER", False)
-	Proc()
-	End With
-
-	With objPPT.ActivePresentation
-	.Saved = True
-	.Close
-	End With
+	Set ap = objPPT.Presentations.Open("FILENAME_PLACEHOLDER", , , msoFalse)
+	Proc(ap)
 
 	For each opres In objPPT.Presentations
 		TestFile = opres.FullName
