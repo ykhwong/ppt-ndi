@@ -12,31 +12,21 @@ Dim TestFile
 Dim opres
 Set objPPT = CreateObject("PowerPoint.Application")
 
-Sub Proc()
-	Dim ap
-	Set ap = objPPT.ActivePresentation
+Sub Proc(ap)
 	Dim sl
 	Dim shGroup
 	Dim sngWidth
 	Dim sngHeight
 
-	objPPT.ActiveWindow.WindowState = 2 'ppWindowMinimized
 	For Each sl In ap.Slides
-		objPPT.ActiveWindow.View.GotoSlide (sl.SlideIndex)
 		sl.Export "TEMPPATH_PLACEHOLDER" & "/Slide" & sl.SlideIndex & ".png", "PNG"
 	Next
 End Sub
 
 sub Main()
 	objPPT.DisplayAlerts = False
-	With objPPT.Presentations.Open("FILENAME_PLACEHOLDER", False)
-	Proc()
-	End With
-
-	With objPPT.ActivePresentation
-	.Saved = True
-	.Close
-	End With
+	Set ap = objPPT.Presentations.Open("FILENAME_PLACEHOLDER", , , msoFalse)
+	Proc(ap)
 
 	For each opres In objPPT.Presentations
 		TestFile = opres.FullName
