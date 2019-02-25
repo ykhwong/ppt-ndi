@@ -19,13 +19,13 @@ Sub Proc(ap)
 	Dim sngHeight
 
 	For Each sl In ap.Slides
-		sl.Export "TEMPPATH_PLACEHOLDER" & "/Slide" & sl.SlideIndex & ".png", "PNG"
+		sl.Export Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png", "PNG"
 	Next
 End Sub
 
 sub Main()
 	objPPT.DisplayAlerts = False
-	Set ap = objPPT.Presentations.Open("FILENAME_PLACEHOLDER", , , msoFalse)
+	Set ap = objPPT.Presentations.Open(Wscript.Arguments.Item(0), , , msoFalse)
 	Proc(ap)
 
 	For each opres In objPPT.Presentations
@@ -72,14 +72,14 @@ Sub Proc(ap)
 		End With
 
 		Set shpGroup = sl.Shapes.Range()
-		shpGroup.Export "TEMPPATH_PLACEHOLDER" & "/Slide" & sl.SlideIndex & ".png", _
+		shpGroup.Export Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png", _
 							2, , , 1
 	Next
 End Sub
 
 sub Main()
 	objPPT.DisplayAlerts = False
-	Set ap = objPPT.Presentations.Open("FILENAME_PLACEHOLDER", , , msoFalse)
+	Set ap = objPPT.Presentations.Open(Wscript.Arguments.Item(0), , , msoFalse)
 	Proc(ap)
 
 	For each opres In objPPT.Presentations
@@ -157,6 +157,7 @@ $(document).ready(function() {
 				if (re.exec(file)) {
 					var now = new Date().getTime();
 					var new_vbs_content;
+					var tmpFile;
 					cleanup_for_temp();
 					tmp_dir = process.env.TEMP + '/ppt_ndi';
 					if (!fs.existsSync(tmp_dir)) {
@@ -165,14 +166,12 @@ $(document).ready(function() {
 					tmp_dir += '/' + now;
 					fs.mkdirSync(tmp_dir);
 					vbs_dir = tmp_dir + '/wb.vbs';
-					re = new RegExp("FILENAME_PLACEHOLDER", "");
+
 					if ($("#with_background").is(":checked")) {
-						new_vbs_content = vbs_bg.replace(re, file);
+						new_vbs_content = vbs_bg;
 					} else {
-						new_vbs_content = vbs_no_bg.replace(re, file);
+						new_vbs_content = vbs_no_bg;
 					}
-					re = new RegExp("TEMPPATH_PLACEHOLDER", "");
-					new_vbs_content = new_vbs_content.replace(re, tmp_dir);
 					
 					try {
 						fs.writeFileSync(vbs_dir, new_vbs_content, 'utf-8');
@@ -180,7 +179,7 @@ $(document).ready(function() {
 						alert('Failed to access the temporary directory!');
 						return;
 					}
-					res = spawnSync( 'cscript.exe', [ vbs_dir, '' ] );
+					res = spawnSync( 'cscript.exe', [ vbs_dir, file, tmp_dir, '' ] );
 					if ( res.status !== 0 ) {
 						alert('Failed to parse the presentation!');
 						return;
