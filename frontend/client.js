@@ -53,7 +53,7 @@ Sub Proc()
 	Dim sngWidth
 	Dim sngHeight
 
-	objPPT.ActiveWindow.WindowState = 2 'ppWindowMinimized
+	'objPPT.ActiveWindow.WindowState = 2 'ppWindowMinimized
 	With objPPT.ActivePresentation.PageSetup
 		sngWidth = .SlideWidth
 		sngHeight = .SlideHeight
@@ -62,13 +62,17 @@ Sub Proc()
 	objPPT.ActiveWindow.ViewType = 1
 	For Each sl In ap.Slides
 		objPPT.ActiveWindow.View.GotoSlide (sl.SlideIndex)
-		sl.Shapes.AddShape( 1, 0, 0, sngWidth, sngHeight).Select
-		With objPPT.ActiveWindow.Selection.ShapeRange
-			.Fill.Visible = msoTrue
-			.Fill.Solid
-			.Fill.ForeColor.RGB = RGB(0, 0, 0)
-			.Fill.Transparency = 1
-			.Line.Visible = msoFalse
+		With sl.Shapes.AddShape( 1, 0, 0, sngWidth, sngHeight)
+			With .Fill
+			.Visible = msoTrue
+			.Solid
+			.ForeColor.RGB = RGB(0, 0, 0)
+			.Transparency = 1
+			End With
+			.SetShapesDefaultProperties
+			With .Line
+			.Visible = msoFalse
+			End With
 		End With
 
 		sl.Shapes.SelectAll
