@@ -138,7 +138,8 @@ html, body {
 }
 
 #below img {
-    width:200px;
+	height: 100px;
+	width: auto;
 	background-color: black;
 	/*border: 2px solid black;*/
 }

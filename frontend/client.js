@@ -46,6 +46,7 @@ Dim opres
 Set objPPT = CreateObject("PowerPoint.Application")
 
 Sub Proc(ap)
+	On Error Resume Next
 	Dim sl
 	Dim shGroup
 	Dim sngWidth
@@ -70,7 +71,7 @@ Sub Proc(ap)
 			End With
 		End With
 
-		Set shpGroup = sl.Shapes.Range().Group
+		Set shpGroup = sl.Shapes.Range()
 		shpGroup.Export "TEMPPATH_PLACEHOLDER" & "/Slide" & sl.SlideIndex & ".png", _
 							2, , , 1
 	Next
