@@ -20,6 +20,7 @@ Sub Proc()
 	Dim sngWidth
 	Dim sngHeight
 
+	objPPT.ActiveWindow.WindowState = 2 'ppWindowMinimized
 	For Each sl In ap.Slides
 		objPPT.ActiveWindow.View.GotoSlide (sl.SlideIndex)
 		sl.Export "TEMPPATH_PLACEHOLDER" & "/Slide" & sl.SlideIndex & ".png", "PNG"
@@ -62,6 +63,7 @@ Sub Proc()
 	Dim sngWidth
 	Dim sngHeight
 
+	objPPT.ActiveWindow.WindowState = 2 'ppWindowMinimized
 	With objPPT.ActivePresentation.PageSetup
 		sngWidth = .SlideWidth
 		sngHeight = .SlideHeight
