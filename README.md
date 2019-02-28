@@ -17,7 +17,7 @@ The latest version is PPT NDI (20190301) and only supports Windows as of now.
 
 ### Use PowerPoint SlideShow
 When choosing the PowerPoint SlideShow mode, the following message will be displayed: "Please open PowerPoint and run Slide Show"
-Please make sure to disable "Includes backgruond" option to ensure the transparency.
+Please make sure to disable "Includes background" option to ensure the transparency.
 
 ![PPT NDI Mode: SlideShow](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_slideshow_integration.png)
 
@@ -30,7 +30,7 @@ In the Classic Mode, you will get an interface provided by PPT NDI.
 ![PPT NDI Screenshot](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_sshot.png)
 
 Click the [LOAD PPT/PPTX] button to open Powerpoint file.
-Please make sure to disable "Includes backgruond" option to ensure the transparency.
+Please make sure to disable "Includes background" option to ensure the transparency.
 
 ## INTEGRATION EXAMPLE
 If you are using vMix, for example, you can get slides from PPT NDI software via NDI technology.
