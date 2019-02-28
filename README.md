@@ -20,6 +20,7 @@ When choosing the PowerPoint SlideShow mode, the following message will be displ
 Please make sure to disable "Includes backgruond" option to ensure the transparency.
 
 ![PPT NDI Mode: SlideShow](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_slideshow_integration.png)
+
 By following the instruction, run PowerPoint and open any Powerpoint slide. Hit Alt-F5 to open the slide show.
 ![PPT NDI SlideShow: SlideShow](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_slideshow_integration2.png)
 
