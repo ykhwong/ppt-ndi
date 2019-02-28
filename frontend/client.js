@@ -102,6 +102,10 @@ $(document).ready(function() {
 	child.stdin.setEncoding('utf-8');
 	child.stdout.pipe(process.stdout);
 
+	child.on('exit', function (code) {
+		//alert("EXITED " + code);
+	});
+
 	function update_screen() {
 		var cur_sli, next_sli;
 		var next_num;
@@ -120,7 +124,10 @@ $(document).ready(function() {
 		}
 		$("select").find('option[value="Next"]').data('img-src', next_sli);
 		init_imgpicker();
-		child.stdin.write(cur_sli + "\n");
+		try {
+			child.stdin.write(cur_sli + "\n");
+		} catch(e) {
+		}
 		$("#slide_cnt").html("SLIDE " + current_slide + " / " + max_slide_num);
 	}
 
@@ -139,6 +146,11 @@ $(document).ready(function() {
 				update_screen();
 			}
 		});
+		if ($("#trans_checker").is(":checked")) {
+			$("#right img").css('background-image', "url('trans_slide.png')");
+		} else {
+			$("#right img").css('background-image', "url('null_slide.png')");
+		}
 	}
 
 	$("#load_pptx").click(function() {
@@ -157,7 +169,6 @@ $(document).ready(function() {
 				if (re.exec(file)) {
 					var now = new Date().getTime();
 					var new_vbs_content;
-					var tmpFile;
 					cleanup_for_temp();
 					tmp_dir = process.env.TEMP + '/ppt_ndi';
 					if (!fs.existsSync(tmp_dir)) {
@@ -326,7 +337,10 @@ $(document).ready(function() {
 	}
 
 	function cleanup_for_exit() {
-		child.stdin.write("destroy\n");
+		try {
+			child.stdin.write("destroy\n");
+		} catch(e) {
+		}
 		cleanup_for_temp();
 		ipc.send('remote', "exit");
 	}
@@ -349,12 +363,20 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#trans_checker').click(function() {
+		if ($("#trans_checker").is(":checked")) {
+			$("#right img").css('background-image', "url('trans_slide.png')");
+		} else {
+			$("#right img").css('background-image', "url('null_slide.png')");
+		}
+	});
+
 	current_window.on('maximize', function (){
-		$("#max_restore").html('&nbsp;v&nbsp;');
+		$("#max_restore").attr("src", "restore.png");
     });
 
 	current_window.on('unmaximize', function (){
-		$("#max_restore").html('&nbsp;^&nbsp;');
+		$("#max_restore").attr("src", "max.png");
     });
 	
 	$('#exit').click(function() {

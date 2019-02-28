@@ -19,34 +19,38 @@
 html, body {
 	width: 100%;
 	height: 100%;
-	background-color: #283142;
-}
-
-#minimize {
-	position: fixed !important;
-	top: 0px !important;
-	right: 85px !important;
-	height: 27px;
-	font-family: Lucida Sans Typewriter;
-	font-size: 15px;
-}
-
-#max_restore {
-	position: fixed !important;
-	top: 0px !important;
-	right: 45px !important;
-	height: 27px;
-	font-family: Lucida Sans Typewriter;
-	font-size: 15px;
+	background-color: #051336;
 }
 
 #exit {
-	position: fixed !important;
-	top: 0px !important;
-	right: 5px !important;
-	height: 27px;
-	font-family: Lucida Sans Typewriter;
-	font-size: 15px;
+	position: absolute;
+	top: 0px;
+	right: 5px;
+}
+
+#minimize {
+	position: absolute;
+	top: 0px;
+	right: 82px;
+}
+
+#max_restore {
+	position: absolute;
+	top: 0px;
+	right: 55px;
+}
+
+#exit, #minimize, #max_restore {
+	filter: brightness(0.8);
+}
+
+#exit:hover, #minimize:hover, #max_restore:hover {
+	filter: brightness(1);
+}
+
+#bktbl {
+	width: 200px;
+	color: #78e8f7;
 }
 
 #top {
@@ -54,7 +58,7 @@ html, body {
 	top: 0px;
 	height: 37px;
 	width: 100%;
-	background-color: #2A2A2A;
+	background-color: #000c18;
 }
 
 #top2 {
@@ -84,12 +88,9 @@ html, body {
 	text-align: left;
 	padding: 10px;
 	top: 37px;
-	background-color: #283142;
+	background-color: #051336;
 	width:300px;
 	height:100%;
-	border-color: #2B3443;
-	border-width: 2px 2px 0px 0px;
-	border-style: solid;
 	color: white;
 }
 
@@ -101,7 +102,7 @@ html, body {
 	padding:10px;
 	left: 310px;
 	top: 57px;
-	background-color: #283142;
+	background-color: #051336;
 	width:100%;
 	height:100%;
 	color: white;
@@ -133,13 +134,13 @@ html, body {
 }
 
 #below {
-	background-color: #27293E;
+	background-color: #060621;
 	color: white;
 }
 
 #below img {
-	height: 100px;
-	width: auto;
+	height: 90px;
+	width: 160px;
 	background-color: black;
 	/*border: 2px solid black;*/
 }

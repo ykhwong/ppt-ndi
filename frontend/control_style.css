@@ -1,0 +1,61 @@
+* {
+	font-family: Arial;
+	padding: 0;
+	margin: 0;
+	font-size: 13px;
+}
+
+*, *::after, *::before {
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-app-region: no-drag;
+	cursor: default;
+}
+
+*:focus {
+    outline: none;
+}
+
+html, body {
+	width: 100%;
+	height: 100%;
+	background-color: #060621;
+	color: white;
+	-webkit-app-region: drag !important;
+}
+
+#closeImg {
+	position: absolute;
+	top: 0px;
+	right: 5px;
+	filter: brightness(0.8);
+}
+
+#closeImg:hover {
+	filter: brightness(1);
+}
+
+#tip, #bigIconImg {
+	-webkit-app-region: drag !important;
+}
+
+#tip {
+	position: fixed;
+	left: 15px;
+	top: 60px;
+}
+
+#bigIconImg {
+	position: fixed;
+	top: 10px;
+	left: 10px;
+}
+
+#bktbl {
+	position: fixed;
+	top: 100px;
+	width: 200px;
+	left: 10px;
+	color: #79a9f7;
+}
+
