@@ -51,6 +51,7 @@ Sub Proc(ap)
 	Dim shGroup
 	Dim sngWidth
 	Dim sngHeight
+	Set fso = CreateObject("Scripting.FileSystemObject")
 
 	With ap.PageSetup
 		sngWidth = .SlideWidth
@@ -60,10 +61,7 @@ Sub Proc(ap)
 	For Each sl In ap.Slides
 		With sl.Shapes.AddShape( 1, 0, 0, sngWidth, sngHeight)
 			With .Fill
-			.Visible = msoTrue
-			.Solid
-			.ForeColor.RGB = RGB(0, 0, 0)
-			.Transparency = 1
+			.Visible = msoFalse
 			End With
 			.SetShapesDefaultProperties
 			With .Line
@@ -72,8 +70,14 @@ Sub Proc(ap)
 		End With
 
 		Set shpGroup = sl.Shapes.Range()
-		shpGroup.Export Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png", _
-							2, , , 1
+		Dim fn
+		fn = Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png"
+		shpGroup.Export fn, 2, , , 1
+		Set objFile = fso.GetFile(fn)
+		If objFile.Size = 0 Then
+			sl.Export fn, "PNG"
+		End If
+
 	Next
 End Sub
 

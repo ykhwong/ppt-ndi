@@ -12,29 +12,23 @@ Dim preVal
 Dim ap
 Set objPPT = CreateObject("PowerPoint.Application")
 On Error Resume Next
-
 Sub Proc(preVal)
 	Dim sl
 	Dim shGroup
 	Dim sngWidth
 	Dim sngHeight
-
 	With ap.PageSetup
 		sngWidth = .SlideWidth
 		sngHeight = .SlideHeight
 	End With
-
 	Set objSlideShow = ap.SlideShowWindow.View
-
 	With ap.Slides(objSlideShow.CurrentShowPosition)
 		.Export Wscript.Arguments.Item(0) & "/Slide.png", "PNG"
 	End With
 End Sub
-
 sub Main()
 	objPPT.DisplayAlerts = False
 	preVal = 0
-
 	Do While True
 		On Error Resume Next
 		Set ap = objPPT.ActivePresentation
@@ -49,7 +43,6 @@ sub Main()
 		End If
 		WScript.Sleep(250)
 	Loop
-
 End Sub
 Main
 `;
@@ -60,34 +53,26 @@ Dim preVal
 Dim ap
 Set objPPT = CreateObject("PowerPoint.Application")
 On Error Resume Next
-
 Sub Proc(preVal)
 	Dim sl
 	Dim shGroup
 	Dim sngWidth
 	Dim sngHeight
-
 	With ap.PageSetup
 		sngWidth = .SlideWidth
 		sngHeight = .SlideHeight
 	End With
-
 	Set objSlideShow = ap.SlideShowWindow.View
-
 	With ap.Slides(objSlideShow.CurrentShowPosition)
 		With .Shapes.AddShape( 1, 0, 0, sngWidth, sngHeight)
 			With .Fill
-			.Visible = msoTrue
-			.Solid
-			.ForeColor.RGB = RGB(0, 0, 0)
-			.Transparency = 1
+			.Visible = msoFalse
 			End With
 			.SetShapesDefaultProperties
 			With .Line
 			.Visible = msoFalse
 			End With
 		End With
-
 		Set shpGroup = .Shapes.Range()
 		shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", _
 							2, , , 1
@@ -101,11 +86,9 @@ Sub Proc(preVal)
 		End With
 	End With
 End Sub
-
 sub Main()
 	objPPT.DisplayAlerts = False
 	preVal = 0
-
 	Do While True
 		On Error Resume Next
 		Set ap = objPPT.ActivePresentation
@@ -120,7 +103,6 @@ sub Main()
 		End If
 		WScript.Sleep(250)
 	Loop
-
 End Sub
 Main
 `;
@@ -183,7 +165,7 @@ $(document).ready(function() {
 				}
 			}
 		}
-		setTimeout(refreshSlide, 250);
+		setTimeout(refreshSlide, 100);
 	}
 
 	function cleanup_for_temp() {
