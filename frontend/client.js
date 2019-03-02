@@ -60,13 +60,9 @@ Sub Proc(ap)
 
 	For Each sl In ap.Slides
 		With sl.Shapes.AddShape( 1, 0, 0, sngWidth, sngHeight)
-			With .Fill
-			.Visible = msoFalse
-			End With
+			.Fill.Visible = msoFalse
+			.Line.Visible = msoFalse
 			.SetShapesDefaultProperties
-			With .Line
-			.Visible = msoFalse
-			End With
 		End With
 
 		Set shpGroup = sl.Shapes.Range()
