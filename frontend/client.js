@@ -5,8 +5,8 @@ const {dialog} = require('electron').remote;
 const spawnSync = require( 'child_process' ).spawnSync;
 const spawn = require( 'child_process' ).spawn;
 
-var tmp_dir;
-const vbs_bg = `
+var tmpDir = "";
+const vbsBg = `
 Dim objPPT
 Dim TestFile
 Dim opres
@@ -39,7 +39,7 @@ End Sub
 Main
 `
 
-const vbs_no_bg = `
+const vbsNoBg = `
 Dim objPPT
 Dim TestFile
 Dim opres
@@ -96,9 +96,9 @@ Main
 
 $(document).ready(function() {
 	var child = spawn('./bin/PPTNDI');
-	var max_slide_num = 0;
-	var current_slide = 1;
-	var current_window = remote.getCurrentWindow();
+	var maxSlideNum = 0;
+	var currentSlide = 1;
+	var currentWindow = remote.getCurrentWindow();
 	var repo;
 	child.stdin.setEncoding('utf-8');
 	child.stdout.pipe(process.stdout);
@@ -107,29 +107,29 @@ $(document).ready(function() {
 		//alert("EXITED " + code);
 	});
 
-	function update_screen() {
-		var cur_sli, next_sli;
-		var next_num;
+	function updateScreen() {
+		var curSli, nextSli;
+		var nextNum;
 		var re, rpc;
 		if(!repo) {
 			return;
 		}
-		rpc = tmp_dir + "/Slide";
-		cur_sli = rpc + current_slide.toString() + '.png';
-		next_num = current_slide;
-		next_num++;
-		next_sli = rpc + next_num.toString() + '.png';
-		$("select").find('option[value="Current"]').data('img-src', cur_sli);
-		if (!fs.existsSync(next_sli)) {
-			next_sli = rpc + '1.png';
+		rpc = tmpDir + "/Slide";
+		curSli = rpc + currentSlide.toString() + '.png';
+		nextNum = currentSlide;
+		nextNum++;
+		nextSli = rpc + nextNum.toString() + '.png';
+		$("select").find('option[value="Current"]').data('img-src', curSli);
+		if (!fs.existsSync(nextSli)) {
+			nextSli = rpc + '1.png';
 		}
-		$("select").find('option[value="Next"]').data('img-src', next_sli);
-		init_imgpicker();
+		$("select").find('option[value="Next"]').data('img-src', nextSli);
+		initImgPicker();
 		try {
-			child.stdin.write(cur_sli + "\n");
+			child.stdin.write(curSli + "\n");
 		} catch(e) {
 		}
-		$("#slide_cnt").html("SLIDE " + current_slide + " / " + max_slide_num);
+		$("#slide_cnt").html("SLIDE " + currentSlide + " / " + maxSlideNum);
 	}
 
 	$("select").change(function() {
@@ -138,13 +138,13 @@ $(document).ready(function() {
 		}
 	});
 
-	function init_imgpicker() {
+	function initImgPicker() {
 		$("select").imagepicker({
 			hide_select: true,
 			show_label: true,
 			selected:function(select, picker_option, event) {
-				current_slide=$('.selected').text();
-				update_screen();
+				currentSlide=$('.selected').text();
+				updateScreen();
 			}
 		});
 		if ($("#trans_checker").is(":checked")) {
@@ -155,7 +155,8 @@ $(document).ready(function() {
 	}
 
 	$("#load_pptx").click(function() {
-		dialog.showOpenDialog(current_window,{
+		$("#fullblack").show();
+		dialog.showOpenDialog(currentWindow,{
 			properties: ['openFile'],
 			filters: [
 				{name: 'PowerPoint Presentations', extensions: ['pptx', 'ppt']},
@@ -164,74 +165,95 @@ $(document).ready(function() {
 		}, function (file) {
 			if (file !== undefined) {
 				var re = new RegExp("\\.pptx*\$", "i");
-				var vbs_dir, res;
-				var file_arr = [];
+				var vbsDir, res;
+				var fileArr = [];
 				var options = "";
 				if (re.exec(file)) {
 					var now = new Date().getTime();
-					var new_vbs_content;
-					cleanup_for_temp();
-					tmp_dir = process.env.TEMP + '/ppt_ndi';
-					if (!fs.existsSync(tmp_dir)) {
-						fs.mkdirSync(tmp_dir);
+					var newVbsContent;
+					var preTmpDir;
+					preTmpDir = tmpDir;
+					tmpDir = process.env.TEMP + '/ppt_ndi';
+					if (!fs.existsSync(tmpDir)) {
+						fs.mkdirSync(tmpDir);
 					}
-					tmp_dir += '/' + now;
-					fs.mkdirSync(tmp_dir);
-					vbs_dir = tmp_dir + '/wb.vbs';
+					tmpDir += '/' + now;
+					fs.mkdirSync(tmpDir);
+					vbsDir = tmpDir + '/wb.vbs';
 
 					if ($("#with_background").is(":checked")) {
-						new_vbs_content = vbs_bg;
+						newVbsContent = vbsBg;
 					} else {
-						new_vbs_content = vbs_no_bg;
+						newVbsContent = vbsNoBg;
 					}
 					
 					try {
-						fs.writeFileSync(vbs_dir, new_vbs_content, 'utf-8');
+						fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 					} catch(e) {
+						cleanupForTemp();
+						tmpDir = preTmpDir;
 						alert('Failed to access the temporary directory!');
+						$("#fullblack").hide();
 						return;
 					}
-					res = spawnSync( 'cscript.exe', [ vbs_dir, file, tmp_dir, '' ] );
+					res = spawnSync( 'cscript.exe', [ vbsDir, file, tmpDir, '' ] );
+					$("#fullblack").hide();
 					if ( res.status !== 0 ) {
+						maxSlideNum = 0;
+						cleanupForTemp();
+						tmpDir = preTmpDir;
 						alert('Failed to parse the presentation!');
+						$("#fullblack").hide();
 						return;
 					}
-					max_slide_num = 0;
-					fs.readdirSync(tmp_dir).forEach(file2 => {
+					maxSlideNum = 0;
+					fs.readdirSync(tmpDir).forEach(file2 => {
 						re = new RegExp("^Slide(\\d+)\\.png\$", "i");
 						if (re.exec(file2)) {
 							var rpc = file2.replace(re, "\$1");
-							file_arr.push(rpc);
-							max_slide_num++;
+							fileArr.push(rpc);
+							maxSlideNum++;
 						}
 					})
+					if (fileArr === undefined || fileArr.length == 0) {
+						maxSlideNum = 0;
+						cleanupForTemp();
+						tmpDir = preTmpDir;
+						alert("Presentation file could not be loaded.\nPlease remove missing fonts if applicable.");
+						$("#fullblack").hide();
+						return;
+					}
 
-					file_arr.sort((a, b) => a - b).forEach(file2 => {
+					fileArr.sort((a, b) => a - b).forEach(file2 => {
 						var rpc = file2;
 						options +=
 						'<option data-img-label="' + rpc +
-						'" data-img-src="' + tmp_dir + '/Slide' + rpc
+						'" data-img-src="' + tmpDir + '/Slide' + rpc
 						+ '.png" value="' + rpc + '">Slide ' + rpc + "\n";
 						$("#slides_grp").html(options);
-						$("select").find('option[value="Current"]').prop('img-src', tmp_dir + "/Slide1.png");
-						if (!fs.existsSync(tmp_dir + "/Slide2.png")) {
-							$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide1.png");
+						$("select").find('option[value="Current"]').prop('img-src', tmpDir + "/Slide1.png");
+						if (!fs.existsSync(tmpDir + "/Slide2.png")) {
+							$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide1.png");
 						} else {
-							$("select").find('option[value="Next"]').prop('img-src', tmp_dir + "/Slide2.png");
+							$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide2.png");
 						}
 					})
-					select_slide('1');
+					$("#fullblack").hide();
+					selectSlide('1');
 				} else {
 					alert("Only allowed filename extensions are PPT and PPTX.");
+					$("#fullblack").hide();
 				}
+			} else {
+				$("#fullblack").hide();
 			}
 		})
 	});
 
-	function select_slide(num) {
+	function selectSlide(num) {
 		$('optgroup[label="Slides"] option[value="' + num.toString() + '"]').prop('selected',true);
 		$('optgroup[label="Slides"] option[value="' + num.toString() + '"]').change();
-		current_slide = num;
+		currentSlide = num;
 
 		var selected = $('.selected:eq( 0 )');
 		if (selected.length) {
@@ -241,59 +263,59 @@ $(document).ready(function() {
 			  });
 		}
 
-		update_screen();
+		updateScreen();
 	}
 
-	function goto_prev() {
-		var cur_sli;
+	function gotoPrev() {
+		var curSli;
 		var re;
 		if (!repo) {
 			return;
 		}
-		cur_sli = current_slide;
-		cur_sli--;
-		if (cur_sli == 0) {
-			cur_sli = max_slide_num;
+		curSli = currentSlide;
+		curSli--;
+		if (curSli == 0) {
+			curSli = maxSlideNum;
 		}
-		select_slide(cur_sli.toString());
+		selectSlide(curSli.toString());
 	}
 
-	function goto_next() {
-		var cur_sli;
+	function gotoNext() {
+		var curSli;
 		var re;
 		if (!repo) {
 			return;
 		}
-		cur_sli = current_slide;
-		cur_sli++;
-		if (cur_sli > max_slide_num) {
-			cur_sli = 1;
+		curSli = currentSlide;
+		curSli++;
+		if (curSli > maxSlideNum) {
+			curSli = 1;
 		}
-		select_slide(cur_sli.toString());
+		selectSlide(curSli.toString());
 	}
 	
 	$('#prev').click(function() {
-		goto_prev();
+		gotoPrev();
 	});
 
 	$('#next').click(function() {
-		goto_next();
+		gotoNext();
 	});
 
 	$(document).keydown(function(e) {
 		$("#below").trigger('click');
 		if(e.which == 13 || e.which == 32 || e.which == 39 || e.which == 40) {
 			// Enter, spacebar, right arrow or down
-			goto_next();
+			gotoNext();
 		} else if(e.which == 37 || e.which == 8 || e.which == 38) {
 			// Left arrow, backspace or up
-			goto_prev();
+			gotoPrev();
 		} else if(e.which == 36) {
 			// Home
-			select_slide('1');
+			selectSlide('1');
 		} else if(e.which == 35) {
 			// End
-			select_slide(max_slide_num.toString());
+			selectSlide(maxSlideNum.toString());
 		} else if (e.ctrlKey) {
 			if (e.which == 87) {
 				// Prevents Ctrl-W
@@ -308,7 +330,7 @@ $(document).ready(function() {
 			// Enter or spacebar
 			e.preventDefault();
 			e.stopPropagation();
-			goto_next();
+			gotoNext();
 		}
 	});
 
@@ -331,24 +353,24 @@ $(document).ready(function() {
 		t = setTimeout(startCurrentTime, 500);
 	}
 
-	function cleanup_for_temp() {
-		if (fs.existsSync(tmp_dir)) {
-			fs.removeSync(tmp_dir);
+	function cleanupForTemp() {
+		if (fs.existsSync(tmpDir)) {
+			fs.removeSync(tmpDir);
 		}
 	}
 
-	function cleanup_for_exit() {
+	function cleanupForExit() {
 		try {
 			child.stdin.write("destroy\n");
 		} catch(e) {
 		}
-		cleanup_for_temp();
+		cleanupForTemp();
 		ipc.send('remote', "exit");
 	}
 
 	ipc.on('remote' , function(event, data){
 		if (data.msg == "exit") {
-			cleanup_for_exit();
+			cleanupForExit();
 		}
 	});
 
@@ -357,7 +379,7 @@ $(document).ready(function() {
 	});
 
 	$('#max_restore').click(function() {
-		if(current_window.isMaximized()) {
+		if(currentWindow.isMaximized()) {
 			remote.BrowserWindow.getFocusedWindow().unmaximize();
 		} else {
 			remote.BrowserWindow.getFocusedWindow().maximize();
@@ -372,16 +394,16 @@ $(document).ready(function() {
 		}
 	});
 
-	current_window.on('maximize', function (){
+	currentWindow.on('maximize', function (){
 		$("#max_restore").attr("src", "restore.png");
     });
 
-	current_window.on('unmaximize', function (){
+	currentWindow.on('unmaximize', function (){
 		$("#max_restore").attr("src", "max.png");
     });
 	
 	$('#exit').click(function() {
-		cleanup_for_exit();
+		cleanupForExit();
 	});
 
 	document.addEventListener('dragover',function(event){
@@ -400,6 +422,6 @@ $(document).ready(function() {
 		}
 	}, false);
 
-	init_imgpicker();
+	initImgPicker();
 	startCurrentTime();
 });

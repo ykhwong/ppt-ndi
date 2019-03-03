@@ -6,7 +6,7 @@ const util = require('util');
 var tmpDir = null;
 var preTime = 0;
 
-var vbs_bg =`
+var vbsBg =`
 Dim objPPT
 Dim preVal
 Dim ap
@@ -47,7 +47,7 @@ End Sub
 Main
 `;
 
-var vbs_no_bg =`
+var vbsNoBg =`
 Dim objPPT
 Dim preVal
 Dim ap
@@ -112,8 +112,8 @@ $(document).ready(function() {
 	});
 
 	function init() {
-		var vbs_dir;
-		var new_vbs_content;
+		var vbsDir;
+		var newVbsContent;
 		var now = new Date().getTime();
 		child.stdin.setEncoding('utf-8');
 		child.stdout.pipe(process.stdout);
@@ -124,16 +124,16 @@ $(document).ready(function() {
 		}
 		tmpDir += '/' + now;
 		fs.mkdirSync(tmpDir);
-		vbs_dir = tmpDir + '/wb.vbs';
+		vbsDir = tmpDir + '/wb.vbs';
 
-		new_vbs_content = vbs_no_bg;
+		newVbsContent = vbsNoBg;
 		try {
-			fs.writeFileSync(vbs_dir, new_vbs_content, 'utf-8');
+			fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 		} catch(e) {
 			alert('Failed to access the temporary directory!');
 			return;
 		}
-		res = spawn( 'cscript.exe', [ vbs_dir, tmpDir, '' ] );
+		res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
 		/*
 		if ( res.status !== 0 ) {
 			alert('Failed to parse the presentation!');
@@ -164,46 +164,46 @@ $(document).ready(function() {
 		setTimeout(refreshSlide, 100);
 	}
 
-	function cleanup_for_temp() {
+	function cleanupForTemp() {
 		if (fs.existsSync(tmpDir)) {
 			fs.removeSync(tmpDir);
 		}
 	}
 
-	function cleanup_for_exit() {
+	function cleanupForExit() {
 		try {
 			child.stdin.write("destroy\n");
 		} catch(e) {
 		}
-		cleanup_for_temp();
+		cleanupForTemp();
 		ipc.send('remote', "exit");
 	}
 
 	ipc.on('remote' , function(event, data){
 		if (data.msg == "exit") {
-			cleanup_for_exit();
+			cleanupForExit();
 		}
 	});
 
 	$('#closeImg').click(function() {
-		cleanup_for_exit();
+		cleanupForExit();
 	});
 
 	$('#bk').click(function() {
-		var new_vbs_content;
-		var vbs_dir = tmpDir + '/wb.vbs';
+		var newVbsContent;
+		var vbsDir = tmpDir + '/wb.vbs';
 		if ($("#bk").is(":checked")) {
-			new_vbs_content = vbs_bg;
+			newVbsContent = vbsBg;
 			try {
-				fs.writeFileSync(vbs_dir, new_vbs_content, 'utf-8');
+				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 			} catch(e) {
 				alert('Failed to access the temporary directory!');
 				return;
 			}
 		} else {
-			new_vbs_content = vbs_no_bg;
+			newVbsContent = vbsNoBg;
 			try {
-				fs.writeFileSync(vbs_dir, new_vbs_content, 'utf-8');
+				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 			} catch(e) {
 				alert('Failed to access the temporary directory!');
 				return;
@@ -211,7 +211,7 @@ $(document).ready(function() {
 		}
 		res.stdin.pause();
 		res.kill();
-		res = spawn( 'cscript.exe', [ vbs_dir, tmpDir, '' ] );
+		res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
 	});
 
 

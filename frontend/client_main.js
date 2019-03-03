@@ -1,4 +1,3 @@
-//const { remote } = require('electron');
 const ipc = require('electron').ipcRenderer;
 
 $(document).ready(function() {
