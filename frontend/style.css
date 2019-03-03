@@ -1,20 +1,3 @@
-* {
-	font-family: Arial;
-	padding: 0;
-	margin: 0;
-	font-size: 13px;
-}
-
-*, *::after, *::before {
-	-webkit-user-select: none;
-	-webkit-user-drag: none;
-	-webkit-app-region: no-drag;
-	cursor: default;
-}
-
-*:focus {
-    outline: none;
-}
 
 html, body {
 	width: 100%;
@@ -49,8 +32,13 @@ html, body {
 }
 
 #bktbl {
-	width: 200px;
+	width: 400px;
 	color: #78e8f7;
+}
+
+#reloadReq {
+	color: yellow;
+	display: none;
 }
 
 #top {
@@ -121,6 +109,8 @@ html, body {
 
 #right img {
     width:400px;
+	height: 250px;
+	background-image: url('null_slide.png');
 }
 
 #slide_cnt, #progress, #current_time {

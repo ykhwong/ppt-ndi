@@ -1,10 +1,3 @@
-const { remote } = require('electron');
-const ipc = require('electron').ipcRenderer;
-const fs = require("fs-extra");
-const {dialog} = require('electron').remote;
-const spawnSync = require( 'child_process' ).spawnSync;
-const spawn = require( 'child_process' ).spawn;
-
 var tmpDir = "";
 const vbsBg = `
 Dim objPPT
@@ -95,6 +88,10 @@ Main
 `;
 
 $(document).ready(function() {
+	const spawn = require( 'child_process' ).spawn;
+	const { remote } = require('electron');
+	const ipc = require('electron').ipcRenderer;
+	const fs = require("fs-extra");
 	var child = spawn('./bin/PPTNDI');
 	var maxSlideNum = 0;
 	var currentSlide = 1;
@@ -138,6 +135,10 @@ $(document).ready(function() {
 		}
 	});
 
+	$("#with_background").click(function() {
+		$("#reloadReq").toggle();
+	});
+
 	function initImgPicker() {
 		$("select").imagepicker({
 			hide_select: true,
@@ -155,6 +156,7 @@ $(document).ready(function() {
 	}
 
 	$("#load_pptx").click(function() {
+		const {dialog} = require('electron').remote;
 		$("#fullblack").show();
 		dialog.showOpenDialog(currentWindow,{
 			properties: ['openFile'],
@@ -172,6 +174,7 @@ $(document).ready(function() {
 					var now = new Date().getTime();
 					var newVbsContent;
 					var preTmpDir;
+					const spawnSync = require( 'child_process' ).spawnSync;
 					preTmpDir = tmpDir;
 					tmpDir = process.env.TEMP + '/ppt_ndi';
 					if (!fs.existsSync(tmpDir)) {
@@ -239,6 +242,7 @@ $(document).ready(function() {
 						}
 					})
 					$("#fullblack").hide();
+					$("#reloadReq").hide();
 					selectSlide('1');
 				} else {
 					alert("Only allowed filename extensions are PPT and PPTX.");

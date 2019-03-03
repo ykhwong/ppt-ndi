@@ -1,8 +1,3 @@
-const ipc = require('electron').ipcRenderer;
-const fs = require("fs-extra");
-const spawn = require( 'child_process' ).spawn;
-const util = require('util');
-
 var tmpDir = null;
 var preTime = 0;
 
@@ -104,6 +99,9 @@ Main
 `;
 
 $(document).ready(function() {
+	const spawn = require( 'child_process' ).spawn;
+	const ipc = require('electron').ipcRenderer;
+	const fs = require("fs-extra");
 	var child = spawn('./bin/PPTNDI');
 	var res;
 
@@ -213,7 +211,6 @@ $(document).ready(function() {
 		res.kill();
 		res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
 	});
-
 
 	init();
 	refreshSlide();

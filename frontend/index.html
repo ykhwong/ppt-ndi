@@ -17,8 +17,6 @@
 <div id="top" style="-webkit-app-region: drag">
 <img src="big_icon.png" style="-webkit-app-region: drag">
 </div>
-<!--<button type="button" class="button" id="minimize">&nbsp;_&nbsp;</button>
-<button type="button" class="button" id="max_restore">&nbsp;^&nbsp;</button>-->
 <img id="minimize" src="min.png">
 <img id="max_restore" src="max.png">
 <img id="exit" src="close.png">
@@ -31,12 +29,15 @@
 	  <tbody>
 		<tr>
 		  <td width="140px">Includes Background</td>
-		  <td>
+		  <td width="35px">
 			<label class="switch">
 			<input type="checkbox" id="with_background" class="checkbox" name="with_background" value="with_background">
 			<span class="slider"></span>
 			</label>
-		</td>
+		  </td>
+		  <td>
+			<div id="reloadReq">Reload required</div>
+		  </td>
 		</tr>
 		<tr>
 		  <td width="140px">Transparency Checker</td>
@@ -53,7 +54,6 @@
 
 <div id="right">
 	<div id="slide_cnt">SLIDE 0 / 0</div>
-<!--	<div id="progress">0:0:0</div>-->
 	<div id="current_time">00:00 AM</div>
 	<select class="image-picker show-html">
 		<optgroup label="Screen" id="screen_grp">
@@ -63,13 +63,6 @@
 	</select>
 	<button type="button" class="button" id="prev">&lt; PREV</button>
 	<button type="button" class="button" id="next">NEXT &gt;</button>
-<!--
-	<button type="button" class="button" id="stop_resume">STOP / RESUME</button>
-	<br /><br />
-	<button type="button" class="button" id="black">BLACK</button>
-	<button type="button" class="button" id="white">WHITE</button>
-	<button type="button" class="button" id="color_bar">COLOR BAR</button>
--->
 </div>
 
 <div id="below">
