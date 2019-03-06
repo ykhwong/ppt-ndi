@@ -63,17 +63,10 @@ Sub Proc(preVal)
 			.Fill.Visible = msoFalse
 			.Line.Visible = msoFalse
 			.SetShapesDefaultProperties
-		End With
-		Set shpGroup = .Shapes.Range()
-		shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", _
-							2, , , 1
-		With ap.Slides(objSlideShow.CurrentShowPosition).Shapes
-		For intShape = .Count To 1 Step -1
-			With .Item(intShape)
-				.Delete
-			End With
-			Exit For
-		Next
+			Set shpGroup = ap.Slides(objSlideShow.CurrentShowPosition).Shapes.Range()
+			shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", _
+								2, , , 1
+			.Delete
 		End With
 	End With
 End Sub
