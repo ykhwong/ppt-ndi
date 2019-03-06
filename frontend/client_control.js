@@ -59,10 +59,8 @@ Sub Proc(preVal)
 	End With
 	Set objSlideShow = ap.SlideShowWindow.View
 	With ap.Slides(objSlideShow.CurrentShowPosition)
-		With .Shapes.AddShape( 1, 0, 0, sngWidth, sngHeight)
-			.Fill.Visible = msoFalse
-			.Line.Visible = msoFalse
-			.SetShapesDefaultProperties
+		With .Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
+			.TextFrame.TextRange = ""
 			Set shpGroup = ap.Slides(objSlideShow.CurrentShowPosition).Shapes.Range()
 			shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", _
 								2, , , 1
