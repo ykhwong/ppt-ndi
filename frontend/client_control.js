@@ -1,5 +1,4 @@
 var tmpDir = null;
-var preTime = 0;
 
 var vbsBg =`
 Dim objPPT
@@ -20,6 +19,7 @@ Sub Proc(preVal)
 	With ap.Slides(objSlideShow.CurrentShowPosition)
 		.Export Wscript.Arguments.Item(0) & "/Slide.png", "PNG"
 	End With
+	Wscript.Echo "PPTNDI: Sent"
 End Sub
 sub Main()
 	objPPT.DisplayAlerts = False
@@ -111,6 +111,20 @@ $(document).ready(function() {
 		}
 	}
 
+	function sendNDI(file, data) {
+		if (/^PPTNDI: Sent/.test(data.toString())) {
+			var now = new Date().getTime();
+			$("#slidePreview").attr("src", file + "?" + now);
+			try {
+				child.stdin.write(file + "\n");
+			} catch(e) {
+				runBin();
+				sleep(500);
+				child.stdin.write(file + "\n");
+			}
+		}
+	}
+
 	function init() {
 		var file;
 		var vbsDir;
@@ -139,16 +153,7 @@ $(document).ready(function() {
 		if (fs.existsSync(vbsDir)) {
 			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
 			res.stdout.on('data', function(data) {
-				if (/^PPTNDI: Sent/.test(data.toString())) {
-					var now2 = new Date().getTime();
-					$("#slidePreview").attr("src", file + "?" + now2);
-					try {
-						child.stdin.write(file + "\n");
-					} catch(e) {
-						child = spawn(binPath);
-						child.stdin.write(file + "\n");
-					}
-				}
+				sendNDI(file, data);
 			});
 		} else {
 			alert('Failed to parse the presentation!');
@@ -184,6 +189,7 @@ $(document).ready(function() {
 	$('#bk').click(function() {
 		var newVbsContent;
 		var vbsDir = tmpDir + '/wb.vbs';
+		var file = tmpDir + "/Slide.png";
 		if ($("#bk").is(":checked")) {
 			newVbsContent = vbsBg;
 			try {
@@ -203,8 +209,12 @@ $(document).ready(function() {
 		}
 		res.stdin.pause();
 		res.kill();
+		res = null;
 		if (fs.existsSync(vbsDir)) {
 			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
+			res.stdout.on('data', function(data) {
+				sendNDI(file, data);
+			});
 		} else {
 			alert('Failed to parse the presentation!');
 			return;
