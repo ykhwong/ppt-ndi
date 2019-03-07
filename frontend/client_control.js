@@ -66,6 +66,7 @@ Sub Proc(preVal)
 								2, , , 1
 			.Delete
 		End With
+		Wscript.Echo "PPTNDI: Sent"
 	End With
 End Sub
 sub Main()
@@ -97,21 +98,25 @@ $(document).ready(function() {
 	var child;
 	var res;
 
-	if (fs.existsSync(binPath)) {
-		child = spawn(binPath);
-		//child.on('exit', function (code) {
-		//	alert("EXITED " + code);
-		//});
-	} else {
-		alert('Failed to create a listening server!');
-		ipc.send('remote', "exit");
-		return;
+	function runBin() {
+		if (fs.existsSync(binPath)) {
+			child = spawn(binPath);
+			//child.on('exit', function (code) {
+			//	alert("EXITED " + code);
+			//});
+		} else {
+			alert('Failed to create a listening server!');
+			ipc.send('remote', "exit");
+			return;
+		}
 	}
 
 	function init() {
+		var file;
 		var vbsDir;
 		var newVbsContent;
 		var now = new Date().getTime();
+		runBin();
 		child.stdin.setEncoding('utf-8');
 		child.stdout.pipe(process.stdout);
 
@@ -122,6 +127,7 @@ $(document).ready(function() {
 		tmpDir += '/' + now;
 		fs.mkdirSync(tmpDir);
 		vbsDir = tmpDir + '/wb.vbs';
+		file = tmpDir + "/Slide.png";
 
 		newVbsContent = vbsNoBg;
 		try {
@@ -132,35 +138,22 @@ $(document).ready(function() {
 		}
 		if (fs.existsSync(vbsDir)) {
 			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
-		} else {
-			alert('Failed to parse the presentation!');
-			return;
-		}
-	}
-
-	function refreshSlide() {
-		var stats, mtime, file;
-		if (tmpDir != null) {
-			file = tmpDir + "/Slide.png";
-			if (fs.existsSync(file)) {
-				stats = fs.statSync(file);
-				mtime = stats.mtime;
-				if (mtime > preTime || mtime < preTime) {
-					var now = new Date().getTime();
-					preTime = mtime;
-					file = tmpDir + "/Slide.png";
+			res.stdout.on('data', function(data) {
+				if (/^PPTNDI: Sent/.test(data.toString())) {
+					var now2 = new Date().getTime();
+					$("#slidePreview").attr("src", file + "?" + now2);
 					try {
-						$("#slidePreview").attr("src", file + "?" + now);
 						child.stdin.write(file + "\n");
 					} catch(e) {
-						$("#slidePreview").attr("src", file + "?" + now);
 						child = spawn(binPath);
 						child.stdin.write(file + "\n");
 					}
 				}
-			}
+			});
+		} else {
+			alert('Failed to parse the presentation!');
+			return;
 		}
-		setTimeout(refreshSlide, 100);
 	}
 
 	function cleanupForTemp() {
@@ -219,5 +212,4 @@ $(document).ready(function() {
 	});
 
 	init();
-	refreshSlide();
 });
