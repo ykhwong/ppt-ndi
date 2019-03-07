@@ -1,96 +1,91 @@
 const { app } = require('electron');
+const frontendDir = __dirname + '/frontend/';
+const iconFile = __dirname + '/icon.png';
 
 app.on('ready', function() {
 	let mainWindow = null;
 	let mainWindow2 = null;
-	const { BrowserWindow } = require('electron');
-	mainWindow = new BrowserWindow({
-		width: 700,
-		height: 360,
-		title: "",
-		icon: __dirname + '/icon.png',
-		resize: false,
-		frame: false,
-		maximizable: false,
-		backgroundColor: '#060621',
-		webPreferences: { webSecurity: false, nodeIntegration: true }
-	});
+	let debugMode = false;
 
-	mainWindow.loadURL('file://' + __dirname + '/frontend/main.html');
-	mainWindow.focus();
+	function loadMainWin() {
+		mainWindow = createWin(700, 360, false);
+		mainWindow.loadURL(frontendDir + 'main.html');
+		mainWindow.focus();
 
-	mainWindow.on('closed', function(e) {
-		if (mainWindow2 === null) {
-			mainWindow = null;
-			if (process.platform != 'darwin') {
-				app.quit();
+		mainWindow.on('closed', function(e) {
+			if (mainWindow2 === null) {
+				mainWindow = null;
+				if (process.platform != 'darwin') {
+					app.quit();
+				}
+			} else {
+				e.preventDefault();
 			}
-		} else {
-			e.preventDefault();
-		}
-	});
-
-	loadIpc();
-
-	function loadEvent() {
-		mainWindow2.on('close', function(e) {
-			e.preventDefault();
-			mainWindow2.webContents.send('remote', {
-				msg: 'exit'
-			});
 		});
+	}
+
+	function createWin(width, height, maximizable, winFile) {
+		const { BrowserWindow } = require('electron');
+		let retData;
+		retData = new BrowserWindow({
+			width: width,
+			height: height,
+			minWidth: width,
+			minHeight: height,
+			title: "",
+			icon: iconFile,
+			frame: false,
+			resize: (maximizable ? true : false),
+			maximizable: maximizable,
+			backgroundColor: '#060621',
+			webPreferences: { webSecurity: false, nodeIntegration: true }
+		});
+		if (!maximizable) {
+			retData.setMaximumSize(width, height);
+		}
+		if (debugMode) {
+			retData.webContents.openDevTools();
+		}
+		return retData;
 	}
 
 	function loadIpc() {
 		const ipc = require('electron').ipcMain;
 		ipc.on('remote', (event, data) => {
-			if (data == "exit") {
-				if (mainWindow2 != null) {
-					mainWindow2.destroy();
-				}
-				if (process.platform != 'darwin') {
-					app.quit();
-				}
-				return;
+			switch (data) {
+				case "exit":
+					if (mainWindow2 != null) {
+						mainWindow2.destroy();
+					}
+					if (process.platform != 'darwin') {
+						app.quit();
+					}
+					break;
+				case "select1":
+					mainWindow2 = createWin(300, 300, false);
+					mainWindow2.loadURL(frontendDir + 'control.html');
+					break;
+				case "select2":
+					mainWindow2 = createWin(1200, 680, true);
+					mainWindow2.loadURL(frontendDir + 'index.html');
+					break;
+				default:
+					mainWindow.destroy();
+					break;
 			}
-			if (data == "select1") {
-				mainWindow2 = new BrowserWindow({
-					width: 300,
-					height: 150,
-					minWidth: 300,
-					minHeight: 150,
-					title: "",
-					icon: __dirname + '/icon.png',
-					resize: false,
-					frame: false,
-					maximizable: false,
-					backgroundColor: '#060621'
+			if (/^select/.test(data)) {
+				mainWindow2.on('close', function(e) {
+					e.preventDefault();
+					mainWindow2.webContents.send('remote', {
+						msg: 'exit'
+					});
 				});
-				mainWindow2.loadURL('file://' + __dirname + '/frontend/control.html');
-				loadEvent();
-				mainWindow.destroy();
-
-				//For debugging:
-				//mainWindow2.webContents.openDevTools();
-			}
-			if (data == "select2") {
-				mainWindow2 = new BrowserWindow({
-					width: 1200,
-					height: 680,
-					minWidth: 1200,
-					minHeight: 680,
-					title: "",
-					icon: __dirname + '/icon.png',
-					resize: true,
-					frame: false,
-					backgroundColor: '#060621'
-				});
-				mainWindow2.loadURL('file://' + __dirname + '/frontend/index.html');
-				loadEvent();
 				mainWindow.destroy();
 			}
 		});
 	}
+	loadMainWin();
+	loadIpc();
 });
 
 app.on('window-all-closed', (e) => {

@@ -92,17 +92,25 @@ $(document).ready(function() {
 	const { remote } = require('electron');
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
-	var child = spawn('./bin/PPTNDI');
+	const binPath = './bin/PPTNDI.EXE';
+	var child;
 	var maxSlideNum = 0;
 	var currentSlide = 1;
 	var currentWindow = remote.getCurrentWindow();
 	var repo;
-	child.stdin.setEncoding('utf-8');
-	child.stdout.pipe(process.stdout);
 
-	child.on('exit', function (code) {
-		//alert("EXITED " + code);
-	});
+	if (fs.existsSync(binPath)) {
+		child = spawn(binPath);
+		child.stdin.setEncoding('utf-8');
+		child.stdout.pipe(process.stdout);
+		//child.on('exit', function (code) {
+		//	alert("EXITED " + code);
+		//});
+	} else {
+		alert('Failed to create a listening server!');
+		ipc.send('remote', "exit");
+		return;
+	}
 
 	function updateScreen() {
 		var curSli, nextSli;

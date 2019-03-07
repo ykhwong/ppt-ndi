@@ -93,12 +93,20 @@ $(document).ready(function() {
 	const spawn = require( 'child_process' ).spawn;
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
-	var child = spawn('./bin/PPTNDI');
+	const binPath = './bin/PPTNDI.EXE';
+	var child;
 	var res;
 
-	child.on('exit', function (code) {
-		//alert("EXITED " + code);
-	});
+	if (fs.existsSync(binPath)) {
+		child = spawn(binPath);
+		//child.on('exit', function (code) {
+		//	alert("EXITED " + code);
+		//});
+	} else {
+		alert('Failed to create a listening server!');
+		ipc.send('remote', "exit");
+		return;
+	}
 
 	function init() {
 		var vbsDir;
@@ -122,13 +130,12 @@ $(document).ready(function() {
 			alert('Failed to access the temporary directory!');
 			return;
 		}
-		res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
-		/*
-		if ( res.status !== 0 ) {
+		if (fs.existsSync(vbsDir)) {
+			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
+		} else {
 			alert('Failed to parse the presentation!');
 			return;
 		}
-		*/
 	}
 
 	function refreshSlide() {
@@ -139,12 +146,15 @@ $(document).ready(function() {
 				stats = fs.statSync(file);
 				mtime = stats.mtime;
 				if (mtime > preTime || mtime < preTime) {
+					var now = new Date().getTime();
 					preTime = mtime;
 					file = tmpDir + "/Slide.png";
 					try {
+						$("#slidePreview").attr("src", file + "?" + now);
 						child.stdin.write(file + "\n");
 					} catch(e) {
-						child = spawn('./bin/PPTNDI');
+						$("#slidePreview").attr("src", file + "?" + now);
+						child = spawn(binPath);
 						child.stdin.write(file + "\n");
 					}
 				}
@@ -200,7 +210,12 @@ $(document).ready(function() {
 		}
 		res.stdin.pause();
 		res.kill();
-		res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
+		if (fs.existsSync(vbsDir)) {
+			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
+		} else {
+			alert('Failed to parse the presentation!');
+			return;
+		}
 	});
 
 	init();

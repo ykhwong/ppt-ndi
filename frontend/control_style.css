@@ -7,6 +7,22 @@ html, body {
 	-webkit-app-region: drag !important;
 }
 
+#prevTxt {
+	position: fixed;
+	top: 125px;
+	left: 15px;
+	color: #79a9f7;
+}
+
+#slidePreview {
+	position: fixed;
+	top: 145px;
+	left: 15px;
+    width: 200px;
+	height: 125px;
+	border: 3px solid rgb(0, 102, 255);
+}
+
 #closeImg {
 	position: absolute;
 	top: 0px;
@@ -38,6 +54,7 @@ html, body {
 	position: fixed;
 	top: 100px;
 	width: 200px;
+	height: 20px;
 	left: 10px;
 	color: #79a9f7;
 }
