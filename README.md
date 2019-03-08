@@ -20,7 +20,7 @@ In the PowerPoint SlideShow mode, NDI Preview window is provided. Please make su
 
 ![PPT NDI Mode: SlideShow](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_slideshow_integration.png)
 
-Open PowerPoint presentation and begin a slide show with Alt-F5 or Shift-F5.
+Open PowerPoint presentation and begin a slide show with Alt-F5 or Alt-Shift-F5.
 ![PPT NDI SlideShow: SlideShow](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_slideshow_integration2.png)
 
 ### Classic Mode
