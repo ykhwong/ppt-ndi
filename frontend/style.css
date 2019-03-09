@@ -156,6 +156,27 @@ html, body {
 	padding: 2px;
 	background: rgb(0, 102, 255);
 	cursor:pointer;
+	border-radius: 10%;
+}
+
+#blk {
+	width: 35px;
+	background: black;
+}
+
+#wht {
+	width: 35px;
+	background: #c1daff;
+}
+
+#trn {
+	width: 35px;
+	filter: brightness(0.8);
+}
+
+#prev:hover, #next:hover,
+#load_pptx:hover, #blk:hover, #wht:hover, #trn:hover {
+	filter: brightness(0.5);
 }
 
 .abox {

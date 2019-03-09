@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"main": "backend.js",
 	"dependencies": {
-		"fs-extra": "^7.0.0"
+		"fs-extra": "^7.0.1"
 	},
 	"devDependencies": {},
 	"scripts": {}

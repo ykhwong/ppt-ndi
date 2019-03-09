@@ -1,4 +1,3 @@
-var tmpDir = "";
 const vbsBg = `
 Dim objPPT
 Dim TestFile
@@ -93,10 +92,15 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const binPath = './bin/PPTNDI.EXE';
-	var child;
 	var maxSlideNum = 0;
 	var currentSlide = 1;
 	var currentWindow = remote.getCurrentWindow();
+	var blkBool = false;
+	var whtBool = false;
+	var trnBool = false;
+	var numTypBuf = "";
+	var tmpDir = "";
+	var child;
 	var repo;
 
 	if (fs.existsSync(binPath)) {
@@ -263,6 +267,15 @@ $(document).ready(function() {
 	});
 
 	function selectSlide(num) {
+		blkBool = false;
+		whtBool = false;
+		trnBool = false;
+		if (num == 0) {
+			return;
+		}
+		if ( num > maxSlideNum ) {
+			num = maxSlideNum;
+		}
 		$('optgroup[label="Slides"] option[value="' + num.toString() + '"]').prop('selected',true);
 		$('optgroup[label="Slides"] option[value="' + num.toString() + '"]').change();
 		currentSlide = num;
@@ -314,21 +327,118 @@ $(document).ready(function() {
 		gotoNext();
 	});
 
+	function updateBlkWhtTrn(color) {
+		switch (color) {
+			case "black":
+				whtBool = false;
+				trnBool = false;
+				if (blkBool) {
+					blkBool = false;
+					updateScreen();
+					return;
+				} else {
+					blkBool = true;
+				}
+				break;
+			case "white":
+				blkBool = false;
+				trnBool = false;
+				if (whtBool) {
+					whtBool = false;
+					updateScreen();
+					return;
+				} else {
+					whtBool = true;
+				}
+				break;
+			case "trn":
+				blkBool = false;
+				whtBool = false;
+				if (trnBool) {
+					trnBool = false;
+					updateScreen();
+					return;
+				} else {
+					trnBool = true;
+				}
+				break;
+			default:
+				break;
+		}
+
+		if (color == "trn") {
+			color = "null";
+		}
+		$("select").find('option[value="Current"]').data('img-src', color + "_slide.png");
+		initImgPicker();
+		try {
+			child.stdin.write(__dirname + "/" + color + "_slide.png" + "\n");
+		} catch(e) {
+		}
+	}
+
+	$('#blk').click(function() {
+		updateBlkWhtTrn("black");
+	});
+
+	$('#wht').click(function() {
+		updateBlkWhtTrn("white");
+	});
+
+	$('#trn').click(function() {
+		updateBlkWhtTrn("trn");
+	});
+
 	$(document).keydown(function(e) {
+		var realNum = 0;
 		$("#below").trigger('click');
-		if(e.which == 13 || e.which == 32 || e.which == 39 || e.which == 40) {
-			// Enter, spacebar, right arrow or down
+		if(e.which >= 48 && e.which <= 57) {
+			// 0 through 9
+			realNum = e.which - 48;
+			numTypBuf += realNum.toString();
+		} else if (e.which >= 96 && e.which <= 105) {
+			// 0 through 9 (keypad)
+			realNum = e.which - 96;
+			numTypBuf += realNum.toString();
+		} else if (e.which == 13) {
+			// Enter
+			if (numTypBuf == "") {
+				gotoNext();
+			} else {
+				realNum = parseInt(numTypBuf, 10);
+				selectSlide(realNum);
+			}
+			numTypBuf = "";
+		} else if (e.which == 32 || e.which == 39 || e.which == 40 || e.which == 78) {
+			// Enter, spacebar, right arrow, down or N
+			numTypBuf = "";
 			gotoNext();
-		} else if(e.which == 37 || e.which == 8 || e.which == 38) {
-			// Left arrow, backspace or up
+		} else if(e.which == 37 || e.which == 8 || e.which == 38 || e.which == 80) {
+			// Left arrow, backspace, up or P
+			numTypBuf = "";
 			gotoPrev();
 		} else if(e.which == 36) {
 			// Home
+			numTypBuf = "";
 			selectSlide('1');
 		} else if(e.which == 35) {
 			// End
+			numTypBuf = "";
 			selectSlide(maxSlideNum.toString());
+		} else if(e.which == 66) {
+			// B
+			numTypBuf = "";
+			updateBlkWhtTrn("black");
+		} else if(e.which == 84) {
+			// T
+			numTypBuf = "";
+			updateBlkWhtTrn("trn");
+		} else if(e.which == 87) {
+			// W
+			numTypBuf = "";
+			updateBlkWhtTrn("white");
 		} else if (e.ctrlKey) {
+			numTypBuf = "";
 			if (e.which == 87) {
 				// Prevents Ctrl-W
 				e.preventDefault();

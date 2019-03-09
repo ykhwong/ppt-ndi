@@ -1,8 +1,7 @@
-var tmpDir = null;
-
-var vbsBg =`
+const vbsBg =`
 Dim objPPT
 Dim preVal
+Dim preState
 Dim ap
 Set objPPT = CreateObject("PowerPoint.Application")
 On Error Resume Next
@@ -28,12 +27,19 @@ sub Main()
 		On Error Resume Next
 		Set ap = objPPT.ActivePresentation
 		If Err.Number = 0 Then
-			If preVal = 0 Then
+			If preVal = 0 Or ap.SlideShowWindow.View.CurrentShowPosition <> preVal Then
 				preVal = ap.SlideShowWindow.View.CurrentShowPosition
 				Proc(preVal)
-			ElseIf (ap.SlideShowWindow.View.CurrentShowPosition <> preVal) Then
-				preVal = ap.SlideShowWindow.View.CurrentShowPosition
-				Proc(preVal)
+			End If
+			If preState <> ap.SlideShowWindow.View.State Then
+				preState = ap.SlideShowWindow.View.State
+				If ap.SlideShowWindow.View.State = 3 Then
+					Wscript.Echo "PPTNDI: Black"
+				ElseIf ap.SlideShowWindow.View.State = 4 Then
+					Wscript.Echo "PPTNDI: White"
+				ElseIf ap.SlideShowWindow.View.State = 5 Then
+					Wscript.Echo "PPTNDI: Done"
+				End If
 			End If
 		End If
 		WScript.Sleep(250)
@@ -42,9 +48,10 @@ End Sub
 Main
 `;
 
-var vbsNoBg =`
+const vbsNoBg =`
 Dim objPPT
 Dim preVal
+Dim preState
 Dim ap
 Set objPPT = CreateObject("PowerPoint.Application")
 On Error Resume Next
@@ -76,12 +83,23 @@ sub Main()
 		On Error Resume Next
 		Set ap = objPPT.ActivePresentation
 		If Err.Number = 0 Then
-			If preVal = 0 Then
+			If preVal = 0 Or ap.SlideShowWindow.View.CurrentShowPosition <> preVal Then
 				preVal = ap.SlideShowWindow.View.CurrentShowPosition
 				Proc(preVal)
-			ElseIf (ap.SlideShowWindow.View.CurrentShowPosition <> preVal) Then
-				preVal = ap.SlideShowWindow.View.CurrentShowPosition
-				Proc(preVal)
+			End If
+			If preState <> ap.SlideShowWindow.View.State Then
+				preState = ap.SlideShowWindow.View.State
+				If ap.SlideShowWindow.View.State = -1 Then
+				ElseIf ap.SlideShowWindow.View.State = 3 Then
+					Wscript.Echo "PPTNDI: Black"
+				ElseIf ap.SlideShowWindow.View.State = 4 Then
+					Wscript.Echo "PPTNDI: White"
+				ElseIf ap.SlideShowWindow.View.State = 5 Then
+					Wscript.Echo "PPTNDI: Done"
+				ElseIf ap.SlideShowWindow.View.State = 1 Or ap.SlideShowWindow.View.State = 2 Then
+					preVal = ap.SlideShowWindow.View.CurrentShowPosition
+					Proc(preVal)
+				End If
 			End If
 		End If
 		WScript.Sleep(250)
@@ -95,6 +113,7 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const binPath = './bin/PPTNDI.EXE';
+	var tmpDir = null;
 	var child;
 	var res;
 
@@ -112,15 +131,26 @@ $(document).ready(function() {
 	}
 
 	function sendNDI(file, data) {
-		if (/^PPTNDI: Sent/.test(data.toString())) {
-			var now = new Date().getTime();
+		var now = new Date().getTime();
+		var cmd = data.toString();
+		if (/^PPTNDI: Sent/.test(cmd)) {
+			// Do nothing
+		} else if(/^PPTNDI: White/.test(cmd)) {
+			file = "white_slide.png";
+		} else if(/^PPTNDI: Black/.test(cmd)) {
+			file = "black_slide.png";
+		} else if(/^PPTNDI: Done/.test(cmd)) {
+			//file = "null_slide.png";
+		} else {
+			return;
+		}
+		if (/^PPTNDI: (Sent|White|Black)/.test(cmd)) {
 			$("#slidePreview").attr("src", file + "?" + now);
 			try {
-				child.stdin.write(file + "\n");
+				child.stdin.write(__dirname + "/" + file + "\n");
 			} catch(e) {
 				runBin();
-				sleep(500);
-				child.stdin.write(file + "\n");
+				child.stdin.write(__dirname + "/" +file + "\n");
 			}
 		}
 	}
@@ -218,6 +248,14 @@ $(document).ready(function() {
 		} else {
 			alert('Failed to parse the presentation!');
 			return;
+		}
+	});
+
+	$('#trans_checker').click(function() {
+		if ($("#trans_checker").is(":checked")) {
+			$("#slidePreview").css('background-image', "url('trans_slide.png')");
+		} else {
+			$("#slidePreview").css('background-image', "url('null_slide.png')");
 		}
 	});
 

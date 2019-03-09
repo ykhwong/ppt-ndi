@@ -8,10 +8,7 @@ app.on('ready', function() {
 	let debugMode = false;
 
 	function loadMainWin() {
-		mainWindow = createWin(700, 360, false);
-		mainWindow.loadURL(frontendDir + 'main.html');
-		mainWindow.focus();
-
+		mainWindow = createWin(700, 360, false, 'main.html');
 		mainWindow.on('closed', function(e) {
 			if (mainWindow2 === null) {
 				mainWindow = null;
@@ -46,6 +43,8 @@ app.on('ready', function() {
 		if (debugMode) {
 			retData.webContents.openDevTools();
 		}
+		retData.loadURL(frontendDir + winFile);
+		retData.focus();
 		return retData;
 	}
 
@@ -62,12 +61,10 @@ app.on('ready', function() {
 					}
 					break;
 				case "select1":
-					mainWindow2 = createWin(300, 300, false);
-					mainWindow2.loadURL(frontendDir + 'control.html');
+					mainWindow2 = createWin(300, 330, false, 'control.html');
 					break;
 				case "select2":
-					mainWindow2 = createWin(1200, 680, true);
-					mainWindow2.loadURL(frontendDir + 'index.html');
+					mainWindow2 = createWin(1200, 680, true, 'index.html');
 					break;
 				default:
 					mainWindow.destroy();

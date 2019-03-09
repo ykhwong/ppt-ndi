@@ -9,14 +9,14 @@ html, body {
 
 #prevTxt {
 	position: fixed;
-	top: 125px;
+	top: 153px;
 	left: 15px;
 	color: #79a9f7;
 }
 
 #slidePreview {
 	position: fixed;
-	top: 145px;
+	top: 173px;
 	left: 15px;
     width: 200px;
 	height: 125px;
