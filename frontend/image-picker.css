@@ -24,7 +24,7 @@ ul.thumbnails.image_picker_selector {
     /* line 35, source/sass/image-picker.scss */
     ul.thumbnails.image_picker_selector li .thumbnail {
       padding: 6px;
-      border: 1px solid #DDD;
+      border: 2px solid rgb(0, 102, 255);
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none; }
