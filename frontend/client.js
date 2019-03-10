@@ -11,6 +11,12 @@ Sub Proc(ap)
 	Dim sngHeight
 
 	For Each sl In ap.Slides
+		If sl.SlideShowTransition.Hidden Then
+			Set objFileToWrite = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/hidden.dat",8,true)
+			objFileToWrite.WriteLine(sl.SlideIndex)
+			objFileToWrite.Close
+			Set objFileToWrite = Nothing
+		End If
 		sl.Export Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png", "PNG"
 	Next
 End Sub
@@ -27,6 +33,7 @@ sub Main()
 
 	If TestFile = "" Then objPPT.Quit
 	Set objPPT = Nothing
+	Wscript.Echo "PPTNDI: Loaded"
 End Sub
 Main
 `
@@ -50,11 +57,12 @@ Sub Proc(ap)
 	End With
 
 	For Each sl In ap.Slides
-		With sl.Shapes.AddShape( 1, 0, 0, sngWidth, sngHeight)
-			.Fill.Visible = msoFalse
-			.Line.Visible = msoFalse
-			.SetShapesDefaultProperties
-		End With
+		If sl.SlideShowTransition.Hidden Then
+			Set objFileToWrite = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/hidden.dat",8,true)
+			objFileToWrite.WriteLine(sl.SlideIndex)
+			objFileToWrite.Close
+			Set objFileToWrite = Nothing
+		End If
 
 		For intShape = 1 To sl.Shapes.Count
 			If sl.Shapes(intShape).Type = 7 Then
@@ -62,11 +70,14 @@ Sub Proc(ap)
 			End If
 		Next
 
+		With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
+			.TextFrame.TextRange = ""
+		End With
+
 		Set shpGroup = sl.Shapes.Range()
 		Dim fn
 		fn = Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png"
 		shpGroup.Export fn, 2, , , 1
-
 	Next
 End Sub
 
@@ -82,6 +93,7 @@ sub Main()
 
 	If TestFile = "" Then objPPT.Quit
 	Set objPPT = Nothing
+	Wscript.Echo "PPTNDI: Loaded"
 End Sub
 Main
 `;
@@ -95,6 +107,7 @@ $(document).ready(function() {
 	var maxSlideNum = 0;
 	var currentSlide = 1;
 	var currentWindow = remote.getCurrentWindow();
+	var hiddenSlides = [];
 	var blkBool = false;
 	var whtBool = false;
 	var trnBool = false;
@@ -239,11 +252,29 @@ $(document).ready(function() {
 						return;
 					}
 
+					hiddenSlides = [];
+					if (fs.existsSync(tmpDir + "/hidden.dat")) {
+						const hs = fs.readFileSync(tmpDir + "/hidden.dat", { encoding: 'utf8' });
+						hiddenSlides = hs.split("\n");
+					}
+					hiddenSlides = hiddenSlides.filter(n => n);
+					for (i = 0, len = hiddenSlides.length; i < len; i++) { 
+						hiddenSlides[i] = parseInt(hiddenSlides[i], 10);
+					}
 					fileArr.sort((a, b) => a - b).forEach(file2 => {
 						var rpc = file2;
-						options +=
-						'<option data-img-label="' + rpc +
-						'" data-img-src="' + tmpDir + '/Slide' + rpc
+						options += '<option data-img-label="' + rpc + '"';
+
+						for (i = 0, len = hiddenSlides.length; i < len; i++) { 
+							var num = hiddenSlides[i];
+							if (/^\d+$/.test(num)) {
+								if (num == parseInt(rpc, 10)) {
+									options += ' data-img-class="hiddenSlide" ';
+								}
+							}
+						}
+
+						options += ' data-img-src="' + tmpDir + '/Slide' + rpc
 						+ '.png" value="' + rpc + '">Slide ' + rpc + "\n";
 						$("#slides_grp").html(options);
 						$("select").find('option[value="Current"]').prop('img-src', tmpDir + "/Slide1.png");
@@ -255,7 +286,17 @@ $(document).ready(function() {
 					})
 					$("#fullblack").hide();
 					$("#reloadReq").hide();
-					selectSlide('1');
+
+					if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
+						selectSlide('1');
+					} else {
+						for (i = 1; i <= maxSlideNum; i++) {
+							if (!hiddenSlides.includes(i)) {
+								selectSlide(i.toString());
+								break;
+							}
+						}
+					}
 				} else {
 					alert("Only allowed filename extensions are PPT and PPTX.");
 					$("#fullblack").hide();
@@ -298,9 +339,21 @@ $(document).ready(function() {
 			return;
 		}
 		curSli = currentSlide;
-		curSli--;
-		if (curSli == 0) {
-			curSli = maxSlideNum;
+		if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
+			curSli--;
+			if (curSli == 0) {
+				curSli = maxSlideNum;
+			}
+		} else {
+			while (true) {
+				curSli--;
+				if (curSli == 0) {
+					curSli = maxSlideNum;
+				}
+				if (!hiddenSlides.includes(curSli)) {
+					break;
+				}
+			}
 		}
 		selectSlide(curSli.toString());
 	}
@@ -312,9 +365,21 @@ $(document).ready(function() {
 			return;
 		}
 		curSli = currentSlide;
-		curSli++;
-		if (curSli > maxSlideNum) {
-			curSli = 1;
+		if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
+			curSli++;
+			if (curSli > maxSlideNum) {
+				curSli = 1;
+			}
+		} else {
+			while (true) {
+				curSli++;
+				if (curSli > maxSlideNum) {
+					curSli = 1;
+				}
+				if (!hiddenSlides.includes(curSli)) {
+					break;
+				}
+			}
 		}
 		selectSlide(curSli.toString());
 	}

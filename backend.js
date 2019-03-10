@@ -66,6 +66,9 @@ app.on('ready', function() {
 				case "select2":
 					mainWindow2 = createWin(1200, 680, true, 'index.html');
 					break;
+				case "onTop":
+					mainWindow2.setAlwaysOnTop(true);
+					break;
 				default:
 					mainWindow.destroy();
 					break;

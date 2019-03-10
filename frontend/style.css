@@ -68,6 +68,10 @@ html, body {
 	display: none;
 }
 
+.hiddenSlide {
+	filter: grayscale(1);
+}
+
 .combobox {
 	color: #42f4a4;
 	border-color: #42f4a4;
