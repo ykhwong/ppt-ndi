@@ -144,13 +144,20 @@ $(document).ready(function() {
 		} else {
 			return;
 		}
-		if (/^PPTNDI: (Sent|White|Black)/.test(cmd)) {
-			$("#slidePreview").attr("src", file + "?" + now);
+		$("#slidePreview").attr("src", file + "?" + now);
+		if (/^PPTNDI: (White|Black)/.test(cmd)) {
 			try {
 				child.stdin.write(__dirname + "/" + file + "\n");
 			} catch(e) {
 				runBin();
 				child.stdin.write(__dirname + "/" +file + "\n");
+			}
+		} else {
+			try {
+				child.stdin.write(file + "\n");
+			} catch(e) {
+				runBin();
+				child.stdin.write(file + "\n");
 			}
 		}
 	}
