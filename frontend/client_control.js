@@ -113,9 +113,10 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const binPath = './bin/PPTNDI.EXE';
-	var tmpDir = null;
-	var child;
-	var res;
+	let tmpDir = null;
+	let pin = false;
+	let child;
+	let res;
 
 	function runBin() {
 		if (fs.existsSync(binPath)) {
@@ -131,8 +132,8 @@ $(document).ready(function() {
 	}
 
 	function sendNDI(file, data) {
-		var now = new Date().getTime();
-		var cmd = data.toString();
+		let now = new Date().getTime();
+		let cmd = data.toString();
 		if (/^PPTNDI: Sent/.test(cmd)) {
 			// Do nothing
 		} else if(/^PPTNDI: White/.test(cmd)) {
@@ -163,10 +164,10 @@ $(document).ready(function() {
 	}
 
 	function init() {
-		var file;
-		var vbsDir;
-		var newVbsContent;
-		var now = new Date().getTime();
+		let file;
+		let vbsDir;
+		let newVbsContent;
+		let now = new Date().getTime();
 		runBin();
 		child.stdin.setEncoding('utf-8');
 		child.stdout.pipe(process.stdout);
@@ -224,9 +225,9 @@ $(document).ready(function() {
 	});
 
 	$('#bk').click(function() {
-		var newVbsContent;
-		var vbsDir = tmpDir + '/wb.vbs';
-		var file = tmpDir + "/Slide.png";
+		let newVbsContent;
+		let vbsDir = tmpDir + '/wb.vbs';
+		let file = tmpDir + "/Slide.png";
 		if ($("#bk").is(":checked")) {
 			newVbsContent = vbsBg;
 			try {
@@ -263,6 +264,18 @@ $(document).ready(function() {
 			$("#slidePreview").css('background-image', "url('trans_slide.png')");
 		} else {
 			$("#slidePreview").css('background-image', "url('null_slide.png')");
+		}
+	});
+	
+	$('#pin').click(function() {
+		if (pin) {
+			ipc.send('remote', "onTopOff");
+			$("#pin").attr("src", "pin_grey.png");
+			pin = false;
+		} else {
+			ipc.send('remote', "onTop");
+			$("#pin").attr("src", "pin_green.png");
+			pin = true;
 		}
 	});
 

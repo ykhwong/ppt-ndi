@@ -59,3 +59,19 @@ html, body {
 	color: #79a9f7;
 }
 
+#pin {
+	position: fixed;
+	width: 15px;
+	top: 280px;
+	left: 263px;
+	padding: 5px;
+	cursor: pointer;
+}
+
+#pinTxt {
+	position: fixed;
+	font-size: 8px;
+	top: 260px;
+	left: 260px;
+	color: #79a9f7;
+}

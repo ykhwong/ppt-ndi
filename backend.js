@@ -69,6 +69,9 @@ app.on('ready', function() {
 				case "onTop":
 					mainWindow2.setAlwaysOnTop(true);
 					break;
+				case "onTopOff":
+					mainWindow2.setAlwaysOnTop(false);
+					break;
 				default:
 					mainWindow.destroy();
 					break;
