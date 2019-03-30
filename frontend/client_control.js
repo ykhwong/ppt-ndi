@@ -1,10 +1,9 @@
 const vbsBg =`
 Dim objPPT
-Dim preVal
 Dim preState
 Dim ap
+Dim curPos
 On Error Resume Next
-Set objPPT = CreateObject("PowerPoint.Application")
 Sub Proc()
 	Dim sl
 	Dim shGroup
@@ -62,7 +61,6 @@ Main
 
 const vbsNoBg =`
 Dim objPPT
-Dim preVal
 Dim preState
 Dim ap
 Dim curPos
@@ -142,9 +140,6 @@ $(document).ready(function() {
 	function runBin() {
 		if (fs.existsSync(binPath)) {
 			child = spawn(binPath);
-			//child.on('exit', function (code) {
-			//	alert("EXITED " + code);
-			//});
 		} else {
 			alert('Failed to create a listening server!');
 			ipc.send('remote', "exit");
