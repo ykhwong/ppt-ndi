@@ -3,9 +3,9 @@ Dim objPPT
 Dim preVal
 Dim preState
 Dim ap
-Set objPPT = CreateObject("PowerPoint.Application")
 On Error Resume Next
-Sub Proc(preVal)
+Set objPPT = CreateObject("PowerPoint.Application")
+Sub Proc()
 	Dim sl
 	Dim shGroup
 	Dim sngWidth
@@ -21,28 +21,40 @@ Sub Proc(preVal)
 	Wscript.Echo "PPTNDI: Sent"
 End Sub
 sub Main()
-	objPPT.DisplayAlerts = False
-	preVal = 0
 	Do While True
 		On Error Resume Next
-		Set ap = objPPT.ActivePresentation
+		Err.Clear
+		Set objPPT = CreateObject("PowerPoint.Application")
 		If Err.Number = 0 Then
-			If preVal = 0 Or ap.SlideShowWindow.View.CurrentShowPosition <> preVal Then
-				preVal = ap.SlideShowWindow.View.CurrentShowPosition
-				Proc(preVal)
-			End If
-			If preState <> ap.SlideShowWindow.View.State Then
-				preState = ap.SlideShowWindow.View.State
-				If ap.SlideShowWindow.View.State = 3 Then
-					Wscript.Echo "PPTNDI: Black"
-				ElseIf ap.SlideShowWindow.View.State = 4 Then
-					Wscript.Echo "PPTNDI: White"
-				ElseIf ap.SlideShowWindow.View.State = 5 Then
-					Wscript.Echo "PPTNDI: Done"
+			Set ap = objPPT.ActivePresentation
+			If Err.Number = 0 Then
+				objPPT.DisplayAlerts = False
+				Err.Clear
+				curPos = ap.SlideShowWindow.View.CurrentShowPosition
+				If Err.Number = 0 Then
+					Proc()
+					If ap.SlideShowWindow.View.State = -1 Then
+					ElseIf ap.SlideShowWindow.View.State = 3 Then
+						Wscript.Echo "PPTNDI: Black"
+					ElseIf ap.SlideShowWindow.View.State = 4 Then
+						Wscript.Echo "PPTNDI: White"
+					ElseIf ap.SlideShowWindow.View.State = 5 Then
+						Wscript.Echo "PPTNDI: Done"
+					ElseIf ap.SlideShowWindow.View.State = 1 Or ap.SlideShowWindow.View.State = 2 Then
+						Proc()
+					End If
+				Else
+					curPos = 0
 				End If
 			End If
 		End If
-		WScript.Sleep(250)
+		If curPos <> 0 Then
+			If ap.Slides(curPos).SlideShowTransition.AdvanceOnTime = -1 Then
+				Wscript.Sleep(250)
+			Else
+				Wscript.StdIn.ReadLine()
+			End If
+		End If
 	Loop
 End Sub
 Main
@@ -53,9 +65,9 @@ Dim objPPT
 Dim preVal
 Dim preState
 Dim ap
-Set objPPT = CreateObject("PowerPoint.Application")
+Dim curPos
 On Error Resume Next
-Sub Proc(preVal)
+Sub Proc()
 	Dim sl
 	Dim shGroup
 	Dim sngWidth
@@ -77,32 +89,40 @@ Sub Proc(preVal)
 	End With
 End Sub
 sub Main()
-	objPPT.DisplayAlerts = False
-	preVal = 0
 	Do While True
 		On Error Resume Next
-		Set ap = objPPT.ActivePresentation
+		Err.Clear
+		Set objPPT = CreateObject("PowerPoint.Application")
 		If Err.Number = 0 Then
-			If preVal = 0 Or ap.SlideShowWindow.View.CurrentShowPosition <> preVal Then
-				preVal = ap.SlideShowWindow.View.CurrentShowPosition
-				Proc(preVal)
-			End If
-			If preState <> ap.SlideShowWindow.View.State Then
-				preState = ap.SlideShowWindow.View.State
-				If ap.SlideShowWindow.View.State = -1 Then
-				ElseIf ap.SlideShowWindow.View.State = 3 Then
-					Wscript.Echo "PPTNDI: Black"
-				ElseIf ap.SlideShowWindow.View.State = 4 Then
-					Wscript.Echo "PPTNDI: White"
-				ElseIf ap.SlideShowWindow.View.State = 5 Then
-					Wscript.Echo "PPTNDI: Done"
-				ElseIf ap.SlideShowWindow.View.State = 1 Or ap.SlideShowWindow.View.State = 2 Then
-					preVal = ap.SlideShowWindow.View.CurrentShowPosition
-					Proc(preVal)
+			Set ap = objPPT.ActivePresentation
+			If Err.Number = 0 Then
+				objPPT.DisplayAlerts = False
+				Err.Clear
+				curPos = ap.SlideShowWindow.View.CurrentShowPosition
+				If Err.Number = 0 Then
+					Proc()
+					If ap.SlideShowWindow.View.State = -1 Then
+					ElseIf ap.SlideShowWindow.View.State = 3 Then
+						Wscript.Echo "PPTNDI: Black"
+					ElseIf ap.SlideShowWindow.View.State = 4 Then
+						Wscript.Echo "PPTNDI: White"
+					ElseIf ap.SlideShowWindow.View.State = 5 Then
+						Wscript.Echo "PPTNDI: Done"
+					ElseIf ap.SlideShowWindow.View.State = 1 Or ap.SlideShowWindow.View.State = 2 Then
+						Proc()
+					End If
+				Else
+					curPos = 0
 				End If
 			End If
 		End If
-		WScript.Sleep(250)
+		If curPos <> 0 Then
+			If ap.Slides(curPos).SlideShowTransition.AdvanceOnTime = -1 Then
+				Wscript.Sleep(250)
+			Else
+				Wscript.StdIn.ReadLine()
+			End If
+		End If
 	Loop
 End Sub
 Main
@@ -112,6 +132,7 @@ $(document).ready(function() {
 	const spawn = require( 'child_process' ).spawn;
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
+	const ioHook = require('iohook');
 	const binPath = './bin/PPTNDI.EXE';
 	let tmpDir = null;
 	let pin = false;
@@ -197,6 +218,18 @@ $(document).ready(function() {
 			alert('Failed to parse the presentation!');
 			return;
 		}
+		
+		ioHook.on('keydown', event => {
+			res.stdin.write("\n");
+		});
+		ioHook.on('mouseclick', event => {
+			res.stdin.write("\n");
+		});
+		ioHook.on('mousewheel', event => {
+			res.stdin.write("\n");
+		});
+
+		ioHook.start();
 	}
 
 	function cleanupForTemp() {
