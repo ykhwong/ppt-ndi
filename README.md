@@ -28,11 +28,22 @@ In the Classic Mode, a dedicated graphical user interface is displayed.
 
 ![PPT NDI Screenshot](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_sshot.png)
 
-Click the [LOAD PPT/PPTX] button to open a Powerpoint file. Please make sure to disable "Includes background" option to ensure the transparency.
+Click the Load icon to open a Powerpoint file. Please make sure to disable "Includes background" option to ensure the transparency.
 
 ## INTEGRATION EXAMPLE
 If you are using vMix, for example, PowerPoint slides with a transparent background can be used from the PPT NDI via NDI technology.
 ![PPT NDI vMix Integration](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_vmix_example.png)
+
+## OTHER NOTES
+For the best result, please set the slide resolution properly.
+
+1. Open PowerPoint, and go to Design - Slide Size - Custom Slide Size.
+
+![Custom Slide Size 1](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_slide_set_size1.png)
+
+2. Set the width and height manually. For example, if you prefer Full HD, set the width to 1920px and height to 1080px. The px will be automatically converted to either cm or in depending on the system locale.
+
+![Custom Slide Size 2](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_slide_set_size2.png)
 
 ## REQUIREMENT
 * Microsoft PowerPoint
