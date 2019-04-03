@@ -71,7 +71,6 @@ Sub Proc(ap)
 		Next
 
 		With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
-			.TextFrame.TextRange = ""
 		End With
 
 		Set shpGroup = sl.Shapes.Range()
