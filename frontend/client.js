@@ -498,7 +498,7 @@ $(document).ready(function() {
 			// End
 			numTypBuf = "";
 			if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
-				selectSlide('1');
+				selectSlide(maxSlideNum.toString());
 			} else {
 				for (i = maxSlideNum; i >= 1; i--) {
 					if (!hiddenSlides.includes(i)) {
