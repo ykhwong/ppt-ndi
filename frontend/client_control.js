@@ -9,14 +9,23 @@ Sub Proc()
 	Dim shGroup
 	Dim sngWidth
 	Dim sngHeight
+	Dim isSaved
 	With ap.PageSetup
 		sngWidth = .SlideWidth
 		sngHeight = .SlideHeight
 	End With
 	Set objSlideShow = ap.SlideShowWindow.View
+	If ap.Saved Then
+		isSaved = True
+	Else
+		isSaved = False
+	End If
 	With ap.Slides(objSlideShow.CurrentShowPosition)
 		.Export Wscript.Arguments.Item(0) & "/Slide.png", "PNG"
 	End With
+	If isSaved = True Then
+		ap.Saved = True
+	End If
 	Wscript.Echo "PPTNDI: Sent"
 End Sub
 sub Main()
@@ -46,12 +55,12 @@ sub Main()
 					curPos = 0
 				End If
 			End If
-		End If
-		If curPos <> 0 Then
-			If ap.Slides(curPos).SlideShowTransition.AdvanceOnTime = -1 Then
-				Wscript.Sleep(250)
-			Else
-				Wscript.StdIn.ReadLine()
+			If curPos <> 0 Then
+				If ap.Slides(curPos).SlideShowTransition.AdvanceOnTime = -1 Then
+					Wscript.Sleep(250)
+				Else
+					Wscript.StdIn.ReadLine()
+				End If
 			End If
 		End If
 	Loop
@@ -76,13 +85,20 @@ Sub Proc()
 	End With
 	Set objSlideShow = ap.SlideShowWindow.View
 	With ap.Slides(objSlideShow.CurrentShowPosition)
+		Dim isSaved
+		If ap.Saved Then
+			isSaved = True
+		Else
+			isSaved = False
+		End If
 		With .Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
-			.TextFrame.TextRange = ""
 			Set shpGroup = ap.Slides(objSlideShow.CurrentShowPosition).Shapes.Range()
-			shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", _
-								2, , , 1
+			shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", 2, , , 1
 			.Delete
 		End With
+		If isSaved = True Then
+			ap.Saved = True
+		End If
 		Wscript.Echo "PPTNDI: Sent"
 	End With
 End Sub
@@ -113,12 +129,12 @@ sub Main()
 					curPos = 0
 				End If
 			End If
-		End If
-		If curPos <> 0 Then
-			If ap.Slides(curPos).SlideShowTransition.AdvanceOnTime = -1 Then
-				Wscript.Sleep(250)
-			Else
-				Wscript.StdIn.ReadLine()
+			If curPos <> 0 Then
+				If ap.Slides(curPos).SlideShowTransition.AdvanceOnTime = -1 Then
+					Wscript.Sleep(250)
+				Else
+					Wscript.StdIn.ReadLine()
+				End If
 			End If
 		End If
 	Loop

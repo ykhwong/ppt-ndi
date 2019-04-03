@@ -10,8 +10,7 @@
 	"scripts": {},
 	"iohook": {
 		"targets": [
-			"electron-69",
-			"node-67"
+			"electron-69"
 		],
 		"platforms": [
 			"win32"
