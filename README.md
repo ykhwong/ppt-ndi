@@ -30,9 +30,10 @@ In the Classic Mode, a dedicated graphical user interface is displayed.
 
 Click the Open icon to load a Powerpoint file. Please make sure to disable "Includes background" option to ensure the transparency.
 
-## INTEGRATION EXAMPLE
-If you are using vMix, for example, PowerPoint slides with a transparent background can be used from the PPT NDI via NDI technology.
-![PPT NDI vMix Integration](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_vmix_example.png)
+## TESTING AND INTEGRATION
+
+The features of PPT NDI can be tested with NDI Studio Monitor. Any NDI-compatible software or hardware can be also used for the integration.
+![PPT NDI Studio Monitor Integration](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_vmix_example.png)
 
 ## OTHER NOTES
 For the best result, please set the slide resolution properly.
