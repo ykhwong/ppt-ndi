@@ -34,13 +34,13 @@ sub Main()
 		Err.Clear
 		Set objPPT = CreateObject("PowerPoint.Application")
 		If Err.Number = 0 Then
+			Err.Clear
 			Set ap = objPPT.ActivePresentation
 			If Err.Number = 0 Then
 				objPPT.DisplayAlerts = False
 				Err.Clear
 				curPos = ap.SlideShowWindow.View.CurrentShowPosition
 				If Err.Number = 0 Then
-					Proc()
 					If ap.SlideShowWindow.View.State = -1 Then
 					ElseIf ap.SlideShowWindow.View.State = 3 Then
 						Wscript.Echo "PPTNDI: Black"
@@ -61,6 +61,8 @@ sub Main()
 				Else
 					Wscript.StdIn.ReadLine()
 				End If
+			Else
+				Wscript.Sleep(500)
 			End If
 		End If
 	Loop
@@ -108,13 +110,13 @@ sub Main()
 		Err.Clear
 		Set objPPT = CreateObject("PowerPoint.Application")
 		If Err.Number = 0 Then
+			Err.Clear
 			Set ap = objPPT.ActivePresentation
 			If Err.Number = 0 Then
 				objPPT.DisplayAlerts = False
 				Err.Clear
 				curPos = ap.SlideShowWindow.View.CurrentShowPosition
 				If Err.Number = 0 Then
-					Proc()
 					If ap.SlideShowWindow.View.State = -1 Then
 					ElseIf ap.SlideShowWindow.View.State = 3 Then
 						Wscript.Echo "PPTNDI: Black"
@@ -135,6 +137,8 @@ sub Main()
 				Else
 					Wscript.StdIn.ReadLine()
 				End If
+			Else
+				Wscript.Sleep(500)
 			End If
 		End If
 	Loop
@@ -149,7 +153,7 @@ $(document).ready(function() {
 	const ioHook = require('iohook');
 	const binPath = './bin/PPTNDI.EXE';
 	let tmpDir = null;
-	let pin = false;
+	let pin = true;
 	let child;
 	let res;
 
@@ -229,7 +233,12 @@ $(document).ready(function() {
 			alert('Failed to parse the presentation!');
 			return;
 		}
-		
+
+		// Enable Always On Top by default
+		ipc.send('remote', "onTop");
+		$("#pin").attr("src", "pin_green.png");
+		pin = true;
+
 		ioHook.on('keydown', event => {
 			res.stdin.write("\n");
 		});
