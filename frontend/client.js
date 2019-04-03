@@ -104,17 +104,17 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const binPath = './bin/PPTNDI.EXE';
-	var maxSlideNum = 0;
-	var currentSlide = 1;
-	var currentWindow = remote.getCurrentWindow();
-	var hiddenSlides = [];
-	var blkBool = false;
-	var whtBool = false;
-	var trnBool = false;
-	var numTypBuf = "";
-	var tmpDir = "";
-	var child;
-	var repo;
+	let maxSlideNum = 0;
+	let currentSlide = 1;
+	let currentWindow = remote.getCurrentWindow();
+	let hiddenSlides = [];
+	let blkBool = false;
+	let whtBool = false;
+	let trnBool = false;
+	let numTypBuf = "";
+	let tmpDir = "";
+	let child;
+	let repo;
 
 	if (fs.existsSync(binPath)) {
 		child = spawn(binPath);
@@ -130,9 +130,9 @@ $(document).ready(function() {
 	}
 
 	function updateScreen() {
-		var curSli, nextSli;
-		var nextNum;
-		var re, rpc;
+		let curSli, nextSli;
+		let nextNum;
+		let re, rpc;
 		if(!repo) {
 			return;
 		}
@@ -191,14 +191,14 @@ $(document).ready(function() {
 			]
 		}, function (file) {
 			if (file !== undefined) {
-				var re = new RegExp("\\.pptx*\$", "i");
-				var vbsDir, res;
-				var fileArr = [];
-				var options = "";
+				let re = new RegExp("\\.pptx*\$", "i");
+				let vbsDir, res;
+				let fileArr = [];
+				let options = "";
 				if (re.exec(file)) {
-					var now = new Date().getTime();
-					var newVbsContent;
-					var preTmpDir;
+					let now = new Date().getTime();
+					let newVbsContent;
+					let preTmpDir;
 					const spawnSync = require( 'child_process' ).spawnSync;
 					preTmpDir = tmpDir;
 					tmpDir = process.env.TEMP + '/ppt_ndi';
@@ -238,7 +238,7 @@ $(document).ready(function() {
 					fs.readdirSync(tmpDir).forEach(file2 => {
 						re = new RegExp("^Slide(\\d+)\\.png\$", "i");
 						if (re.exec(file2)) {
-							var rpc = file2.replace(re, "\$1");
+							let rpc = file2.replace(re, "\$1");
 							fileArr.push(rpc);
 							maxSlideNum++;
 						}
@@ -262,11 +262,11 @@ $(document).ready(function() {
 						hiddenSlides[i] = parseInt(hiddenSlides[i], 10);
 					}
 					fileArr.sort((a, b) => a - b).forEach(file2 => {
-						var rpc = file2;
+						let rpc = file2;
 						options += '<option data-img-label="' + rpc + '"';
 
 						for (i = 0, len = hiddenSlides.length; i < len; i++) { 
-							var num = hiddenSlides[i];
+							let num = hiddenSlides[i];
 							if (/^\d+$/.test(num)) {
 								if (num == parseInt(rpc, 10)) {
 									options += ' data-img-class="hiddenSlide" ';
@@ -321,7 +321,7 @@ $(document).ready(function() {
 		$('optgroup[label="Slides"] option[value="' + num.toString() + '"]').change();
 		currentSlide = num;
 
-		var selected = $('.selected:eq( 0 )');
+		let selected = $('.selected:eq( 0 )');
 		if (selected.length) {
 			$("#below").stop().animate(
 			{ scrollTop: selected.position().top + $("#below").scrollTop() },
@@ -333,8 +333,8 @@ $(document).ready(function() {
 	}
 
 	function gotoPrev() {
-		var curSli;
-		var re;
+		let curSli;
+		let re;
 		if (!repo) {
 			return;
 		}
@@ -359,8 +359,8 @@ $(document).ready(function() {
 	}
 
 	function gotoNext() {
-		var curSli;
-		var re;
+		let curSli;
+		let re;
 		if (!repo) {
 			return;
 		}
@@ -455,7 +455,7 @@ $(document).ready(function() {
 	});
 
 	$(document).keydown(function(e) {
-		var realNum = 0;
+		let realNum = 0;
 		$("#below").trigger('click');
 		if(e.which >= 48 && e.which <= 57) {
 			// 0 through 9
@@ -485,11 +485,30 @@ $(document).ready(function() {
 		} else if(e.which == 36) {
 			// Home
 			numTypBuf = "";
-			selectSlide('1');
+			if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
+				selectSlide('1');
+			} else {
+				for (i = 1; i <= maxSlideNum; i++) {
+					if (!hiddenSlides.includes(i)) {
+						selectSlide(i.toString());
+						break;
+					}
+				}
+			}
 		} else if(e.which == 35) {
 			// End
 			numTypBuf = "";
-			selectSlide(maxSlideNum.toString());
+			if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
+				selectSlide('1');
+			} else {
+				for (i = maxSlideNum; i >= 1; i--) {
+					if (!hiddenSlides.includes(i)) {
+						selectSlide(i.toString());
+						break;
+					}
+				}
+			}
+
 		} else if(e.which == 66) {
 			// B
 			numTypBuf = "";
@@ -529,11 +548,11 @@ $(document).ready(function() {
 	}
 
 	function startCurrentTime() {
-		var today = new Date();
-		var h = today.getHours();
-		var m = today.getMinutes();
-		var s = today.getSeconds();
-		var t;
+		let today = new Date();
+		let h = today.getHours();
+		let m = today.getMinutes();
+		let s = today.getSeconds();
+		let t;
 		m = checkTime(m);
 		s = checkTime(s);
 		$('#current_time').html(h + ":" + m + ":" + s);
