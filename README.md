@@ -33,6 +33,7 @@ Click the Open icon to load a Powerpoint file. Please make sure to disable "Incl
 ## TESTING AND INTEGRATION
 
 The features of PPT NDI can be tested with NDI Studio Monitor. Any NDI-compatible software or hardware can be also used for the integration.
+
 ![PPT NDI Studio Monitor Integration](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_vmix_example.png)
 
 ## OTHER NOTES
