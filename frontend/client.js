@@ -436,7 +436,7 @@ $(document).ready(function() {
 		$("select").find('option[value="Current"]').data('img-src', color + "_slide.png");
 		initImgPicker();
 		try {
-			child.stdin.write(__dirname + "/" + color + "_slide.png" + "\n");
+			child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + color + "_slide.png" + "\n");
 		} catch(e) {
 		}
 	}
