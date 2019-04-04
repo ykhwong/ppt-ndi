@@ -37,6 +37,8 @@ The features of PPT NDI can be tested with NDI Studio Monitor. Any NDI-compatibl
 ![PPT NDI Studio Monitor Integration](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_ndi_vmix_example.png)
 
 ## OTHER NOTES
+
+### Slide resolution
 For the best result, please set the slide resolution properly.
 
 1. Open PowerPoint, and go to Design - Slide Size - Custom Slide Size.
@@ -46,6 +48,22 @@ For the best result, please set the slide resolution properly.
 2. Set the width and height manually. For example, if you prefer Full HD, set the width to 1920px and height to 1080px. The px will be automatically converted to either cm or in depending on the system locale.
 
 ![Custom Slide Size 2](https://raw.githubusercontent.com/ykhwong/ppt_ndi/master/resources/ppt_slide_set_size2.png)
+
+### Command Line Options
+
+```sh
+  ppt_ndi.exe  [--slideshow] [--classic] [--bg]
+     [--slideshow] : SlidShow Mode
+       [--classic] : Classic Mode
+            [--bg] : Run SlideShow Mode as background
+```
+
+### SlideShow Mode as Background
+
+1. Press Windows-R key. In the Run dialog box, type <code>shell:startup</code>, and hit Enter.
+2. Drag and drop the runAsBackground.vbs file to the Startup folder while holding down the ALT key on your keyboard.
+3. A shortcut of the vbs file will be created.
+4. Restart the computer and it will be automatically executed on startup or boot.
 
 ## REQUIREMENT
 * Microsoft PowerPoint

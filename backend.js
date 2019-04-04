@@ -7,6 +7,48 @@ app.on('ready', function() {
 	let mainWindow2 = null;
 	let debugMode = false;
 
+	function init() {
+		let ret = loadArg();
+		if (!ret) {
+			loadMainWin();
+		}
+		loadIpc();
+	}
+
+	function loadArg() {
+		let matched=false;
+		for (i = 0, len = process.argv.length; i < len; i++) {
+			let val = process.argv[i];
+			if (/--(h|help)/i.test(val)) {
+				const path = require('path');
+				let out = "PPT NDI\n";
+				out += " " + path.basename(process.argv[0]) + " [--slideshow] [--classic] [--bg]\n";
+				out += "   [--slideshow] : SlidShow Mode\n";
+				out += "     [--classic] : Classic Mode\n";
+				out += "          [--bg] : Run SlideShow Mode as background\n";
+				console.log(out);
+				app.quit();
+			}
+			if (/--bg/i.test(val)) {
+				matched=true;
+				mainWindow2 = createWin(300, 300, false, 'control.html');
+				mainWindow2.hide();
+				break;
+			}
+			if (/--slideshow/i.test(val)) {
+				matched=true;
+				mainWindow2 = createWin(300, 330, false, 'control.html');
+				break;
+			}
+			if (/--classic/i.test(val)) {
+				matched=true;
+				mainWindow2 = createWin(1200, 680, true, 'index.html');
+				break;
+			}
+		}
+		return matched;
+	}
+
 	function loadMainWin() {
 		mainWindow = createWin(700, 360, false, 'main.html');
 		mainWindow.on('closed', function(e) {
@@ -87,8 +129,10 @@ app.on('ready', function() {
 			}
 		});
 	}
-	loadMainWin();
-	loadIpc();
+	
+	init();
+
+	//console.log(process.argv);
 });
 
 app.on('window-all-closed', (e) => {
