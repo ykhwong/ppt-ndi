@@ -184,10 +184,10 @@ $(document).ready(function() {
 		$("#slidePreview").attr("src", file + "?" + now);
 		if (/^PPTNDI: (White|Black)/.test(cmd)) {
 			try {
-				child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + file + "\n");
+				child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file + "\n");
 			} catch(e) {
 				runBin();
-				child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") +file + "\n");
+				child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file + "\n");
 			}
 		} else {
 			try {
