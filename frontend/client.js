@@ -473,12 +473,12 @@ $(document).ready(function() {
 				selectSlide(realNum);
 			}
 			numTypBuf = "";
-		} else if (e.which == 32 || e.which == 39 || e.which == 40 || e.which == 78) {
-			// Enter, spacebar, right arrow, down or N
+		} else if (e.which == 32 || e.which == 39 || e.which == 40 || e.which == 78 || e.which == 34) {
+			// Spacebar, right arrow, down, N or page down
 			numTypBuf = "";
 			gotoNext();
-		} else if(e.which == 37 || e.which == 8 || e.which == 38 || e.which == 80) {
-			// Left arrow, backspace, up or P
+		} else if(e.which == 37 || e.which == 8 || e.which == 38 || e.which == 80 || e.which == 33) {
+			// Left arrow, backspace, up, P or page up
 			numTypBuf = "";
 			gotoPrev();
 		} else if(e.which == 36) {
