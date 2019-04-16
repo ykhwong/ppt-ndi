@@ -242,13 +242,12 @@ $(document).ready(function() {
 		ioHook.on('keydown', event => {
 			res.stdin.write("\n");
 		});
-		ioHook.on('mouseclick', event => {
+		ioHook.on('mouseup', event => {
 			res.stdin.write("\n");
 		});
 		ioHook.on('mousewheel', event => {
 			res.stdin.write("\n");
 		});
-
 		ioHook.start();
 	}
 
