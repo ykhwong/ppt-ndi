@@ -3,12 +3,13 @@
 ## INTRODUCTION
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Can be also used as a character generator because it supports transparency.
 
-The latest version is PPT NDI (20190405).
+The latest version is PPT NDI (20190427).
 
 ## HOW TO USE
-1. Download the ppt_ndi_20190405.7z from https://github.com/ykhwong/ppt_ndi/releases and extract it.
-2. Simply run the executable "ppt_ndi.exe"
-3. Please select either one of the following modes.
+1. Download PPT NDI from https://github.com/ykhwong/ppt_ndi/releases
+2. If you have downloaded the installer, execute the pptndi_setup.exe. After the installation, click Start button and select "PPT NDI".
+3. If you have downloaded the 7z file, decompress it and simply run the executable "ppt_ndi.exe"
+4. Please select either one of the following modes.
 
 * PowerPoint SlideShow Mode
 * Classic Mode
@@ -64,6 +65,12 @@ For the best result, please set the slide resolution properly.
 2. Drag and drop the runAsBackground.vbs file to the Startup folder while holding down the ALT key on your keyboard.
 3. A shortcut of the vbs file will be created.
 4. Restart the computer and it will be automatically executed on startup or boot.
+
+### Sample
+
+Please also refer to the sample.pptx that demonstrates the lower thirds:
+
+https://github.com/ykhwong/ppt_ndi/raw/master/resources/sample.pptx
 
 ## REQUIREMENT
 * Microsoft PowerPoint
