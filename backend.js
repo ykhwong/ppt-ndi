@@ -66,6 +66,9 @@ app.on('ready', function() {
 	function createWin(width, height, maximizable, winFile) {
 		const { BrowserWindow } = require('electron');
 		let retData;
+		if (debugMode) {
+			maximizable = true;
+		}
 		retData = new BrowserWindow({
 			width: width,
 			height: height,
