@@ -64,19 +64,30 @@ Sub Proc(ap)
 			Set objFileToWrite = Nothing
 		End If
 
-		'For intShape = 1 To sl.Shapes.Count
-		'	If sl.Shapes(intShape).Type = 7 Then
-		'		sl.Shapes(intShape).Delete
-		'	End If
-		'Next
-
-		With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
-		End With
-
-		Set shpGroup = sl.Shapes.Range()
 		Dim fn
 		fn = Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png"
-		shpGroup.Export fn, 2, , , 1
+		With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
+			Set shpGroup = sl.Shapes.Range()
+			shpGroup.Export fn, 2, , , 1
+			.Delete
+		End With
+		
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		If fso.FileExists(fn) Then
+			Set objFile = fso.GetFile(fn)
+			If objFile.size = 0 Then
+				For intShape = 1 To sl.Shapes.Count
+					If sl.Shapes(intShape).Type = 7 Then
+						sl.Shapes(intShape).Delete
+					End If
+				Next
+				With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
+					Set shpGroup = sl.Shapes.Range()
+					shpGroup.Export fn, 2, , , 1
+					.Delete
+				End With
+			End If
+		End If
 	Next
 End Sub
 
@@ -139,11 +150,25 @@ $(document).ready(function() {
 		curSli = rpc + currentSlide.toString() + '.png';
 		nextNum = currentSlide;
 		nextNum++;
-		nextSli = rpc + nextNum.toString() + '.png';
 		$("select").find('option[value="Current"]').data('img-src', curSli);
-		if (!fs.existsSync(nextSli)) {
-			nextSli = rpc + '1.png';
+
+		if (nextNum > maxSlideNum) {
+			nextNum = 1;
 		}
+		if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
+			nextSli = rpc + nextNum.toString() + '.png';
+		} else {
+			let cnts = 0;
+			while (1) {
+				if (!hiddenSlides.includes(nextNum + cnts)) {
+					nextNum += cnts;
+					nextSli = rpc + nextNum.toString() + '.png';
+					break;
+				}
+				cnts++;
+			}
+		}
+
 		$("select").find('option[value="Next"]').data('img-src', nextSli);
 		initImgPicker();
 		try {
