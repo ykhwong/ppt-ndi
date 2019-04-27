@@ -39,6 +39,7 @@ Source: "{#MyAppHome}\ppt_ndi-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversi
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
 Name: "{autoprograms}\{#MyAppName} (SlideShow Mode)"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Parameters: "--slideshow"
 Name: "{autoprograms}\{#MyAppName} (Classic Mode)"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Parameters: "--classic"
+Name: "{autoprograms}\Open {#MyAppName} Sample File"; Filename: "{app}\resources\sample.pptx"
 Name: "{autoprograms}\Uninstall PPT NDI"; Filename: "{uninstallexe}"
 
 [Run]
