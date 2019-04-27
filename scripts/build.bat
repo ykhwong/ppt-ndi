@@ -25,5 +25,6 @@ copy ..\Processing.NDI.Lib.x64.dll .\.
 copy ..\uiohook.dll .\.
 copy ..\runAsBackground.vbs .\.
 copy ..\*_slide.png .\resources\.
+copy ..\ppt_ndi\resources\sample.pptx .\resources\.
 :done
 pause >nul
