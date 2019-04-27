@@ -81,6 +81,8 @@ Sub Proc()
 	Dim shGroup
 	Dim sngWidth
 	Dim sngHeight
+	Dim origGrpCnt
+	oriGrpCnt = 0
 	With ap.PageSetup
 		sngWidth = .SlideWidth
 		sngHeight = .SlideHeight
@@ -93,8 +95,17 @@ Sub Proc()
 		Else
 			isSaved = False
 		End If
+		origGrpCnt = ap.Slides(objSlideShow.CurrentShowPosition).Shapes.Range().Count
 		With .Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
 			Set shpGroup = ap.Slides(objSlideShow.CurrentShowPosition).Shapes.Range()
+			If shpGroup.Count = origGrpCnt Then
+				.Delete
+				origGrpCnt = 0
+				If isSaved = True Then
+					ap.Saved = True
+				End If
+				Exit Sub
+			End If
 			shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", 2, , , 1
 			.Delete
 		End With
