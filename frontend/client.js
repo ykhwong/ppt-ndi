@@ -64,11 +64,11 @@ Sub Proc(ap)
 			Set objFileToWrite = Nothing
 		End If
 
-		For intShape = 1 To sl.Shapes.Count
-			If sl.Shapes(intShape).Type = 7 Then
-				sl.Shapes(intShape).Delete
-			End If
-		Next
+		'For intShape = 1 To sl.Shapes.Count
+		'	If sl.Shapes(intShape).Type = 7 Then
+		'		sl.Shapes(intShape).Delete
+		'	End If
+		'Next
 
 		With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
 		End With
