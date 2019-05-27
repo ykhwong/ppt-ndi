@@ -10,6 +10,6 @@ Release Note (20190427):
 4. FIX: Glitches upon a fast slide transition (PowerPoint Slidshow mode)
 
 Please also refer to the sample.pptx that demonstrates the lower thirds:
-https://github.com/ykhwong/ppt_ndi/raw/master/resources/sample.pptx
+https://github.com/ykhwong/ppt-ndi/raw/master/resources/sample.pptx
 
-For more information, please visit https://github.com/ykhwong/ppt_ndi
+For more information, please visit https://github.com/ykhwong/ppt-ndi
