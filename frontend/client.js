@@ -126,6 +126,7 @@ $(document).ready(function() {
 	let child;
 	let repo;
 
+	process.chdir(remote.app.getAppPath());
 	if (fs.existsSync(binPath)) {
 		child = spawn(binPath);
 		child.stdin.setEncoding('utf-8');

@@ -211,10 +211,12 @@ $(document).ready(function() {
 	}
 
 	function init() {
+		const { remote } = require('electron');
 		let file;
 		let vbsDir;
 		let newVbsContent;
 		let now = new Date().getTime();
+		process.chdir(remote.app.getAppPath());
 		runBin();
 		child.stdin.setEncoding('utf-8');
 		child.stdout.pipe(process.stdout);
