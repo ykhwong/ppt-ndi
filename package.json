@@ -4,7 +4,8 @@
 	"main": "backend.js",
 	"dependencies": {
 		"fs-extra": "^7.0.1",
-		"iohook": "git+https://github.com/wilix-team/iohook.git"
+		"iohook": "git+https://github.com/wilix-team/iohook.git",
+		"jimp": "^0.6.4"
 	},
 	"devDependencies": {},
 	"scripts": {},

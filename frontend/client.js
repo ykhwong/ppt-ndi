@@ -17,6 +17,11 @@ Sub Proc(ap)
 			objFileToWrite.Close
 			Set objFileToWrite = Nothing
 		End If
+
+		Set objSlideEffect = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/slideEffect.dat",8,true)
+		objSlideEffect.WriteLine(sl.SlideShowTransition.EntryEffect & "\t" & sl.SlideShowTransition.Duration)
+		objSlideEffect.Close
+
 		sl.Export Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png", "PNG"
 	Next
 End Sub
@@ -61,8 +66,13 @@ Sub Proc(ap)
 			Set objFileToWrite = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/hidden.dat",8,true)
 			objFileToWrite.WriteLine(sl.SlideIndex)
 			objFileToWrite.Close
+
 			Set objFileToWrite = Nothing
 		End If
+
+		Set objSlideEffect = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/slideEffect.dat",8,true)
+		objSlideEffect.WriteLine(sl.SlideIndex & "," & sl.SlideShowTransition.EntryEffect & "," & sl.SlideShowTransition.Duration)
+		objSlideEffect.Close
 
 		Dim fn
 		fn = Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png"
@@ -118,6 +128,7 @@ $(document).ready(function() {
 	let currentSlide = 1;
 	let currentWindow = remote.getCurrentWindow();
 	let hiddenSlides = [];
+	let slideEffects = {};
 	let blkBool = false;
 	let whtBool = false;
 	let trnBool = false;
@@ -138,6 +149,24 @@ $(document).ready(function() {
 		alert('Failed to create a listening server!');
 		ipc.send('remote', "exit");
 		return;
+	}
+
+	function createNullSlide() {
+		const Jimp = require('jimp');
+		Jimp.read(tmpDir + "/Slide1.png").then(image=> {
+			new Jimp(image.bitmap.width, image.bitmap.height, (err, image2) => {
+				image2.opacity(0);
+				image2.write(tmpDir + "/Slide0.png");
+			});
+			new Jimp(image.bitmap.width, image.bitmap.height, 0x000000FF, (err, image2) => {
+				image2.opacity(1);
+				image2.write(tmpDir + "/SlideBlack.png");
+			});
+			new Jimp(image.bitmap.width, image.bitmap.height, 0xFFFFFFFF, (err, image2) => {
+				image2.opacity(1);
+				image2.write(tmpDir + "/SlideWhite.png");
+			});
+		});
 	}
 
 	function updateScreen() {
@@ -272,7 +301,7 @@ $(document).ready(function() {
 						maxSlideNum = 0;
 						cleanupForTemp();
 						tmpDir = preTmpDir;
-						alert("Presentation file could not be loaded.\nPlease remove missing fonts if applicable.");
+						alert("Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.");
 						$("#fullblack").hide();
 						return;
 					}
@@ -322,6 +351,25 @@ $(document).ready(function() {
 							}
 						}
 					}
+
+					slideEffects = {};
+					if (fs.existsSync(tmpDir + "/slideEffect.dat")) {
+						const hs = fs.readFileSync(tmpDir + "/slideEffect.dat", { encoding: 'utf8' });
+						const lines = hs.split(/(\r|\n)+/);
+						for (i = 0; i < lines.length; i++) {
+							let ls = lines[i].split(",");
+							let obj = {
+								"effectName" : ls[1],
+								"duration" : ls[2]
+							};
+							slideEffects[ls[0].toString()] = obj;
+							if (obj.effectName !== "0") {
+								// TO-DO: Implement the transition effect
+							}
+						}
+					}
+
+					createNullSlide();
 				} else {
 					alert("Only allowed filename extensions are PPT and PPTX.");
 					$("#fullblack").hide();
@@ -329,7 +377,7 @@ $(document).ready(function() {
 			} else {
 				$("#fullblack").hide();
 			}
-		})
+		});
 	});
 
 	function selectSlide(num) {
@@ -418,6 +466,7 @@ $(document).ready(function() {
 	});
 
 	function updateBlkWhtTrn(color) {
+		let dirTo = "";
 		switch (color) {
 			case "black":
 				whtBool = false;
@@ -428,6 +477,7 @@ $(document).ready(function() {
 					return;
 				} else {
 					blkBool = true;
+					dirTo = tmpDir + "/SlideBlack.png";
 				}
 				break;
 			case "white":
@@ -439,6 +489,7 @@ $(document).ready(function() {
 					return;
 				} else {
 					whtBool = true;
+					dirTo = tmpDir + "/SlideWhite.png";
 				}
 				break;
 			case "trn":
@@ -450,6 +501,7 @@ $(document).ready(function() {
 					return;
 				} else {
 					trnBool = true;
+					dirTo = tmpDir + "/Slide0.png";
 					color = "null";
 				}
 				break;
@@ -457,10 +509,14 @@ $(document).ready(function() {
 				break;
 		}
 
-		$("select").find('option[value="Current"]').data('img-src', color + "_slide.png");
+		if (!fs.existsSync(dirTo)) {
+			dirTo = __dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + color + "_slide.png";
+		}
+		$("select").find('option[value="Current"]').data('img-src', dirTo);
 		initImgPicker();
+
 		try {
-			child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + color + "_slide.png" + "\n");
+			child.stdin.write(dirTo + "\n");
 		} catch(e) {
 		}
 	}
