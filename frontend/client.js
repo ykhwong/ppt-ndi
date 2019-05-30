@@ -216,7 +216,7 @@ $(document).ready(function() {
 			]
 		}, function (file) {
 			if (file !== undefined) {
-				let re = new RegExp("\\.pptx*\$", "i");
+				let re = new RegExp("\\.(ppt|pptx)\$", "i");
 				let vbsDir, res;
 				let fileArr = [];
 				let options = "";
@@ -450,15 +450,13 @@ $(document).ready(function() {
 					return;
 				} else {
 					trnBool = true;
+					color = "null";
 				}
 				break;
 			default:
 				break;
 		}
 
-		if (color == "trn") {
-			color = "null";
-		}
 		$("select").find('option[value="Current"]').data('img-src', color + "_slide.png");
 		initImgPicker();
 		try {
