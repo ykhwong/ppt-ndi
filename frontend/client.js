@@ -19,7 +19,7 @@ Sub Proc(ap)
 		End If
 
 		Set objSlideEffect = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/slideEffect.dat",8,true)
-		objSlideEffect.WriteLine(sl.SlideShowTransition.EntryEffect & "\t" & sl.SlideShowTransition.Duration)
+		objSlideEffect.WriteLine(sl.SlideIndex & "," & sl.SlideShowTransition.EntryEffect & "," & sl.SlideShowTransition.Duration)
 		objSlideEffect.Close
 
 		sl.Export Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png", "PNG"
@@ -125,6 +125,7 @@ $(document).ready(function() {
 	const fs = require("fs-extra");
 	const binPath = './bin/PPTNDI.EXE';
 	let maxSlideNum = 0;
+	let prevSlide = 1;
 	let currentSlide = 1;
 	let currentWindow = remote.getCurrentWindow();
 	let hiddenSlides = [];
@@ -201,9 +202,63 @@ $(document).ready(function() {
 
 		$("select").find('option[value="Next"]').data('img-src', nextSli);
 		initImgPicker();
-		try {
-			child.stdin.write(curSli + "\n");
-		} catch(e) {
+
+		if (!(Object.entries(slideEffects).length === 0 && slideEffects.constructor === Object) &&
+		slideEffects[currentSlide.toString()].effectName !== "0") {
+			/*
+				let duration = slideEffects[currentSlide.toString()].duration;
+				// TO-DO: Implement the transition effect
+				const Jimp = require('jimp');
+				const prevSli = rpc + prevSlide.toString() + '.png';
+				try {
+					for (var i=1; i<=10; i++) {
+						fs.unlinkSync(tmpDir + "/t" + i.toString() + ".png");
+					}
+				} catch(e) {
+				}
+
+				function doTrans2(i) {
+					setTimeout(function() {
+						try {
+							child.stdin.write(tmpDir + "/t" + i.toString() + ".png" + "\n");
+						} catch(e) {
+						}
+					}, i * 10);
+				}
+
+				function doTrans(i) {
+					Jimp.read(curSli).then(image=> {
+						Jimp.read(prevSli).then(image2=> {
+							image.composite(image2, 0, 0, {
+								mode: Jimp.BLEND_OVERLAY,
+								opacitySource: 1 - (0.1 * i),
+								opacityDest: 0.1 * i
+							});
+							image.write(tmpDir + "/t" + i.toString() + ".png", function() {
+								if (i === 10) {
+									for (var i2=1; i2<=10; i2++) {
+										doTrans2(i2);
+									}
+								}
+							});
+						});
+					});
+				}
+				for (var i=1; i<=10; i++) {
+					doTrans(i);
+				}
+			*/
+
+			try {
+				child.stdin.write(curSli + "\n");
+			} catch(e) {
+			}
+
+		} else {
+			try {
+				child.stdin.write(curSli + "\n");
+			} catch(e) {
+			}
 		}
 		$("#slide_cnt").html("SLIDE " + currentSlide + " / " + maxSlideNum);
 	}
@@ -223,6 +278,7 @@ $(document).ready(function() {
 			hide_select: true,
 			show_label: true,
 			selected:function(select, picker_option, event) {
+				prevSlide = currentSlide;
 				currentSlide=$('.selected').text();
 				updateScreen();
 			}
@@ -363,9 +419,6 @@ $(document).ready(function() {
 								"duration" : ls[2]
 							};
 							slideEffects[ls[0].toString()] = obj;
-							if (obj.effectName !== "0") {
-								// TO-DO: Implement the transition effect
-							}
 						}
 					}
 
@@ -392,6 +445,7 @@ $(document).ready(function() {
 		}
 		$('optgroup[label="Slides"] option[value="' + num.toString() + '"]').prop('selected',true);
 		$('optgroup[label="Slides"] option[value="' + num.toString() + '"]').change();
+		prevSlide = currentSlide;
 		currentSlide = num;
 
 		let selected = $('.selected:eq( 0 )');
