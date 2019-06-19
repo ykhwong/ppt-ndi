@@ -5,7 +5,7 @@ const iconFile = __dirname + '/icon.png';
 app.on('ready', function() {
 	let mainWindow = null;
 	let mainWindow2 = null;
-	let debugMode = true;
+	let debugMode = false;
 
 	function init() {
 		let ret = loadArg();
