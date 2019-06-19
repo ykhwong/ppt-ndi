@@ -128,6 +128,8 @@ $(document).ready(function() {
 	let prevSlide = 1;
 	let currentSlide = 1;
 	let currentWindow = remote.getCurrentWindow();
+	let slideWidth = 0;
+	let slideHeight = 0;
 	let hiddenSlides = [];
 	let slideEffects = {};
 	let blkBool = false;
@@ -137,6 +139,11 @@ $(document).ready(function() {
 	let tmpDir = "";
 	let child;
 	let repo;
+	let w = [];
+	
+	for (var pp=1; pp<=10; pp++) {
+		w[pp] = new Worker("createTransitions.js");
+	}
 
 	process.chdir(remote.app.getAppPath());
 	if (fs.existsSync(binPath)) {
@@ -155,6 +162,8 @@ $(document).ready(function() {
 	function createNullSlide() {
 		const Jimp = require('jimp');
 		Jimp.read(tmpDir + "/Slide1.png").then(image=> {
+			slideWidth = image.bitmap.width;
+			slideHeight = image.bitmap.height;
 			new Jimp(image.bitmap.width, image.bitmap.height, (err, image2) => {
 				image2.opacity(0);
 				image2.write(tmpDir + "/Slide0.png");
@@ -203,56 +212,63 @@ $(document).ready(function() {
 		$("select").find('option[value="Next"]').data('img-src', nextSli);
 		initImgPicker();
 
-		if (!(Object.entries(slideEffects).length === 0 && slideEffects.constructor === Object) &&
-		slideEffects[currentSlide.toString()].effectName !== "0") {
-			/*
-				let duration = slideEffects[currentSlide.toString()].duration;
-				// TO-DO: Implement the transition effect
-				const Jimp = require('jimp');
-				const prevSli = rpc + prevSlide.toString() + '.png';
-				try {
-					for (var i=1; i<=10; i++) {
-						fs.unlinkSync(tmpDir + "/t" + i.toString() + ".png");
-					}
-				} catch(e) {
-				}
-
-				function doTrans2(i) {
-					setTimeout(function() {
-						try {
-							child.stdin.write(tmpDir + "/t" + i.toString() + ".png" + "\n");
-						} catch(e) {
-						}
-					}, i * 10);
-				}
-
-				function doTrans(i) {
-					Jimp.read(curSli).then(image=> {
-						Jimp.read(prevSli).then(image2=> {
-							image.composite(image2, 0, 0, {
-								mode: Jimp.BLEND_OVERLAY,
-								opacitySource: 1 - (0.1 * i),
-								opacityDest: 0.1 * i
-							});
-							image.write(tmpDir + "/t" + i.toString() + ".png", function() {
-								if (i === 10) {
-									for (var i2=1; i2<=10; i2++) {
-										doTrans2(i2);
-									}
-								}
-							});
-						});
-					});
-				}
-				for (var i=1; i<=10; i++) {
-					doTrans(i);
-				}
-			*/
-
+		// TO-DO: Improve performance for the slide transition
+		if (
+		    $("#use_slide_transition").is(":checked") &&
+		    ! (Object.entries(slideEffects).length === 0 && slideEffects.constructor === Object) &&
+		    slideEffects[currentSlide.toString()].effectName !== "0"
+		) {
+			let duration = slideEffects[currentSlide.toString()].duration;
+			const prevSli = rpc + prevSlide.toString() + '.png';
+			const transLvl=10;
 			try {
-				child.stdin.write(curSli + "\n");
+				for (var i=1; i<=transLvl; i++) {
+					fs.unlinkSync(tmpDir + "/t" + i.toString() + ".png");
+				}
 			} catch(e) {
 			}
+			function sendSlides(i) {
+				setTimeout(function() {
+					try {
+						child.stdin.write(tmpDir + "/t" + i.toString() + ".png" + "\n");
+						if (i === transLvl) {
+							$("#full").hide();
+						}
+					} catch(e) {
+					}
+				}, i * parseFloat(duration) * 50);
+			}
+
+			function doTrans() {
+				if (curSli === prevSli) {
+					return;
+				}
+
+				let transSlidesCnt = 0;
+				const buffer = fs.readFileSync(curSli);
+				const buffer2 = fs.readFileSync(prevSli);
+                
+				$("#full").show();
+
+				for (var i=1; i<=transLvl; i++) {
+					w[i].onmessage = function(msg){
+						transSlidesCnt++;
+						if (transSlidesCnt === 10) {
+							transSlidesCnt = 0;
+							for (var i2=1; i2<=transLvl; i2++) {
+								sendSlides(i2);
+							}
+						}
+					};
+					w[i].postMessage({
+						"buffer": JSON.stringify(buffer),
+						"buffer2" : JSON.stringify(buffer2),
+						"tmpDir" : tmpDir,
+						"i" : i
+					});
+				};
+			}
+			doTrans();
 
 		} else {
 			try {
@@ -371,8 +387,24 @@ $(document).ready(function() {
 					for (i = 0, len = hiddenSlides.length; i < len; i++) { 
 						hiddenSlides[i] = parseInt(hiddenSlides[i], 10);
 					}
+
+					slideEffects = {};
+					if (fs.existsSync(tmpDir + "/slideEffect.dat")) {
+						const hs = fs.readFileSync(tmpDir + "/slideEffect.dat", { encoding: 'utf8' });
+						const lines = hs.split(/(\r|\n)+/);
+						for (i = 0; i < lines.length; i++) {
+							let ls = lines[i].split(",");
+							let obj = {
+								"effectName" : ls[1],
+								"duration" : ls[2]
+							};
+							slideEffects[ls[0].toString()] = obj;
+						}
+					}
+
 					fileArr.sort((a, b) => a - b).forEach(file2 => {
 						let rpc = file2;
+						let isHidden = false;
 						options += '<option data-img-label="' + rpc + '"';
 
 						for (i = 0, len = hiddenSlides.length; i < len; i++) { 
@@ -380,12 +412,16 @@ $(document).ready(function() {
 							if (/^\d+$/.test(num)) {
 								if (num == parseInt(rpc, 10)) {
 									options += ' data-img-class="hiddenSlide" ';
+									isHidden = true;
+									break;
 								}
 							}
 						}
+						if (!isHidden && ( slideEffects[rpc].effectName !== "0" )) {
+							options += ' data-img-class="transSlide" ';
+						}
 
-						options += ' data-img-src="' + tmpDir + '/Slide' + rpc
-						+ '.png" value="' + rpc + '">Slide ' + rpc + "\n";
+						options += ' data-img-src="' + tmpDir + '/Slide' + rpc + '.png" value="' + rpc + '">Slide ' + rpc + "\n";
 						$("#slides_grp").html(options);
 						$("select").find('option[value="Current"]').prop('img-src', tmpDir + "/Slide1.png");
 						if (!fs.existsSync(tmpDir + "/Slide2.png")) {
@@ -405,20 +441,6 @@ $(document).ready(function() {
 								selectSlide(i.toString());
 								break;
 							}
-						}
-					}
-
-					slideEffects = {};
-					if (fs.existsSync(tmpDir + "/slideEffect.dat")) {
-						const hs = fs.readFileSync(tmpDir + "/slideEffect.dat", { encoding: 'utf8' });
-						const lines = hs.split(/(\r|\n)+/);
-						for (i = 0; i < lines.length; i++) {
-							let ls = lines[i].split(",");
-							let obj = {
-								"effectName" : ls[1],
-								"duration" : ls[2]
-							};
-							slideEffects[ls[0].toString()] = obj;
 						}
 					}
 
@@ -589,6 +611,9 @@ $(document).ready(function() {
 
 	$(document).keydown(function(e) {
 		let realNum = 0;
+		if ($("#full").is(":visible")){
+			return;
+		}
 		$("#below").trigger('click');
 		if(e.which >= 48 && e.which <= 57) {
 			// 0 through 9

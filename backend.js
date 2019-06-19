@@ -5,7 +5,7 @@ const iconFile = __dirname + '/icon.png';
 app.on('ready', function() {
 	let mainWindow = null;
 	let mainWindow2 = null;
-	let debugMode = false;
+	let debugMode = true;
 
 	function init() {
 		let ret = loadArg();
@@ -80,7 +80,11 @@ app.on('ready', function() {
 			resize: (maximizable ? true : false),
 			maximizable: maximizable,
 			backgroundColor: '#060621',
-			webPreferences: { webSecurity: false, nodeIntegration: true }
+			webPreferences: {
+				webSecurity: false,
+				nodeIntegration: true,
+				nodeIntegrationInWorker: true
+			}
 		});
 		if (!maximizable) {
 			retData.setMaximumSize(width, height);
