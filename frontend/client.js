@@ -145,7 +145,10 @@ $(document).ready(function() {
 		w[pp] = new Worker("createTransitions.js");
 	}
 
-	process.chdir(remote.app.getAppPath());
+	try {
+		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
+	} catch(e) {
+	}
 	if (fs.existsSync(binPath)) {
 		child = spawn(binPath);
 		child.stdin.setEncoding('utf-8');

@@ -216,7 +216,10 @@ $(document).ready(function() {
 		let vbsDir;
 		let newVbsContent;
 		let now = new Date().getTime();
-		process.chdir(remote.app.getAppPath());
+		try {
+			process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
+		} catch(e) {
+		}
 		runBin();
 		child.stdin.setEncoding('utf-8');
 		child.stdout.pipe(process.stdout);
