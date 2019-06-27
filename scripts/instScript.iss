@@ -35,6 +35,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Source: "{#MyAppHome}\ppt-ndi-win32-x64\ppt_ndi.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyAppHome}\ppt-ndi-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
+[Dirs]
+Name: "{userappdata}\PPT-NDI"
+
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
 Name: "{autoprograms}\{#MyAppName} (SlideShow Mode)"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Parameters: "--slideshow"
