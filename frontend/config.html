@@ -1,0 +1,64 @@
+<html>
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+<script src="jquery.min.js"></script>
+<script src="client_config.js"></script>
+<link rel="stylesheet" type="text/css" href="config_style.css">
+<link rel="stylesheet" type="text/css" href="common.css">
+<script>if (window.module) module = window.module;</script>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>-</title>
+</head>
+<body>
+<table id="bktbl1" border="0">
+  <tbody>
+    <tr>
+      <td width=250>&nbsp;Minimize to system tray when startup</td>
+      <td>
+		<label class="switch">
+		<input type="checkbox" id="systray" name="systray" value="systray">
+		<span class="slider"></span>
+		</label>
+	  </td>
+	</tr>
+	<tr>
+	  <td>&nbsp;</td>
+	  <td>&nbsp;</td>
+	</tr>
+  </tbody>
+</table>
+<table id="bktbl2" border="0">
+  <tbody>
+	<tr>
+	  <td>&nbsp;Hotkeys (Classic-mode only)</td>
+	  <td>&nbsp;</td>
+	</tr>
+    <tr>
+      <td class="alignRight">&nbsp;Prev</td>
+      <td><input class="txtBox" maxlength=1 id="prevTxtBox" name="prevTxtBox"></textarea></td>
+	</tr>
+	<tr>
+      <td class="alignRight">&nbsp;Next</td>
+	  <td><input class="txtBox" maxlength=1 id="nextTxtBox" name="prevTxtBox"></textarea></td>
+	</tr>
+	<tr>
+      <td class="alignRight">&nbsp;Transparent</td>
+	  <td><input class="txtBox" maxlength=1 id="transTxtBox" name="transTxtBox"></textarea></td>
+	</tr>
+	<tr>
+      <td class="alignRight">&nbsp;Black</td>
+	  <td><input class="txtBox" maxlength=1 id="blackTxtBox" name="blackTxtBox"></textarea></td>
+	</tr>
+	<tr>
+      <td class="alignRight">&nbsp;White</td>
+	  <td><input class="txtBox" maxlength=1 id="whiteTxtBox" name="whiteTxtBox"></textarea></td>
+	</tr>
+	<!--TO-DO: Slides-->
+  </tbody>
+</table>
+
+<div class="button" id="saveConfig">Save</div>
+<img id="closeImg" src="close.png">
+</body>
+</html>

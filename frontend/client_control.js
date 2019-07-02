@@ -285,6 +285,10 @@ $(document).ready(function() {
 	ipc.on('remote' , function(event, data){
 		if (data.msg == "exit") {
 			cleanupForExit();
+			return;
+		}
+		if (data.msg == "reload") {
+			// TO-DO: reflect the config
 		}
 	});
 

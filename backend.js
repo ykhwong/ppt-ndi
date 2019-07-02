@@ -1,18 +1,68 @@
-const { app } = require('electron');
+const { app, Menu, Tray } = require('electron');
 const frontendDir = __dirname + '/frontend/';
 const iconFile = __dirname + '/icon.png';
+let tray = null;
 
 app.on('ready', function() {
 	let mainWindow = null;
 	let mainWindow2 = null;
+	let mainWindow3 = null;
 	let debugMode = false;
+	let startAsTray = false;
 
 	function init() {
-		let ret = loadArg();
+		let ret;
+		let configPath;
+		const configFile = 'config.js';
+		const fs = require("fs-extra");
+		mainWindow3 = createWin(400, 345, false, 'config.html', false);
+
+		configPath = configFile;
+		if (!fs.existsSync(configPath)) {
+			const appDataPath = process.env.APPDATA + "/PPT-NDI";
+			configPath = appDataPath + "/" + configFile;
+		}
+		if (fs.existsSync(configPath)) {
+			startAsTray = JSON.parse(fs.readFileSync(configPath)).startAsTray;
+		} else {
+			// Do nothing
+		}
+		ret = loadArg();
 		if (!ret) {
-			loadMainWin();
+			loadMainWin(!startAsTray);
 		}
 		loadIpc();
+
+		tray = new Tray(iconFile);
+		const contextMenu = Menu.buildFromTemplate([
+			{ label: '&Hide', click() {
+				if (mainWindow2 != null) {
+					mainWindow2.hide();
+				} else if (mainWindow != null) {
+					mainWindow.hide();
+				}
+			}},
+			{ label: '&Configure', click() {
+				mainWindow3.show();
+			}},
+			{ label: 'E&xit', click() {
+				if (mainWindow2 != null) {
+					mainWindow2.destroy();
+				}
+				if (process.platform != 'darwin') {
+					app.quit();
+				}
+			}}
+		]);
+		tray.setToolTip('PPT-NDI');
+		tray.setContextMenu(contextMenu);
+		tray.on('double-click', () => {
+			if (mainWindow2 != null) {
+				mainWindow2.show();
+			} else if (mainWindow != null) {
+				mainWindow.show();
+			}
+		});
 	}
 
 	function loadArg() {
@@ -31,26 +81,28 @@ app.on('ready', function() {
 			}
 			if (/--bg/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(300, 300, false, 'control.html');
-				mainWindow2.hide();
+				mainWindow2 = createWin(300, 300, false, 'control.html', false);
+				addMainWin2closeHandler();
 				break;
 			}
 			if (/--slideshow/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(300, 330, false, 'control.html');
+				mainWindow2 = createWin(300, 330, false, 'control.html', !startAsTray);
+				addMainWin2closeHandler();
 				break;
 			}
 			if (/--classic/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(1200, 680, true, 'index.html');
+				mainWindow2 = createWin(1200, 680, true, 'index.html', !startAsTray);
+				addMainWin2closeHandler();
 				break;
 			}
 		}
 		return matched;
 	}
 
-	function loadMainWin() {
-		mainWindow = createWin(700, 360, false, 'main.html');
+	function loadMainWin(showWin) {
+		mainWindow = createWin(700, 360, false, 'main.html', showWin);
 		mainWindow.on('closed', function(e) {
 			if (mainWindow2 === null) {
 				mainWindow = null;
@@ -63,7 +115,7 @@ app.on('ready', function() {
 		});
 	}
 
-	function createWin(width, height, maximizable, winFile) {
+	function createWin(width, height, maximizable, winFile, showWin) {
 		const { BrowserWindow } = require('electron');
 		let retData;
 		if (debugMode) {
@@ -93,8 +145,23 @@ app.on('ready', function() {
 			retData.webContents.openDevTools();
 		}
 		retData.loadURL(frontendDir + winFile);
-		retData.focus();
+		if (!showWin) {
+			retData.hide();
+		} else {
+			retData.focus();
+		}
 		return retData;
+	}
+
+	function addMainWin2closeHandler() {
+		if (mainWindow2 !== null) {
+			mainWindow2.on('close', function(e) {
+				e.preventDefault();
+				mainWindow2.webContents.send('remote', {
+					msg: 'exit'
+				});
+			});
+		}
 	}
 
 	function loadIpc() {
@@ -110,10 +177,20 @@ app.on('ready', function() {
 					}
 					break;
 				case "select1":
-					mainWindow2 = createWin(300, 330, false, 'control.html');
+					mainWindow2 = createWin(300, 330, false, 'control.html', true);
+					addMainWin2closeHandler();
+					mainWindow.destroy();
 					break;
 				case "select2":
-					mainWindow2 = createWin(1200, 680, true, 'index.html');
+					mainWindow2 = createWin(1200, 680, true, 'index.html', true);
+					addMainWin2closeHandler();
+					mainWindow.destroy();
+					break;
+				case "showConfig":
+					mainWindow3.show();
+					break;
+				case "hideConfig":
+					mainWindow3.hide();
 					break;
 				case "onTop":
 					mainWindow2.setAlwaysOnTop(true);
@@ -121,28 +198,22 @@ app.on('ready', function() {
 				case "onTopOff":
 					mainWindow2.setAlwaysOnTop(false);
 					break;
+				case "reflectConfig":
+					mainWindow2.webContents.send('remote', { msg: 'reload' });
+					break;
 				default:
+					console.log("Unhandled function - loadIpc()");
 					mainWindow.destroy();
 					break;
-			}
-			if (/^select/.test(data)) {
-				mainWindow2.on('close', function(e) {
-					e.preventDefault();
-					mainWindow2.webContents.send('remote', {
-						msg: 'exit'
-					});
-				});
-				mainWindow.destroy();
 			}
 		});
 	}
 	
 	init();
-
-	//console.log(process.argv);
 });
 
 app.on('window-all-closed', (e) => {
-	if (process.platform != 'darwin')
+	if (process.platform != 'darwin') {
 		app.quit();
+	}
 });

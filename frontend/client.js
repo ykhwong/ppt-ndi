@@ -124,6 +124,7 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const binPath = './bin/PPTNDI.EXE';
+	let ioHook;
 	let maxSlideNum = 0;
 	let prevSlide = 1;
 	let currentSlide = 1;
@@ -140,7 +141,7 @@ $(document).ready(function() {
 	let child;
 	let repo;
 	let w = [];
-	
+
 	for (var pp=1; pp<=10; pp++) {
 		w[pp] = new Worker("createTransitions.js");
 	}
@@ -289,7 +290,9 @@ $(document).ready(function() {
 	});
 
 	$("#with_background").click(function() {
-		$("#reloadReq").toggle();
+		if (maxSlideNum > 0) {
+			$("#reloadReq").toggle();
+		}
 	});
 
 	function initImgPicker() {
@@ -735,9 +738,48 @@ $(document).ready(function() {
 		ipc.send('remote', "exit");
 	}
 
+	function reflectConfig() {
+		const configFile = 'config.js';
+		let configData = {};
+		let configPath = "";
+		const { remote } = require('electron');
+		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
+		if (!fs.existsSync(configPath)) {
+			const appDataPath = process.env.APPDATA + "/PPT-NDI";
+			configPath = appDataPath + "/" + configFile;
+		}
+		if (fs.existsSync(configPath)) {
+			$.getJSON(configPath, function(json) {
+				configData.hotKeys = json.hotKeys;
+				ioHook = null;
+				ioHook = require('iohook');
+				ioHook.on('keyup', event => {
+					if (event.shiftKey && event.ctrlKey) {
+						let chr = String.fromCharCode( event.rawcode );
+						if (chr === "") return;
+						switch (chr) {
+							case configData.hotKeys.prev: gotoPrev(); break;
+							case configData.hotKeys.next: gotoNext(); break;
+							case configData.hotKeys.transparent: updateBlkWhtTrn("trn"); break;
+							case configData.hotKeys.black: updateBlkWhtTrn("black"); break;
+							case configData.hotKeys.white: updateBlkWhtTrn("white"); break;
+						}
+					}
+				});
+				ioHook.start();
+			});
+		} else {
+			// Do nothing
+		}
+	}
+
 	ipc.on('remote' , function(event, data){
 		if (data.msg == "exit") {
 			cleanupForExit();
+			return;
+		}
+		if (data.msg == "reload") {
+			reflectConfig();
 		}
 	});
 
@@ -791,4 +833,5 @@ $(document).ready(function() {
 
 	initImgPicker();
 	startCurrentTime();
+	reflectConfig();
 });
