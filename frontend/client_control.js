@@ -157,6 +157,33 @@ End Sub
 Main
 `;
 
+const vbsDirectCmd = `
+Dim objPPT
+Dim cmd
+sub Main()
+	Do While True
+		On Error Resume Next
+		cmd = Wscript.StdIn.ReadLine()
+		Set objPPT = CreateObject("PowerPoint.Application")
+		If Err.Number = 0 Then
+			Err.Clear
+			Set ap = objPPT.ActivePresentation
+			If Err.Number = 0 Then
+				Err Clear
+				Set objSlideShow = ap.SlideShowWindow.View
+					If cmd = "prev" Then
+						objSlideShow.GotoSlide objSlideShow.CurrentShowPosition - 1
+					End If
+					If cmd = "next" Then
+						objSlideShow.GotoSlide objSlideShow.CurrentShowPosition + 1
+					End If
+			End If
+		End If
+	Loop
+End Sub
+Main
+`;
+
 $(document).ready(function() {
 	const spawn = require( 'child_process' ).spawn;
 	const ipc = require('electron').ipcRenderer;
@@ -167,6 +194,8 @@ $(document).ready(function() {
 	let pin = true;
 	let child;
 	let res;
+	let res2;
+	let iohook2;
 
 	function runBin() {
 		if (fs.existsSync(binPath)) {
@@ -214,6 +243,7 @@ $(document).ready(function() {
 		const { remote } = require('electron');
 		let file;
 		let vbsDir;
+		let vbsDir2;
 		let newVbsContent;
 		let now = new Date().getTime();
 		try {
@@ -231,6 +261,7 @@ $(document).ready(function() {
 		tmpDir += '/' + now;
 		fs.mkdirSync(tmpDir);
 		vbsDir = tmpDir + '/wb.vbs';
+		vbsDir2 = tmpDir + '/wb2.vbs';
 		file = tmpDir + "/Slide.png";
 
 		newVbsContent = vbsNoBg;
@@ -239,6 +270,10 @@ $(document).ready(function() {
 		} catch(e) {
 			alert('Failed to access the temporary directory!');
 			return;
+		}
+		try {
+			fs.writeFileSync(vbsDir2, vbsDirectCmd, 'utf-8');
+		} catch(e) {
 		}
 		if (fs.existsSync(vbsDir)) {
 			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
@@ -249,7 +284,9 @@ $(document).ready(function() {
 			alert('Failed to parse the presentation!');
 			return;
 		}
-
+		if (fs.existsSync(vbsDir2)) {
+			res2 = spawn( 'cscript.exe', [ vbsDir2, '' ] );
+		}
 		// Enable Always On Top by default
 		ipc.send('remote', "onTop");
 		$("#pin").attr("src", "pin_green.png");
@@ -265,11 +302,47 @@ $(document).ready(function() {
 			res.stdin.write("\n");
 		});
 		ioHook.start();
+		reflectConfig();
 	}
 
 	function cleanupForTemp() {
 		if (fs.existsSync(tmpDir)) {
 			fs.removeSync(tmpDir);
+		}
+	}
+
+	function reflectConfig() {
+		const configFile = 'config.js';
+		let configData = {};
+		let configPath = "";
+		const { remote } = require('electron');
+		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
+		if (!fs.existsSync(configPath)) {
+			const appDataPath = process.env.APPDATA + "/PPT-NDI";
+			configPath = appDataPath + "/" + configFile;
+		}
+		if (fs.existsSync(configPath)) {
+			$.getJSON(configPath, function(json) {
+				configData.hotKeys = json.hotKeys;
+				ioHook2 = null;
+				ioHook2 = require('iohook');
+				ioHook2.on('keyup', event => {
+					if (event.shiftKey && event.ctrlKey) {
+						let chr = String.fromCharCode( event.rawcode );
+						if (chr === "") return;
+						switch (chr) {
+							case configData.hotKeys.prev: res2.stdin.write("prev\n"); break;
+							case configData.hotKeys.next: res2.stdin.write("next\n"); break;
+							case configData.hotKeys.transparent: /* */ break;
+							case configData.hotKeys.black: /* */ break;
+							case configData.hotKeys.white: /* */ break;
+						}
+					}
+				});
+				ioHook2.start();
+			});
+		} else {
+			// Do nothing
 		}
 	}
 
@@ -288,7 +361,8 @@ $(document).ready(function() {
 			return;
 		}
 		if (data.msg == "reload") {
-			// TO-DO: reflect the config
+			reflectConfig();
+			return;
 		}
 	});
 

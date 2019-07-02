@@ -780,6 +780,7 @@ $(document).ready(function() {
 		}
 		if (data.msg == "reload") {
 			reflectConfig();
+			return;
 		}
 	});
 
