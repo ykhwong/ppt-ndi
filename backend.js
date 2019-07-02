@@ -7,7 +7,7 @@ app.on('ready', function() {
 	let mainWindow = null;
 	let mainWindow2 = null;
 	let mainWindow3 = null;
-	let debugMode = true;
+	let debugMode = false;
 	let startAsTray = false;
 
 	function init() {
