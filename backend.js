@@ -199,7 +199,9 @@ app.on('ready', function() {
 					mainWindow2.setAlwaysOnTop(false);
 					break;
 				case "reflectConfig":
-					mainWindow2.webContents.send('remote', { msg: 'reload' });
+					if (mainWindow2 !== null) {
+						mainWindow2.webContents.send('remote', { msg: 'reload' });
+					}
 					break;
 				default:
 					console.log("Unhandled function - loadIpc()");
