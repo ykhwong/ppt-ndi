@@ -3,7 +3,7 @@
 ## INTRODUCTION
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Can be also used as a character generator because it supports transparency.
 
-The latest version is PPT NDI (20190427).
+The latest version is PPT NDI (20190703).
 
 ## HOW TO USE
 1. Download PPT NDI from https://github.com/ykhwong/ppt-ndi/releases
@@ -50,21 +50,25 @@ For the best result, please set the slide resolution properly.
 
 ![Custom Slide Size 2](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_slide_set_size2.png)
 
+### Configuration
+
+Right click the system tray icon and click Configure to configure the PPT NDI.
+
+![System tray 1](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_ndi_systray1.png)
+
+Here, you can assign system-wide hot keys. Additionally, you can set up to minimize PPT NDI to system tray when startup.
+
+![System tray 2](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_ndi_systray2.png)
+
+
 ### Command Line Options
 
 ```sh
   ppt_ndi.exe  [--slideshow] [--classic] [--bg]
      [--slideshow] : SlidShow Mode
        [--classic] : Classic Mode
-            [--bg] : Run SlideShow Mode as background
+            [--bg] : Run SlideShow Mode as background (deprecated)
 ```
-
-### SlideShow Mode as Background
-
-1. Press Windows-R key. In the Run dialog box, type <code>shell:startup</code>, and hit Enter.
-2. Drag and drop the runAsBackground.vbs file to the Startup folder while holding down the ALT key on your keyboard.
-3. A shortcut of the vbs file will be created.
-4. Restart the computer and it will be automatically executed on startup or boot.
 
 ### Sample
 

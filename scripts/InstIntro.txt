@@ -2,12 +2,11 @@ PPT NDI
 
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Can be also used as a character generator because it supports transparency.
 
-Release Note (20190427):
+Release Note (20190703):
 
-1. ADD: An installer has been added as an alternative to the 7z file
-2. FIX: Hidden slides were displayed in NEXT. (Classic mode)
-3. FIX: Could not load images from slides. (Classic mode)
-4. FIX: Glitches upon a fast slide transition (PowerPoint Slidshow mode)
+1. ADD: Assign system-wide hot keys
+2. ADD: Minimize to system tray when startup
+3. ADD: Support for slide transition (currently classic-mode only)
 
 Please also refer to the sample.pptx that demonstrates the lower thirds:
 https://github.com/ykhwong/ppt-ndi/raw/master/resources/sample.pptx

@@ -1,6 +1,6 @@
 
 #define MyAppName "PPT NDI"
-#define MyAppVersion "20190427"
+#define MyAppVersion "20190703"
 #define MyAppPublisher "ykhwong"
 #define MyAppURL "https://github.com/ykhwong/ppt-ndi"
 #define MyAppExeName "ppt_ndi.exe"
@@ -32,7 +32,7 @@ UninstallDisplayName={#MyAppName}
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "{#MyAppHome}\ppt-ndi-win32-x64\ppt_ndi.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyAppHome}\ppt-ndi-win32-x64\ppt-ndi.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyAppHome}\ppt-ndi-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Dirs]
