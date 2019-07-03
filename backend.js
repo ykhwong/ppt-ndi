@@ -16,6 +16,10 @@ app.on('ready', function() {
 		const configFile = 'config.js';
 		const fs = require("fs-extra");
 		mainWindow3 = createWin(400, 345, false, 'config.html', false);
+		mainWindow3.on('close', function (event) {
+			event.preventDefault();
+			mainWindow3.hide();
+		});
 
 		configPath = configFile;
 		if (!fs.existsSync(configPath)) {
