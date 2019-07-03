@@ -110,6 +110,7 @@ app.on('ready', function() {
 		mainWindow.on('closed', function(e) {
 			if (mainWindow2 === null) {
 				mainWindow = null;
+				mainWindow3.destroy();
 				if (process.platform != 'darwin') {
 					app.quit();
 				}
@@ -177,6 +178,7 @@ app.on('ready', function() {
 						mainWindow2.destroy();
 					}
 					if (process.platform != 'darwin') {
+						mainWindow3.destroy();
 						app.quit();
 					}
 					break;

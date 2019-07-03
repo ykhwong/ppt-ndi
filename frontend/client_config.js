@@ -91,6 +91,11 @@ $(document).ready(function() {
 			$(this).focus().val("").val(myVal);
 		}
 	});
+	$(".txtBox").keydown(function(e) {
+		if(e.keyCode === 8) {
+			e.preventDefault();
+		}
+	});
 	$(".txtBox").keyup(function(e) {
 		let myVal = $(this).val();
 		let chr = String.fromCharCode( e.keyCode );
