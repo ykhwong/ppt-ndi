@@ -1,0 +1,88 @@
+<html>
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+<script src="jquery.min.js"></script>
+<script src="client.js"></script>
+<script src="image-picker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<link rel="stylesheet" type="text/css" href="common.css">
+<link rel="stylesheet" type="text/css" href="image-picker.css">
+<script>if (window.module) module = window.module;</script>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>-</title>
+</head>
+<body>
+<h1><h1><br />
+<div id="top" style="-webkit-app-region: drag">
+<img src="big_icon.png" style="-webkit-app-region: drag">
+</div>
+<img id="minimize" src="min.png">
+<img id="max_restore" src="max.png">
+<img id="exit" src="close.png">
+
+<div id="left">
+	<br /><br />
+	<img id="load_pptx" class="button" src="open.png">
+	<br /><br />
+	<table id="bktbl" border="0">
+	  <tbody>
+		<tr>
+		  <td width="140px">Include Background</td>
+		  <td width="35px">
+			<label class="switch">
+			<input type="checkbox" id="with_background" class="checkbox" name="with_background" value="with_background">
+			<span class="slider"></span>
+			</label>
+		  </td>
+		  <td>
+			<div id="reloadReq">Reload required</div>
+		  </td>
+		</tr>
+		<tr>
+		  <td width="140px">Show Checkerboard</td>
+		  <td>
+			<label class="switch">
+			<input type="checkbox" id="trans_checker" class="checkbox" name="trans_checker" value="trans_checker">
+			<span class="slider"></span>
+			</label>
+		</td>
+		</tr>
+		<tr>
+		  <td width="140px">Enable Slide Transition</td>
+		  <td>
+			<label class="switch">
+			<input type="checkbox" id="use_slide_transition" class="checkbox" name="use_slide_transition" value="use_slide_transition">
+			<span class="slider"></span>
+			</label>
+		</td>
+		</tr>
+	  </tbody>
+	</table>
+</div>
+
+<div id="right">
+	<div id="slide_cnt">SLIDE 0 / 0</div>
+	<div id="current_time">00:00 AM</div>
+	<select class="image-picker show-html">
+		<optgroup label="Screen" id="screen_grp">
+		<option data-img-label="CURRENT" data-img-src="null_slide.png" value="Current" disabled>Current</option>
+		<option data-img-label="NEXT" data-img-src="null_slide.png" value="Next" disabled>Next</option>
+		</optgroup>
+	</select>
+	<button type="button" class="button" id="prev">&nbsp;&lt;&nbsp;</button>
+	<button type="button" class="button" id="next">&nbsp;&gt;&nbsp;</button>
+	<button type="button" class="button" id="blk">&nbsp;B&nbsp;</button>
+	<button type="button" class="button" id="wht">&nbsp;W&nbsp;</button>
+	<button type="button" class="button" id="trn">&nbsp;T&nbsp;</button>
+</div>
+
+<div id="below">
+<select class="image-picker">
+	<optgroup label="Slides" id="slides_grp">
+	</optgroup>
+</select>
+<div id="fullblack"></div>
+<div id="full"></div>
+</div>
+</html>
