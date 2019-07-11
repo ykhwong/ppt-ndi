@@ -5,7 +5,7 @@ PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek
 
 The latest version is PPT NDI (20190703).
 
-## HOW TO USE
+## BASIC USAGE
 1. Download PPT NDI from https://github.com/ykhwong/ppt-ndi/releases
 2. If you have downloaded the installer, execute the pptndi_setup.exe. After the installation, click Start button and select "PPT NDI".
 3. If you have downloaded the 7z file, decompress it and simply run the executable "ppt_ndi.exe"
