@@ -79,7 +79,7 @@ app.on('ready', function() {
 				out += " " + path.basename(process.argv[0]) + " [--slideshow] [--classic] [--bg]\n";
 				out += "   [--slideshow] : SlidShow Mode\n";
 				out += "     [--classic] : Classic Mode\n";
-				out += "          [--bg] : Run SlideShow Mode as background\n";
+				out += "          [--bg] : Run SlideShow Mode in the background\n";
 				console.log(out);
 				app.quit();
 			}
