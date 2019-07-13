@@ -9,13 +9,71 @@ app.on('ready', function() {
 	let mainWindow3 = null;
 	let debugMode = false;
 	let startAsTray = false;
+	let isMainWinShown = false;
+	let isMainWin2shown = false;
+
+	function refreshTray() {
+		let isVisible = true;
+		let hideShowItem;
+		if (tray === null) {
+			tray = new Tray(iconFile);
+		}
+		if (mainWindow2 != null) {
+			isVisible = isMainWin2shown;
+		} else if (mainWindow != null) {
+			isVisible = isMainWinShown;
+		}
+		hideShowItem = isVisible ? '&Hide' : '&Show';
+		const contextMenu = Menu.buildFromTemplate([
+			{ label: hideShowItem, click() {
+				if (mainWindow2 != null) {
+					if (isVisible) {
+						mainWindow2.hide();
+					} else {
+						mainWindow2.show();
+					}
+				} else if (mainWindow != null) {
+					if (isVisible) {
+						mainWindow.hide();
+					} else {
+						mainWindow.show();
+					}
+				}
+				refreshTray();
+			}},
+			{ label: '&Configure', click() {
+				mainWindow3.show();
+			}},
+			{ label: 'E&xit', click() {
+				if (mainWindow2 != null) {
+					mainWindow2.destroy();
+				}
+				if (mainWindow3 != null) {
+					mainWindow3.destroy();
+				}
+				if (process.platform != 'darwin') {
+					app.quit();
+				}
+			}}
+		]);
+		tray.setToolTip('PPT-NDI');
+		tray.setContextMenu(contextMenu);
+		tray.on('double-click', () => {
+			if (mainWindow2 != null) {
+				mainWindow2.show();
+			} else if (mainWindow != null) {
+				mainWindow.show();
+			}
+			refreshTray();
+		});
+	}
 
 	function init() {
 		let ret;
 		let configPath;
 		const configFile = 'config.js';
 		const fs = require("fs-extra");
-		mainWindow3 = createWin(400, 345, false, 'config.html', false);
+		mainWindow3 = createWin(340, 345, false, 'config.html', false);
 		mainWindow3.on('close', function (event) {
 			event.preventDefault();
 			mainWindow3.hide();
@@ -37,36 +95,7 @@ app.on('ready', function() {
 		}
 		loadIpc();
 
-		tray = new Tray(iconFile);
-		const contextMenu = Menu.buildFromTemplate([
-			{ label: '&Hide', click() {
-				if (mainWindow2 != null) {
-					mainWindow2.hide();
-				} else if (mainWindow != null) {
-					mainWindow.hide();
-				}
-			}},
-			{ label: '&Configure', click() {
-				mainWindow3.show();
-			}},
-			{ label: 'E&xit', click() {
-				if (mainWindow2 != null) {
-					mainWindow2.destroy();
-				}
-				if (process.platform != 'darwin') {
-					app.quit();
-				}
-			}}
-		]);
-		tray.setToolTip('PPT-NDI');
-		tray.setContextMenu(contextMenu);
-		tray.on('double-click', () => {
-			if (mainWindow2 != null) {
-				mainWindow2.show();
-			} else if (mainWindow != null) {
-				mainWindow.show();
-			}
-		});
+		refreshTray();
 	}
 
 	function loadArg() {
@@ -80,18 +109,18 @@ app.on('ready', function() {
 				out += "   [--slideshow] : SlidShow Mode\n";
 				out += "     [--classic] : Classic Mode\n";
 				console.log(out);
-				app.quit();
+				process.exit(0);
 			}
 			if (/--slideshow/i.test(val)) {
 				matched=true;
 				mainWindow2 = createWin(300, 330, false, 'control.html', !startAsTray);
-				addMainWin2closeHandler();
+				addMainWin2handler(!startAsTray);
 				break;
 			}
 			if (/--classic/i.test(val)) {
 				matched=true;
 				mainWindow2 = createWin(1200, 680, true, 'index.html', !startAsTray);
-				addMainWin2closeHandler();
+				addMainWin2handler(!startAsTray);
 				break;
 			}
 		}
@@ -111,6 +140,15 @@ app.on('ready', function() {
 				e.preventDefault();
 			}
 		});
+		mainWindow.on('show', () => {
+			isMainWinShown = true;
+		});
+		mainWindow.on('hide', () => {
+			isMainWinShown = false;
+		});
+		if (showWin) {
+			mainWindow.show();
+		}
 	}
 
 	function createWin(width, height, maximizable, winFile, showWin) {
@@ -151,7 +189,7 @@ app.on('ready', function() {
 		return retData;
 	}
 
-	function addMainWin2closeHandler() {
+	function addMainWin2handler(showWin) {
 		if (mainWindow2 !== null) {
 			mainWindow2.on('close', function(e) {
 				e.preventDefault();
@@ -159,6 +197,15 @@ app.on('ready', function() {
 					msg: 'exit'
 				});
 			});
+		}
+		mainWindow2.on('show', () => {
+			isMainWin2shown = true;
+		});
+		mainWindow2.on('hide', () => {
+			isMainWin2shown = false;
+		});
+		if (showWin) {
+			mainWindow2.show();
 		}
 	}
 
@@ -170,19 +217,21 @@ app.on('ready', function() {
 					if (mainWindow2 != null) {
 						mainWindow2.destroy();
 					}
-					if (process.platform != 'darwin') {
+					if (mainWindow3 != null) {
 						mainWindow3.destroy();
+					}
+					if (process.platform != 'darwin') {
 						app.quit();
 					}
 					break;
 				case "select1":
 					mainWindow2 = createWin(300, 330, false, 'control.html', true);
-					addMainWin2closeHandler();
+					addMainWin2handler(true);
 					mainWindow.destroy();
 					break;
 				case "select2":
 					mainWindow2 = createWin(1200, 680, true, 'index.html', true);
-					addMainWin2closeHandler();
+					addMainWin2handler(true);
 					mainWindow.destroy();
 					break;
 				case "showConfig":
