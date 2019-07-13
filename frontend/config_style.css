@@ -67,6 +67,12 @@ html, body {
 	width: 50px;
 }
 
+.cmo {
+	color: #3c6ab5;
+	display: inline-block;
+	font-size: 90%;
+}
+
 ::placeholder {
 	color: black;
 }

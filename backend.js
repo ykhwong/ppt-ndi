@@ -76,18 +76,11 @@ app.on('ready', function() {
 			if (/--(h|help)/i.test(val)) {
 				const path = require('path');
 				let out = "PPT NDI\n";
-				out += " " + path.basename(process.argv[0]) + " [--slideshow] [--classic] [--bg]\n";
+				out += " " + path.basename(process.argv[0]) + " [--slideshow] [--classic]\n";
 				out += "   [--slideshow] : SlidShow Mode\n";
 				out += "     [--classic] : Classic Mode\n";
-				out += "          [--bg] : Run SlideShow Mode in the background\n";
 				console.log(out);
 				app.quit();
-			}
-			if (/--bg/i.test(val)) {
-				matched=true;
-				mainWindow2 = createWin(300, 300, false, 'control.html', false);
-				addMainWin2closeHandler();
-				break;
 			}
 			if (/--slideshow/i.test(val)) {
 				matched=true;
@@ -216,7 +209,7 @@ app.on('ready', function() {
 			}
 		});
 	}
-	
+
 	init();
 });
 

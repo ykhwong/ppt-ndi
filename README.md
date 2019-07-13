@@ -64,10 +64,9 @@ Here, you can assign system-wide hotkeys. Additionally, you can set PPT  NDI to 
 ### Command-Line Options
 
 ```sh
-  ppt_ndi.exe  [--slideshow] [--classic] [--bg]
+  ppt_ndi.exe  [--slideshow] [--classic]
      [--slideshow] : SlidShow Mode
        [--classic] : Classic Mode
-            [--bg] : Run SlideShow Mode in the background (deprecated)
 ```
 
 ### Sample
