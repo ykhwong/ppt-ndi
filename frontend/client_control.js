@@ -7,13 +7,7 @@ On Error Resume Next
 Sub Proc()
 	Dim sl
 	Dim shGroup
-	Dim sngWidth
-	Dim sngHeight
 	Dim isSaved
-	With ap.PageSetup
-		sngWidth = .SlideWidth
-		sngHeight = .SlideHeight
-	End With
 	Set objSlideShow = ap.SlideShowWindow.View
 	If ap.Saved Then
 		isSaved = True
@@ -129,6 +123,8 @@ sub Main()
 				curPos = ap.SlideShowWindow.View.CurrentShowPosition
 				If Err.Number = 0 Then
 					If ap.SlideShowWindow.View.State = -1 Then
+					ElseIf ap.SlideShowWindow.View.State = 2 Then
+						Wscript.Echo "PPTNDI: Paused"
 					ElseIf ap.SlideShowWindow.View.State = 3 Then
 						Wscript.Echo "PPTNDI: Black"
 					ElseIf ap.SlideShowWindow.View.State = 4 Then
@@ -183,6 +179,9 @@ sub Main()
 					If cmd = "white" Then
 						ap.SlideShowWindow.View.State = 4
 					End If
+					If cmd = "tran" Then
+						ap.SlideShowWindow.View.State = 2
+					End If
 			End If
 		End If
 	Loop
@@ -224,6 +223,8 @@ $(document).ready(function() {
 			file = "black_slide.png";
 		} else if(/^PPTNDI: Done/.test(cmd)) {
 			//file = "null_slide.png";
+		} else if(/^PPTNDI: Paused/.test(cmd)) {
+			file = "null_slide.png";
 		} else {
 			return;
 		}
@@ -339,7 +340,7 @@ $(document).ready(function() {
 						switch (chr) {
 							case configData.hotKeys.prev: res2.stdin.write("prev\n"); res.stdin.write("\n"); break;
 							case configData.hotKeys.next: res2.stdin.write("next\n"); res.stdin.write("\n"); break;
-							case configData.hotKeys.transparent: /* */ break;
+							case configData.hotKeys.transparent: res2.stdin.write("tran\n"); res.stdin.write("\n"); break;
 							case configData.hotKeys.black: res2.stdin.write("black\n"); res.stdin.write("\n"); break;
 							case configData.hotKeys.white: res2.stdin.write("white\n"); res.stdin.write("\n"); break;
 						}
