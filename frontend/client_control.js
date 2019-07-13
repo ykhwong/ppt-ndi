@@ -36,6 +36,8 @@ sub Main()
 				curPos = ap.SlideShowWindow.View.CurrentShowPosition
 				If Err.Number = 0 Then
 					If ap.SlideShowWindow.View.State = -1 Then
+					ElseIf ap.SlideShowWindow.View.State = 2 Then
+						Wscript.Echo "PPTNDI: Paused"
 					ElseIf ap.SlideShowWindow.View.State = 3 Then
 						Wscript.Echo "PPTNDI: Black"
 					ElseIf ap.SlideShowWindow.View.State = 4 Then
@@ -179,8 +181,8 @@ sub Main()
 					If cmd = "white" Then
 						ap.SlideShowWindow.View.State = 4
 					End If
-					If cmd = "tran" Then
-						ap.SlideShowWindow.View.State = 2
+					If cmd = "pause" Then
+						ap.SlideShowWindow.View.State = 5
 					End If
 			End If
 		End If
@@ -193,14 +195,16 @@ $(document).ready(function() {
 	const spawn = require( 'child_process' ).spawn;
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
-	const ioHook = require('iohook');
 	const binPath = './bin/PPTNDI.EXE';
+	let ignoreIoHook = false;
+	let ioHook = null;
+	let iohook2 = null;
 	let tmpDir = null;
+	let configData = {};
 	let pin = true;
 	let child;
 	let res;
 	let res2;
-	let iohook2;
 
 	function runBin() {
 		if (fs.existsSync(binPath)) {
@@ -212,19 +216,30 @@ $(document).ready(function() {
 		}
 	}
 
+	function sendNullNDI() {
+		const now = new Date().getTime();
+		const file = "null_slide.png";
+		$("#slidePreview").attr("src", file + "?" + now);
+		try {
+			child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file + "\n");
+		} catch(e) {
+			runBin();
+			child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file + "\n");
+		}
+	}
+
 	function sendNDI(file, data) {
-		let now = new Date().getTime();
-		let cmd = data.toString();
+		const now = new Date().getTime();
+		const cmd = data.toString();
 		if (/^PPTNDI: Sent/.test(cmd)) {
 			// Do nothing
 		} else if(/^PPTNDI: White/.test(cmd)) {
 			file = "white_slide.png";
 		} else if(/^PPTNDI: Black/.test(cmd)) {
 			file = "black_slide.png";
-		} else if(/^PPTNDI: Done/.test(cmd)) {
+		} else if(/^PPTNDI: (Done|Paused)/.test(cmd)) {
 			//file = "null_slide.png";
-		} else if(/^PPTNDI: Paused/.test(cmd)) {
-			file = "null_slide.png";
+			return;
 		} else {
 			return;
 		}
@@ -244,6 +259,50 @@ $(document).ready(function() {
 				child.stdin.write(file + "\n");
 			}
 		}
+	}
+
+	function registerIoHook() {
+		ioHook = require('iohook');
+		ioHook.on('keydown', event => {
+			if (!ignoreIoHook) {
+				res.stdin.write("\n");
+			}
+		});
+		ioHook.on('mouseup', event => {
+			if (!ignoreIoHook) {
+				res.stdin.write("\n");
+			}
+		});
+		ioHook.on('mousewheel', event => {
+			if (!ignoreIoHook) {
+				res.stdin.write("\n");
+			}
+		});
+		ioHook.start();
+	}
+
+	function registerIoHook2() {
+		ioHook2 = require('iohook');
+		ioHook2.on('keyup', event => {
+			if (event.shiftKey && event.ctrlKey) {
+				let chr = String.fromCharCode( event.rawcode );
+				if (chr === "") return;
+				switch (chr) {
+					case configData.hotKeys.prev: res2.stdin.write("prev\n"); res.stdin.write("\n"); break;
+					case configData.hotKeys.next: res2.stdin.write("next\n"); res.stdin.write("\n"); break;
+					case configData.hotKeys.transparent:
+						setTimeout(function() {
+							ignoreIoHook = true;
+							sendNullNDI();
+							ignoreIoHook = false;
+						}, 500);
+						break;
+					case configData.hotKeys.black: res2.stdin.write("black\n"); res.stdin.write("\n"); break;
+					case configData.hotKeys.white: res2.stdin.write("white\n"); res.stdin.write("\n"); break;
+				}
+			}
+		});
+		ioHook2.start();
 	}
 
 	function init() {
@@ -299,16 +358,8 @@ $(document).ready(function() {
 		$("#pin").attr("src", "pin_green.png");
 		pin = true;
 
-		ioHook.on('keydown', event => {
-			res.stdin.write("\n");
-		});
-		ioHook.on('mouseup', event => {
-			res.stdin.write("\n");
-		});
-		ioHook.on('mousewheel', event => {
-			res.stdin.write("\n");
-		});
-		ioHook.start();
+		registerIoHook();
+		registerIoHook2();
 		reflectConfig();
 	}
 
@@ -320,7 +371,6 @@ $(document).ready(function() {
 
 	function reflectConfig() {
 		const configFile = 'config.js';
-		let configData = {};
 		let configPath = "";
 		const { remote } = require('electron');
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
@@ -331,22 +381,6 @@ $(document).ready(function() {
 		if (fs.existsSync(configPath)) {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
-				ioHook2 = null;
-				ioHook2 = require('iohook');
-				ioHook2.on('keyup', event => {
-					if (event.shiftKey && event.ctrlKey) {
-						let chr = String.fromCharCode( event.rawcode );
-						if (chr === "") return;
-						switch (chr) {
-							case configData.hotKeys.prev: res2.stdin.write("prev\n"); res.stdin.write("\n"); break;
-							case configData.hotKeys.next: res2.stdin.write("next\n"); res.stdin.write("\n"); break;
-							case configData.hotKeys.transparent: res2.stdin.write("tran\n"); res.stdin.write("\n"); break;
-							case configData.hotKeys.black: res2.stdin.write("black\n"); res.stdin.write("\n"); break;
-							case configData.hotKeys.white: res2.stdin.write("white\n"); res.stdin.write("\n"); break;
-						}
-					}
-				});
-				ioHook2.start();
 			});
 		} else {
 			// Do nothing
