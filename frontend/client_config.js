@@ -3,7 +3,7 @@ $(document).ready(function() {
 	const fs = require("fs-extra");
 	const configFile = 'config.js';
 	const appDataPath = process.env.APPDATA + "/PPT-NDI";
-	const version = "20190703a";
+	const version = "20190713a";
 	const keyCombi = "Ctrl-Shift-";
 	const defaultData = {
 		"version" : version,
@@ -43,7 +43,6 @@ $(document).ready(function() {
 	function setConfig() {
 		// Save the config file
 
-		// TO-DO: reflect the config to mainwindow2
 		let hotKeys = {
 			"prev" : filterHotKey($("#prevTxtBox")),
 			"next" : filterHotKey($("#nextTxtBox")),
