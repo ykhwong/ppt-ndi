@@ -136,13 +136,15 @@ $(document).ready(function() {
 	let blkBool = false;
 	let whtBool = false;
 	let trnBool = false;
+	let mustStop = false;
 	let numTypBuf = "";
 	let tmpDir = "";
 	let child;
 	let repo;
+	let slideTranTimers = [];
 	let w = [];
 
-	for (var pp=1; pp<=10; pp++) {
+	for (var pp=2; pp<=9; pp++) {
 		w[pp] = new Worker("createTransitions.js");
 	}
 
@@ -163,6 +165,16 @@ $(document).ready(function() {
 		return;
 	}
 
+	function stopSlideTransition() {
+		for (var pp=2; pp<=9; pp++) {
+			w[pp].postMessage({
+				"mustStop" : true
+			});
+			clearTimeout(slideTranTimers[pp]);
+		}
+		clearTimeout(slideTranTimers[10]);
+		mustStop = true;
+	}
 	function createNullSlide() {
 		const Jimp = require('jimp');
 		Jimp.read(tmpDir + "/Slide1.png").then(image=> {
@@ -224,23 +236,37 @@ $(document).ready(function() {
 		) {
 			let duration = slideEffects[currentSlide.toString()].duration;
 			const prevSli = rpc + prevSlide.toString() + '.png';
-			const transLvl=10;
+			const transLvl=9;
 			try {
-				for (var i=1; i<=transLvl; i++) {
+				for (var i=2; i<=transLvl; i++) {
 					fs.unlinkSync(tmpDir + "/t" + i.toString() + ".png");
 				}
 			} catch(e) {
 			}
 			function sendSlides(i) {
-				setTimeout(function() {
+				if (mustStop) {
+					return;
+				}
+				function setLast() {
+					if (mustStop) {
+						return;
+					}
+					slideTranTimers[10] = setTimeout(function() {
+						try {
+							child.stdin.write(tmpDir + "/Slide" + currentSlide.toString() + ".png" + "\n");
+						} catch(e) {
+						}
+					}, 10 * parseFloat(duration) * 50);
+				}
+				slideTranTimers[i] = setTimeout(function() {
 					try {
 						child.stdin.write(tmpDir + "/t" + i.toString() + ".png" + "\n");
-						if (i === transLvl) {
-							$("#full").hide();
-						}
 					} catch(e) {
 					}
 				}, i * parseFloat(duration) * 50);
+				if (i === transLvl) {
+					setLast();
+				}
 			}
 
 			function doTrans() {
@@ -251,15 +277,14 @@ $(document).ready(function() {
 				let transSlidesCnt = 0;
 				const buffer = fs.readFileSync(curSli);
 				const buffer2 = fs.readFileSync(prevSli);
-                
-				$("#full").show();
 
-				for (var i=1; i<=transLvl; i++) {
+				mustStop = false;
+				for (var i=2; i<=transLvl; i++) {
 					w[i].onmessage = function(msg){
 						transSlidesCnt++;
-						if (transSlidesCnt === 10) {
+						if (transSlidesCnt === 6) {
 							transSlidesCnt = 0;
-							for (var i2=1; i2<=transLvl; i2++) {
+							for (var i2=2; i2<=transLvl; i2++) {
 								sendSlides(i2);
 							}
 						}
@@ -268,13 +293,15 @@ $(document).ready(function() {
 						"buffer": JSON.stringify(buffer),
 						"buffer2" : JSON.stringify(buffer2),
 						"tmpDir" : tmpDir,
-						"i" : i
+						"i" : i,
+						"mustStop" : false
 					});
 				};
 			}
 			doTrans();
 
 		} else {
+			stopSlideTransition();
 			try {
 				child.stdin.write(curSli + "\n");
 			} catch(e) {
@@ -617,9 +644,6 @@ $(document).ready(function() {
 
 	$(document).keydown(function(e) {
 		let realNum = 0;
-		if ($("#full").is(":visible")){
-			return;
-		}
 		$("#below").trigger('click');
 		if(e.which >= 48 && e.which <= 57) {
 			// 0 through 9
