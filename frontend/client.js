@@ -133,6 +133,7 @@ $(document).ready(function() {
 	let slideHeight = 0;
 	let hiddenSlides = [];
 	let slideEffects = {};
+	let configData = {};
 	let blkBool = false;
 	let whtBool = false;
 	let trnBool = false;
@@ -765,9 +766,26 @@ $(document).ready(function() {
 		ipc.send('remote', "exit");
 	}
 
+	function registerIoHook() {
+		ioHook = require('iohook');
+		ioHook.on('keyup', event => {
+			if (event.shiftKey && event.ctrlKey) {
+				let chr = String.fromCharCode( event.rawcode );
+				if (chr === "") return;
+				switch (chr) {
+					case configData.hotKeys.prev: gotoPrev(); break;
+					case configData.hotKeys.next: gotoNext(); break;
+					case configData.hotKeys.transparent: updateBlkWhtTrn("trn"); break;
+					case configData.hotKeys.black: updateBlkWhtTrn("black"); break;
+					case configData.hotKeys.white: updateBlkWhtTrn("white"); break;
+				}
+			}
+		});
+		ioHook.start();
+	}
+
 	function reflectConfig() {
 		const configFile = 'config.js';
-		let configData = {};
 		let configPath = "";
 		const { remote } = require('electron');
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
@@ -778,22 +796,6 @@ $(document).ready(function() {
 		if (fs.existsSync(configPath)) {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
-				ioHook = null;
-				ioHook = require('iohook');
-				ioHook.on('keyup', event => {
-					if (event.shiftKey && event.ctrlKey) {
-						let chr = String.fromCharCode( event.rawcode );
-						if (chr === "") return;
-						switch (chr) {
-							case configData.hotKeys.prev: gotoPrev(); break;
-							case configData.hotKeys.next: gotoNext(); break;
-							case configData.hotKeys.transparent: updateBlkWhtTrn("trn"); break;
-							case configData.hotKeys.black: updateBlkWhtTrn("black"); break;
-							case configData.hotKeys.white: updateBlkWhtTrn("white"); break;
-						}
-					}
-				});
-				ioHook.start();
 			});
 		} else {
 			// Do nothing
@@ -861,5 +863,6 @@ $(document).ready(function() {
 
 	initImgPicker();
 	startCurrentTime();
+	registerIoHook();
 	reflectConfig();
 });
