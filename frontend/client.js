@@ -644,6 +644,9 @@ $(document).ready(function() {
 
 	$(document).keydown(function(e) {
 		let realNum = 0;
+		if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+			return;
+		}
 		$("#below").trigger('click');
 		if(e.which >= 48 && e.which <= 57) {
 			// 0 through 9
