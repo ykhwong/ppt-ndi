@@ -177,6 +177,12 @@ sub Main()
 					If cmd = "next" Then
 						objSlideShow.GotoSlide objSlideShow.CurrentShowPosition + 1
 					End If
+					If cmd = "black" Then
+						ap.SlideShowWindow.View.State = 3
+					End If
+					If cmd = "white" Then
+						ap.SlideShowWindow.View.State = 4
+					End If
 			End If
 		End If
 	Loop
@@ -331,11 +337,11 @@ $(document).ready(function() {
 						let chr = String.fromCharCode( event.rawcode );
 						if (chr === "") return;
 						switch (chr) {
-							case configData.hotKeys.prev: res2.stdin.write("prev\n"); break;
-							case configData.hotKeys.next: res2.stdin.write("next\n"); break;
+							case configData.hotKeys.prev: res2.stdin.write("prev\n"); res.stdin.write("\n"); break;
+							case configData.hotKeys.next: res2.stdin.write("next\n"); res.stdin.write("\n"); break;
 							case configData.hotKeys.transparent: /* */ break;
-							case configData.hotKeys.black: /* */ break;
-							case configData.hotKeys.white: /* */ break;
+							case configData.hotKeys.black: res2.stdin.write("black\n"); res.stdin.write("\n"); break;
+							case configData.hotKeys.white: res2.stdin.write("white\n"); res.stdin.write("\n"); break;
 						}
 					}
 				});
