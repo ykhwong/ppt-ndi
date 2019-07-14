@@ -22,7 +22,7 @@ function createTransition(buffer, buffer2, tmpDir, i) {
 onmessage = function(e) {
 	mustStop = e.data.mustStop;
 	if (mustStop) {
-		console.log("mustStop");
+		//console.log("mustStop");
 		return;
 	}
 	createTransition(
