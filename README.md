@@ -8,7 +8,7 @@ The latest version is PPT NDI (20190714).
 ## BASIC USAGE
 1. Download PPT NDI from https://github.com/ykhwong/ppt-ndi/releases
 2. If you have downloaded the installer, execute the pptndi_setup.exe. After the installation, click the Start button and select "PPT NDI".
-3. If you have downloaded the 7z file, decompress it and simply run the executable "ppt_ndi.exe"
+3. If you have downloaded the 7z file, decompress it and simply run the executable "ppt-ndi.exe"
 4. Please select either one of the following modes.
 
 * PowerPoint SlideShow Mode
@@ -17,7 +17,7 @@ The latest version is PPT NDI (20190714).
 ![PPT NDI Mode](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_ndi_mode.png)
 
 ### PowerPoint SlideShow Mode
-Select PowerPoint SlideShow Mode to display the NDI Preview window. Please make sure to disable the "Includes background" option to enable transparency.
+Select PowerPoint SlideShow Mode to display the NDI Preview window. Please make sure to disable the "Include background" option to enable transparency.
 
 ![PPT NDI Mode: SlideShow](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_ndi_slideshow_integration.png)
 
@@ -29,7 +29,7 @@ Select Classic Mode to display the dedicated graphical user interface window.
 
 ![PPT NDI Screenshot](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_ndi_sshot.png)
 
-Click the Open icon to load a Powerpoint file. Please make sure to disable "Includes background" option to enable transparency.
+Click the Open icon to load a Powerpoint file. Please make sure to disable "Include background" option to enable transparency.
 
 ## TESTING AND INTEGRATION
 
@@ -64,7 +64,7 @@ Here, you can assign system-wide hotkeys. Additionally, you can set PPT  NDI to 
 ### Command-Line Options
 
 ```sh
-  ppt_ndi.exe  [--slideshow] [--classic]
+  ppt-ndi.exe  [--slideshow] [--classic]
      [--slideshow] : SlidShow Mode
        [--classic] : Classic Mode
 ```
