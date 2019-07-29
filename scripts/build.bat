@@ -1,5 +1,5 @@
 @echo off
-set VERINFO=5.0.6
+set VERINFO=5.0.8
 set OPT=--icon=.\icon.ico --platform=win32 --overwrite --asar --app-copyright="MIT License (github.com/ykhwong/ppt-ndi)"
 
 call electron-packager ./ppt-ndi ppt-ndi --electron-version=%VERINFO% %OPT%
