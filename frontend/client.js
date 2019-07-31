@@ -480,7 +480,9 @@ $(document).ready(function() {
 
 					createNullSlide();
 				} else {
-					alert("Only allowed filename extensions are PPT and PPTX.");
+					if (/\S/.test(file)) {
+						alert("Only allowed filename extensions are PPT and PPTX.");
+					}
 					$("#fullblack").hide();
 				}
 			} else {
