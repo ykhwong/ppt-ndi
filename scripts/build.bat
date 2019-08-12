@@ -1,5 +1,5 @@
 @echo off
-set VERINFO=6.0.0
+set VERINFO=6.0.1
 set OPT=--icon=.\icon.ico --platform=win32 --overwrite --asar --app-copyright="MIT License (github.com/ykhwong/ppt-ndi)"
 
 call electron-packager ./ppt-ndi ppt-ndi --electron-version=%VERINFO% %OPT%
@@ -18,6 +18,7 @@ del /q chrome_*.pak
 del /q snapshot_blob.bin
 del /q version
 mkdir bin
+copy ..\ffmpeg.dll .\.
 copy ..\PPTNDI.EXE .\bin\.
 copy ..\Processing.NDI.Lib.x64.dll .\.
 copy ..\uiohook.dll .\.
