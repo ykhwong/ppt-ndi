@@ -75,3 +75,10 @@ html, body {
 	left: 260px;
 	color: #79a9f7;
 }
+
+#slideRes {
+	position: fixed;
+	top: 153px;
+	left: 90px;
+	color: #79a9f7;
+}

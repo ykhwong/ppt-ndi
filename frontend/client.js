@@ -181,6 +181,7 @@ $(document).ready(function() {
 		Jimp.read(tmpDir + "/Slide1.png").then(image=> {
 			slideWidth = image.bitmap.width;
 			slideHeight = image.bitmap.height;
+			$("#slide_res").html(slideWidth + " x " + slideHeight);
 			new Jimp(image.bitmap.width, image.bitmap.height, (err, image2) => {
 				image2.opacity(0);
 				image2.write(tmpDir + "/Slide0.png");

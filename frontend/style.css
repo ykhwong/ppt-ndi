@@ -130,11 +130,11 @@ html, body {
 	background-image: url('null_slide.png');
 }
 
-#slide_cnt, #progress, #current_time {
+#slide_cnt, #progress, #current_time, #slide_res {
 	display:inline;
 }
 
-#progress, #current_time {
+#progress, #current_time, #slide_res {
 	position: relative;
 	margin-left: 20px;
 }

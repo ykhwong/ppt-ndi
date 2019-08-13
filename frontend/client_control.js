@@ -200,6 +200,8 @@ $(document).ready(function() {
 	let ioHook = null;
 	let iohook2 = null;
 	let tmpDir = null;
+	let slideWidth = 0;
+	let slideHeight = 0;
 	let configData = {};
 	let pin = true;
 	let child;
@@ -231,6 +233,7 @@ $(document).ready(function() {
 	function sendNDI(file, data) {
 		const now = new Date().getTime();
 		const cmd = data.toString();
+		const Jimp = require('jimp');
 		if (/^PPTNDI: Sent/.test(cmd)) {
 			// Do nothing
 		} else if(/^PPTNDI: White/.test(cmd)) {
@@ -259,6 +262,11 @@ $(document).ready(function() {
 				child.stdin.write(file + "\n");
 			}
 		}
+		Jimp.read(tmpDir + "/Slide.png").then(image=> {
+			slideWidth = image.bitmap.width;
+			slideHeight = image.bitmap.height;
+			$("#slideRes").html("( " + slideWidth + " x " + slideHeight + " )");
+		});
 	}
 
 	function registerIoHook() {
