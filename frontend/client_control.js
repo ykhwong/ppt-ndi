@@ -366,6 +366,9 @@ $(document).ready(function() {
 		$("#pin").attr("src", "pin_green.png");
 		pin = true;
 
+		// Enable Slide Checkerboard by default
+		$("#slidePreview").css('background-image', "url('trans_slide.png')");
+
 		registerIoHook();
 		registerIoHook2();
 		reflectConfig();
