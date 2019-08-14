@@ -161,6 +161,13 @@ $(document).ready(function() {
 		return;
 	}
 
+	function stopSlideTransition() {
+		for (var pp=2; pp<=9; pp++) {
+			clearTimeout(slideTranTimers[pp]);
+		}
+		mustStop = true;
+	}
+
 	function createNullSlide() {
 		const Jimp = require('jimp');
 		Jimp.read(tmpDir + "/Slide1.png").then(image=> {
@@ -265,6 +272,7 @@ $(document).ready(function() {
 				let transSlidesCnt2 = 0;
 
 				const mergeImages = require('merge-images');
+				stopSlideTransition();
 				mustStop = false;
 
 				for (let i=2; i<=transLvl; i++) {	
@@ -293,7 +301,7 @@ $(document).ready(function() {
 			doTrans();
 
 		} else {
-			mustStop = true;
+			stopSlideTransition();
 			try {
 				child.stdin.write(curSli + "\n");
 			} catch(e) {
