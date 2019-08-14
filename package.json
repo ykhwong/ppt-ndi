@@ -5,7 +5,8 @@
 	"dependencies": {
 		"fs-extra": "^7.0.1",
 		"iohook": "git+https://github.com/wilix-team/iohook.git",
-		"jimp": "^0.6.4"
+		"jimp": "^0.6.4",
+		"merge-images": "^1.1.0"
 	},
 	"devDependencies": {},
 	"scripts": {},

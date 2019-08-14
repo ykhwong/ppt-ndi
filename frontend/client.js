@@ -143,11 +143,6 @@ $(document).ready(function() {
 	let child;
 	let repo;
 	let slideTranTimers = [];
-	let w = [];
-
-	for (var pp=2; pp<=9; pp++) {
-		w[pp] = new Worker("createTransitions.js");
-	}
 
 	try {
 		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
@@ -166,16 +161,6 @@ $(document).ready(function() {
 		return;
 	}
 
-	function stopSlideTransition() {
-		for (var pp=2; pp<=9; pp++) {
-			w[pp].postMessage({
-				"mustStop" : true
-			});
-			clearTimeout(slideTranTimers[pp]);
-		}
-		clearTimeout(slideTranTimers[10]);
-		mustStop = true;
-	}
 	function createNullSlide() {
 		const Jimp = require('jimp');
 		Jimp.read(tmpDir + "/Slide1.png").then(image=> {
@@ -277,33 +262,38 @@ $(document).ready(function() {
 				}
 
 				let transSlidesCnt = 0;
-				const buffer = fs.readFileSync(curSli);
-				const buffer2 = fs.readFileSync(prevSli);
+				let transSlidesCnt2 = 0;
 
+				const mergeImages = require('merge-images');
 				mustStop = false;
-				for (var i=2; i<=transLvl; i++) {
-					w[i].onmessage = function(msg){
+
+				for (let i=2; i<=transLvl; i++) {	
+					mergeImages([
+						{ src: prevSli, opacity: 1 - (0.1 * i) },
+						{ src: curSli, opacity: 0.1 * i }
+					])
+					.then(b64 => {
+						let b64data = b64.replace(/^data:image\/png;base64,/, "");
+						let newi = 0;
 						transSlidesCnt++;
-						if (transSlidesCnt === 6) {
-							transSlidesCnt = 0;
-							for (var i2=2; i2<=transLvl; i2++) {
-								sendSlides(i2);
+						newi = transSlidesCnt + 1;
+						fs.writeFile(tmpDir + "/t" + newi.toString() + ".png", b64data, 'base64', function(err) {
+							transSlidesCnt2++;
+							if (transSlidesCnt2 === 8) {
+								transSlidesCnt = 0;
+								transSlidesCnt2 = 0;
+								for (var i2=2; i2<=transLvl; i2++) {
+									sendSlides(i2);
+								}
 							}
-						}
-					};
-					w[i].postMessage({
-						"buffer": JSON.stringify(buffer),
-						"buffer2" : JSON.stringify(buffer2),
-						"tmpDir" : tmpDir,
-						"i" : i,
-						"mustStop" : false
+						});
 					});
 				};
 			}
 			doTrans();
 
 		} else {
-			stopSlideTransition();
+			mustStop = true;
 			try {
 				child.stdin.write(curSli + "\n");
 			} catch(e) {

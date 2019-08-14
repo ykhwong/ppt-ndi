@@ -1,4 +1,6 @@
+// Preserved for reference only
 
+/*
 const JimpRead = require('jimp').read;
 let mustStop = false;
 
@@ -32,3 +34,4 @@ onmessage = function(e) {
 		e.data.i
 	);
 };
+*/
