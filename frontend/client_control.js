@@ -1,3 +1,4 @@
+/* vbsBg: Handles the slides with background included */
 const vbsBg =`
 Dim objPPT
 Dim preState
@@ -20,7 +21,11 @@ Sub Proc()
 	If isSaved = True Then
 		ap.Saved = True
 	End If
-	Wscript.Echo "PPTNDI: Sent"
+	Dim entryEffect
+	Dim duration
+	entryEffect = ap.Slides(curPos).SlideShowTransition.EntryEffect
+	duration = ap.Slides(curPos).SlideShowTransition.Duration
+	Wscript.Echo "PPTNDI: Sent " & duration & " " & entryEffect & " " & objSlideShow.CurrentShowPosition
 End Sub
 sub Main()
 	Do While True
@@ -30,6 +35,7 @@ sub Main()
 		If Err.Number = 0 Then
 			Err.Clear
 			Set ap = objPPT.ActivePresentation
+			curPos = 0
 			If Err.Number = 0 Then
 				objPPT.DisplayAlerts = False
 				Err.Clear
@@ -51,21 +57,14 @@ sub Main()
 					curPos = 0
 				End If
 			End If
-			If curPos <> 0 Then
-				If ap.Slides(curPos).SlideShowTransition.AdvanceOnTime = -1 Then
-					Wscript.Sleep(250)
-				Else
-					Wscript.StdIn.ReadLine()
-				End If
-			Else
-				Wscript.Sleep(500)
-			End If
 		End If
+		Wscript.StdIn.ReadLine()
 	Loop
 End Sub
 Main
 `;
 
+/* vbsNoBg: Handles the slides with no background included */
 const vbsNoBg =`
 Dim objPPT
 Dim preState
@@ -108,7 +107,11 @@ Sub Proc()
 		If isSaved = True Then
 			ap.Saved = True
 		End If
-		Wscript.Echo "PPTNDI: Sent"
+		Dim entryEffect
+		Dim duration
+		entryEffect = ap.Slides(curPos).SlideShowTransition.EntryEffect
+		duration = ap.Slides(curPos).SlideShowTransition.Duration
+		Wscript.Echo "PPTNDI: Sent " & duration & " " & entryEffect & " " & objSlideShow.CurrentShowPosition
 	End With
 End Sub
 sub Main()
@@ -119,6 +122,7 @@ sub Main()
 		If Err.Number = 0 Then
 			Err.Clear
 			Set ap = objPPT.ActivePresentation
+			curPos = 0
 			If Err.Number = 0 Then
 				objPPT.DisplayAlerts = False
 				Err.Clear
@@ -140,21 +144,48 @@ sub Main()
 					curPos = 0
 				End If
 			End If
-			If curPos <> 0 Then
-				If ap.Slides(curPos).SlideShowTransition.AdvanceOnTime = -1 Then
-					Wscript.Sleep(250)
-				Else
-					Wscript.StdIn.ReadLine()
-				End If
-			Else
-				Wscript.Sleep(500)
-			End If
 		End If
+		Wscript.StdIn.ReadLine()
 	Loop
 End Sub
 Main
 `;
 
+/* vbsCheckSlide: Checks the status of current slide in real time */
+const vbsCheckSlide =`
+Dim objPPT
+Dim preSlideIdx
+Dim curPos
+preSlideIdx = 0
+
+sub Main()
+	Wscript.Echo "Status: 0"
+	Do While True
+		On Error Resume Next
+		Err.Clear
+		Set objPPT = CreateObject("PowerPoint.Application")
+		If Err.Number = 0 Then
+			Err.Clear
+			Set ap = objPPT.ActivePresentation
+			If Err.Number = 0 Then
+				Err.Clear
+				curPos = ap.SlideShowWindow.View.CurrentShowPosition
+				If preSlideIdx = curPos Then
+				Else
+					Wscript.Echo "Status: " & curPos
+					preSlideIdx = curPos
+				End If
+			End If
+		Else
+			preSlideIdx = 0
+		End If
+		Wscript.Sleep(500)
+	Loop
+End sub
+Main
+`;
+
+/* vbsDiretCmd: Handles hotkey */
 const vbsDirectCmd = `
 Dim objPPT
 Dim cmd
@@ -198,15 +229,22 @@ $(document).ready(function() {
 	const binPath = './bin/PPTNDI.EXE';
 	let ignoreIoHook = false;
 	let ioHook = null;
-	let iohook2 = null;
 	let tmpDir = null;
 	let slideWidth = 0;
 	let slideHeight = 0;
+	let lastSignalTime = 0;
+	let lastSlideStat = "0";
 	let configData = {};
 	let pin = true;
+	let mustStop = false;
 	let child;
 	let res;
 	let res2;
+	let res3;
+	let duration = "";
+	let effect = "";
+	let slideIdx = "";
+	let slideTranTimers = [];
 
 	function runBin() {
 		if (fs.existsSync(binPath)) {
@@ -216,6 +254,13 @@ $(document).ready(function() {
 			ipc.send('remote', "exit");
 			return;
 		}
+	}
+
+	function stopSlideTransition() {
+		for (var pp=2; pp<=9; pp++) {
+			clearTimeout(slideTranTimers[pp]);
+		}
+		mustStop = true;
 	}
 
 	function sendNullNDI() {
@@ -234,27 +279,101 @@ $(document).ready(function() {
 		const now = new Date().getTime();
 		const cmd = data.toString();
 		const Jimp = require('jimp');
-		if (/^PPTNDI: Sent/.test(cmd)) {
-			// Do nothing
+		const preFile = tmpDir + "/SlidePre.png";
+		let newSlideIdx;
+		stopSlideTransition();
+		if (/^PPTNDI: Sent /.test(cmd)) {
+			let tmpCmd = cmd.replace(/^PPTNDI: Sent /, "");
+			newSlideIdx = tmpCmd.split(" ")[2].replace(/\s*.*$/, "");
+			duration = tmpCmd.split(" ")[0].replace(/\s*.*$/, "");
+			effect = tmpCmd.split(" ")[1].replace(/\s*.*$/, "");
 		} else if(/^PPTNDI: White/.test(cmd)) {
-			file = "white_slide.png";
+			file = tmpDir + "/SlideWhite.png";
+			newSlideIdx = "white";
 		} else if(/^PPTNDI: Black/.test(cmd)) {
-			file = "black_slide.png";
+			file = tmpDir + "/SlideBlack.png"
+			newSlideIdx = "black";
 		} else if(/^PPTNDI: (Done|Paused)/.test(cmd)) {
 			//file = "null_slide.png";
 			return;
 		} else {
+			console.log(cmd);
 			return;
 		}
-		$("#slidePreview").attr("src", file + "?" + now);
-		if (/^PPTNDI: (White|Black)/.test(cmd)) {
+		stopped = false;
+
+		if (/^PPTNDI: Sent /.test(cmd)) {
+			let fd;
 			try {
-				child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file + "\n");
-			} catch(e) {
-				runBin();
-				child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file + "\n");
+				fd = fs.openSync(file, 'r+');
+			} catch (err) {
+				if (err && err.code === 'EBUSY'){
+					//console.log("busy");
+					if (fd !== undefined) {
+						fs.closeSync(fd);
+					}
+					sendNDI(file, data);
+					return;
+				}
+			}
+			if (fd !== undefined) {
+				fs.closeSync(fd);
+			}
+
+			$("#slidePreview").attr("src", file + "?" + now);
+			Jimp.read(file).then(image=> {
+				slideWidth = image.bitmap.width;
+				slideHeight = image.bitmap.height;
+				$("#slideRes").html("( " + slideWidth + " x " + slideHeight + " )");
+			});
+		}
+
+		if (slideIdx === newSlideIdx) {
+			if (lastSignalTime >= (Date.now() - 500)) {
+				return;
+			}
+		}
+		console.log(cmd);
+		slideIdx = newSlideIdx;
+		lastSignalTime = Date.now();
+
+		if (/^PPTNDI: (White|Black)/.test(cmd)) {
+			function fillColor(color) {
+				const Jimp = require('jimp');
+				new Jimp(slideWidth, slideHeight, color, (err, image2) => {
+					image2.opacity(1);
+					image2.write(file, function() {
+						$("#slidePreview").attr("src", file + "?" + now);
+						try {
+							child.stdin.write(file + "\n");
+						} catch(e) {
+							runBin();
+							child.stdin.write(file + "\n");
+						}
+					});
+				});
+			}
+			if (newSlideIdx === "black") {
+				fillColor(0x000000FF);
+			} else {
+				fillColor(0xFFFFFFFF);
 			}
 		} else {
+			// TO-DO: Implement Transition Effect
+			/*
+			if(/^\s*0\s*$/.test(effect) && $("#slide_tran").is(":checked")) {
+				if (fs.existsSync(preFile)) {
+					mustStop = false;
+					procTransition(file, data);
+					return;
+				}
+			}
+			*/
+			try {
+				fs.copySync(file, preFile);
+			} catch(e) {
+				console.log("file could not be generated: "+ preFile);
+			}
 			try {
 				child.stdin.write(file + "\n");
 			} catch(e) {
@@ -262,15 +381,30 @@ $(document).ready(function() {
 				child.stdin.write(file + "\n");
 			}
 		}
-		Jimp.read(tmpDir + "/Slide.png").then(image=> {
-			slideWidth = image.bitmap.width;
-			slideHeight = image.bitmap.height;
-			$("#slideRes").html("( " + slideWidth + " x " + slideHeight + " )");
-		});
 	}
 
 	function registerIoHook() {
 		ioHook = require('iohook');
+		ioHook.on('keyup', event => {
+			if (event.shiftKey && event.ctrlKey) {
+				let chr = String.fromCharCode( event.rawcode );
+				if (chr === "") return;
+				switch (chr) {
+					case configData.hotKeys.prev: res2.stdin.write("prev\n"); res.stdin.write("\n"); break;
+					case configData.hotKeys.next: res2.stdin.write("next\n"); res.stdin.write("\n"); break;
+					case configData.hotKeys.transparent:
+						setTimeout(function() {
+							ignoreIoHook = true;
+							sendNullNDI();
+							ignoreIoHook = false;
+						}, 500);
+						break;
+					case configData.hotKeys.black: res2.stdin.write("black\n"); res.stdin.write("\n"); break;
+					case configData.hotKeys.white: res2.stdin.write("white\n"); res.stdin.write("\n"); break;
+					default: break;
+				}
+			}
+		});
 		ioHook.on('keydown', event => {
 			if (!ignoreIoHook) {
 				res.stdin.write("\n");
@@ -289,29 +423,90 @@ $(document).ready(function() {
 		ioHook.start();
 	}
 
-	function registerIoHook2() {
-		ioHook2 = require('iohook');
-		ioHook2.on('keyup', event => {
-			if (event.shiftKey && event.ctrlKey) {
-				let chr = String.fromCharCode( event.rawcode );
-				if (chr === "") return;
-				switch (chr) {
-					case configData.hotKeys.prev: res2.stdin.write("prev\n"); res.stdin.write("\n"); break;
-					case configData.hotKeys.next: res2.stdin.write("next\n"); res.stdin.write("\n"); break;
-					case configData.hotKeys.transparent:
-						setTimeout(function() {
-							ignoreIoHook = true;
-							sendNullNDI();
-							ignoreIoHook = false;
-						}, 500);
-						break;
-					case configData.hotKeys.black: res2.stdin.write("black\n"); res.stdin.write("\n"); break;
-					case configData.hotKeys.white: res2.stdin.write("white\n"); res.stdin.write("\n"); break;
-				}
+// TO-DO: Implement Transition Effect
+/*
+	function procTransition(file, data) {
+		const transLvl=9;
+		const preFile = tmpDir + "/SlidePre.png";
+
+		try {
+			for (var i=2; i<=transLvl; i++) {
+				fs.unlinkSync(tmpDir + "/t" + i.toString() + ".png");
 			}
-		});
-		ioHook2.start();
+		} catch(e) {
+		}
+
+		function sendSlides(i) {
+			console.log(i);
+			if (mustStop) {
+				return;
+			}
+			function setLast() {
+				if (mustStop) {
+					return;
+				}
+				slideTranTimers[10] = setTimeout(function() {
+					try {
+						child.stdin.write(tmpDir + "/Slide.png" + "\n");
+					} catch(e) {
+					}
+					if (fs.existsSync(file)) {
+						const preFile = tmpDir + "/SlidePre.png";
+						try {
+							fs.copySync(file, preFile);
+						} catch(e) {
+							console.log("file could not be generated: "+ preFile);
+						}
+					}
+				}, 10 * parseFloat(duration) * 50);
+			}
+
+			slideTranTimers[i] = setTimeout(function() {
+				try {
+					child.stdin.write(tmpDir + "/t" + i.toString() + ".png" + "\n");
+				} catch(e) {
+				}
+			}, i * parseFloat(duration) * 50);
+			if (i === transLvl) {
+				const now = new Date().getTime();
+				setLast();
+				$("#slidePreview").attr("src", file + "?" + now);
+			}
+		}
+
+		function doTrans() {
+			let transSlidesCnt = 0;
+			let transSlidesCnt2 = 0;
+			const mergeImages = require('merge-images');
+			stopSlideTransition();
+			mustStop = false;
+
+			for (let i=2; i<=transLvl; i++) {	
+				mergeImages([
+					{ src: preFile, opacity: 1 - (0.1 * i) },
+					{ src: file, opacity: 0.1 * i }
+				])
+				.then(b64 => {
+					let b64data = b64.replace(/^data:image\/png;base64,/, "");
+					let newi = 0;
+					transSlidesCnt++;
+					newi = transSlidesCnt + 1;
+					fs.writeFile(tmpDir + "/t" + newi.toString() + ".png", b64data, 'base64', function(err) {
+						transSlidesCnt2++;
+						if (transSlidesCnt2 === 8) {
+							transSlidesCnt = 0;
+							transSlidesCnt2 = 0;
+							for (var i2=2; i2<=transLvl; i2++) {
+								sendSlides(i2);
+							}
+						}
+					});
+				});
+			};
+		}
+		doTrans();
 	}
+*/
 
 	function init() {
 		const { remote } = require('electron');
@@ -336,6 +531,7 @@ $(document).ready(function() {
 		fs.mkdirSync(tmpDir);
 		vbsDir = tmpDir + '/wb.vbs';
 		vbsDir2 = tmpDir + '/wb2.vbs';
+		vbsDir3 = tmpDir + '/wb3.vbs';
 		file = tmpDir + "/Slide.png";
 
 		newVbsContent = vbsNoBg;
@@ -349,8 +545,14 @@ $(document).ready(function() {
 			fs.writeFileSync(vbsDir2, vbsDirectCmd, 'utf-8');
 		} catch(e) {
 		}
+		try {
+			fs.writeFileSync(vbsDir3, vbsCheckSlide, 'utf-8');
+		} catch(e) {
+			alert('Failed to access the temporary directory!');
+			return;
+		}
 		if (fs.existsSync(vbsDir)) {
-			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
+			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, "//NOLOGO", '' ] );
 			res.stdout.on('data', function(data) {
 				sendNDI(file, data);
 			});
@@ -359,18 +561,36 @@ $(document).ready(function() {
 			return;
 		}
 		if (fs.existsSync(vbsDir2)) {
-			res2 = spawn( 'cscript.exe', [ vbsDir2, '' ] );
+			res2 = spawn( 'cscript.exe', [ vbsDir2, "//NOLOGO", '' ] );
 		}
+		if (fs.existsSync(vbsDir3)) {
+			res3 = spawn( 'cscript.exe', [ vbsDir3, "//NOLOGO", '' ] );
+		} else {
+			alert('Failed to parse the presentation!');
+			return;
+		}
+
+		res3.stdout.on('data', function(data) {
+			let curSlideStat = data.toString().replace(/^Status: /, "");
+			if (/^\s*0\s*$/.test(lastSlideStat)) {
+				if (!/^\s*0\s*$/.test(curSlideStat)) {
+					if (slideIdx != curSlideStat) {
+						res.stdin.write("\n");
+					}
+				}
+			}
+			lastSlideStat = curSlideStat;
+		});
+
 		// Enable Always On Top by default
 		ipc.send('remote', "onTop");
 		$("#pin").attr("src", "pin_green.png");
 		pin = true;
 
 		// Enable Slide Checkerboard by default
-		$("#slidePreview").css('background-image', "url('trans_slide.png')");
+		// $("#slidePreview").css('background-image', "url('trans_slide.png')");
 
 		registerIoHook();
-		registerIoHook2();
 		reflectConfig();
 	}
 
@@ -447,7 +667,7 @@ $(document).ready(function() {
 		res.kill();
 		res = null;
 		if (fs.existsSync(vbsDir)) {
-			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, '' ] );
+			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, "//NOLOGO", '' ] );
 			res.stdout.on('data', function(data) {
 				sendNDI(file, data);
 			});

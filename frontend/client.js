@@ -222,7 +222,6 @@ $(document).ready(function() {
 		$("select").find('option[value="Next"]').data('img-src', nextSli);
 		initImgPicker();
 
-		// TO-DO: Improve performance for the slide transition
 		if (
 		    $("#use_slide_transition").is(":checked") &&
 		    ! (Object.entries(slideEffects).length === 0 && slideEffects.constructor === Object) &&
@@ -383,7 +382,7 @@ $(document).ready(function() {
 						$("#fullblack").hide();
 						return;
 					}
-					res = spawnSync( 'cscript.exe', [ vbsDir, file, tmpDir, '' ] );
+					res = spawnSync( 'cscript.exe', [ vbsDir, file, tmpDir, "//NOLOGO", '' ] );
 					$("#fullblack").hide();
 					if ( res.status !== 0 ) {
 						maxSlideNum = 0;

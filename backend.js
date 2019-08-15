@@ -113,7 +113,7 @@ app.on('ready', function() {
 			}
 			if (/--slideshow/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(300, 330, false, 'control.html', !startAsTray);
+				mainWindow2 = createWin(300, 350, false, 'control.html', !startAsTray);
 				addMainWin2handler(!startAsTray);
 				break;
 			}
@@ -225,7 +225,7 @@ app.on('ready', function() {
 					}
 					break;
 				case "select1":
-					mainWindow2 = createWin(300, 330, false, 'control.html', true);
+					mainWindow2 = createWin(300, 350, false, 'control.html', true);
 					addMainWin2handler(true);
 					mainWindow.destroy();
 					break;
