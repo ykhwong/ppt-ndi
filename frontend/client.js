@@ -346,7 +346,7 @@ $(document).ready(function() {
 	function cancelLoad() {
 		const kill  = require('tree-kill');
 		kill(spawn2pid);
-		cleanupForTemp();
+		cleanupForTemp(false);
 		tmpDir = preTmpDir;
 		$("#fullblack, .cancelBox").hide();
 	}
@@ -391,7 +391,7 @@ $(document).ready(function() {
 					try {
 						fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 					} catch(e) {
-						cleanupForTemp();
+						cleanupForTemp(false);
 						tmpDir = preTmpDir;
 						alert('Failed to access the temporary directory!');
 						$("#fullblack, .cancelBox").hide();
@@ -401,7 +401,7 @@ $(document).ready(function() {
 					$(".cancelBox").show();
 					res.stderr.on('data', (data) => {
 						maxSlideNum = 0;
-						cleanupForTemp();
+						cleanupForTemp(false);
 						tmpDir = preTmpDir;
 						alert('Failed to parse the presentation!');
 						$("#fullblack, .cancelBox").hide();
@@ -423,7 +423,7 @@ $(document).ready(function() {
 						if (isCancelTriggered) return;
 						if (fileArr === undefined || fileArr.length == 0) {
 							maxSlideNum = 0;
-							cleanupForTemp();
+							cleanupForTemp(false);
 							tmpDir = preTmpDir;
 							alert("Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.");
 							$("#fullblack, .cancelBox").hide();
@@ -498,7 +498,7 @@ $(document).ready(function() {
 							}
 						}
 						if (isLoaded) {
-							cleanupForTemp(preTmpDir);
+							cleanupForTemp(true);
 						}
 						isLoaded = true;
 					});
@@ -776,10 +776,10 @@ $(document).ready(function() {
 		t = setTimeout(startCurrentTime, 500);
 	}
 
-	function cleanupForTemp(myDir) {
+	function cleanupForTemp(usePreTmp) {
 		let dir = "";
-		if (/\S/.test(myDir)) {
-			dir = myDir;
+		if (usePreTmp) {
+			dir = preTmpDir;
 		} else {
 			dir = tmpDir;
 		}
@@ -796,7 +796,7 @@ $(document).ready(function() {
 			child.stdin.write("destroy\n");
 		} catch(e) {
 		}
-		cleanupForTemp();
+		cleanupForTemp(false);
 		ipc.send('remote', "exit");
 	}
 
