@@ -131,6 +131,7 @@ $(document).ready(function() {
 	let currentWindow = remote.getCurrentWindow();
 	let slideWidth = 0;
 	let slideHeight = 0;
+	let spawn2pid = 0;
 	let hiddenSlides = [];
 	let slideEffects = {};
 	let configData = {};
@@ -138,9 +139,11 @@ $(document).ready(function() {
 	let whtBool = false;
 	let trnBool = false;
 	let mustStop = false;
+	let isLoaded = false;
 	let isCancelTriggered = false;
 	let numTypBuf = "";
 	let tmpDir = "";
+	let preTmpDir = "";
 	let child;
 	let repo;
 	let slideTranTimers = [];
@@ -340,23 +343,18 @@ $(document).ready(function() {
 		}
 	}
 
+	function cancelLoad() {
+		const kill  = require('tree-kill');
+		kill(spawn2pid);
+		cleanupForTemp();
+		tmpDir = preTmpDir;
+		$("#fullblack, .cancelBox").hide();
+	}
+		
 	$("#load_pptx").click(function() {
 		const {dialog} = require('electron').remote;
 		$("#fullblack").show();
 		isCancelTriggered = false;
-
-		function checkLoadStat(pid, myDir) {
-			if (isCancelTriggered) {
-				const kill  = require('tree-kill');
-				isCancelTriggered = false;
-				kill(pid);
-				cleanupForTemp();
-				tmpDir = myDir;
-				$("#fullblack, .cancelBox").hide();
-				return true;
-			}
-			return false;
-		}
 
 		dialog.showOpenDialog(currentWindow,{
 			properties: ['openFile'],
@@ -373,8 +371,8 @@ $(document).ready(function() {
 				if (re.exec(file)) {
 					let now = new Date().getTime();
 					let newVbsContent;
-					let preTmpDir;
 					const spawn2 = require( 'child_process' ).spawn;
+					spawn2pid = spawn2.pid;
 					preTmpDir = tmpDir;
 					tmpDir = process.env.TEMP + '/ppt_ndi';
 					if (!fs.existsSync(tmpDir)) {
@@ -411,6 +409,9 @@ $(document).ready(function() {
 					});
 					res.on('close', (code) => {
 						let newMaxSlideNum = 0;
+						if (tmpDir === "") {
+							return;
+						}
 						fs.readdirSync(tmpDir).forEach(file2 => {
 							re = new RegExp("^Slide(\\d+)\\.png\$", "i");
 							if (re.exec(file2)) {
@@ -419,7 +420,7 @@ $(document).ready(function() {
 								newMaxSlideNum++;
 							}
 						});
-						if (checkLoadStat(spawn2.pid, preTmpDir)) return;
+						if (isCancelTriggered) return;
 						if (fileArr === undefined || fileArr.length == 0) {
 							maxSlideNum = 0;
 							cleanupForTemp();
@@ -434,7 +435,7 @@ $(document).ready(function() {
 							const hs = fs.readFileSync(tmpDir + "/hidden.dat", { encoding: 'utf8' });
 							hiddenSlides = hs.split("\n");
 						}
-						if (checkLoadStat(spawn2.pid, preTmpDir)) return;
+						if (isCancelTriggered) return;
 						hiddenSlides = hiddenSlides.filter(n => n);
 						for (i = 0, len = hiddenSlides.length; i < len; i++) { 
 							hiddenSlides[i] = parseInt(hiddenSlides[i], 10);
@@ -453,7 +454,7 @@ $(document).ready(function() {
 								slideEffects[ls[0].toString()] = obj;
 							}
 						}
-						if (checkLoadStat(spawn2.pid, preTmpDir)) return;
+						if (isCancelTriggered) return;
 
 						fileArr.sort((a, b) => a - b).forEach(file2 => {
 							let rpc = file2;
@@ -482,7 +483,7 @@ $(document).ready(function() {
 							} else {
 								$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide2.png");
 							}
-						})
+						});
 						$("#fullblack, .cancelBox, #reloadReq").hide();
 						maxSlideNum = newMaxSlideNum;
 						createNullSlide();
@@ -496,7 +497,10 @@ $(document).ready(function() {
 								}
 							}
 						}
-
+						if (isLoaded) {
+							cleanupForTemp(preTmpDir);
+						}
+						isLoaded = true;
 					});
 				} else {
 					if (/\S/.test(file)) {
@@ -772,9 +776,18 @@ $(document).ready(function() {
 		t = setTimeout(startCurrentTime, 500);
 	}
 
-	function cleanupForTemp() {
-		if (fs.existsSync(tmpDir)) {
-			fs.removeSync(tmpDir);
+	function cleanupForTemp(myDir) {
+		let dir = "";
+		if (/\S/.test(myDir)) {
+			dir = myDir;
+		} else {
+			dir = tmpDir;
+		}
+		if (dir === "") {
+			return;
+		}
+		if (fs.existsSync(dir)) {
+			fs.removeSync(dir);
 		}
 	}
 
@@ -848,6 +861,7 @@ $(document).ready(function() {
 
 	$('#cancel').click(function() {
 		isCancelTriggered = true;
+		cancelLoad();
 	});
 
 	$('#trans_checker').click(function() {
