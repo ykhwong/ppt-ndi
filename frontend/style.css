@@ -191,9 +191,27 @@ html, body {
 	filter: brightness(0.8);
 }
 
-#prev:hover, #next:hover,
+#prev:hover, #next:hover, #cancel:hover,
 #load_pptx:hover, #blk:hover, #wht:hover, #trn:hover {
 	filter: brightness(0.5);
+}
+
+#loadingTxt {
+	font-size: 20px;
+	text-align: center;
+}
+
+#cancel {
+	text-align: center;
+}
+
+.cancelBox {
+	position: fixed;
+	display: none;
+	top: 250px;
+	left: 0px;
+	width: 100%;
+	height: 300px;
 }
 
 .abox {

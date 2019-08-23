@@ -6,7 +6,8 @@
 		"fs-extra": "^7.0.1",
 		"iohook": "git+https://github.com/wilix-team/iohook.git",
 		"jimp": "^0.6.4",
-		"merge-images": "^1.1.0"
+		"merge-images": "^1.1.0",
+		"tree-kill": "^1.2.1"
 	},
 	"devDependencies": {},
 	"scripts": {},

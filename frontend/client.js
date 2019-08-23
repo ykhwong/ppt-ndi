@@ -138,6 +138,7 @@ $(document).ready(function() {
 	let whtBool = false;
 	let trnBool = false;
 	let mustStop = false;
+	let isCancelTriggered = false;
 	let numTypBuf = "";
 	let tmpDir = "";
 	let child;
@@ -263,10 +264,11 @@ $(document).ready(function() {
 			}
 
 			function doTrans() {
+				/*
 				if (curSli === prevSli) {
 					return;
 				}
-
+				*/
 				let transSlidesCnt = 0;
 				let transSlidesCnt2 = 0;
 
@@ -341,6 +343,21 @@ $(document).ready(function() {
 	$("#load_pptx").click(function() {
 		const {dialog} = require('electron').remote;
 		$("#fullblack").show();
+		isCancelTriggered = false;
+
+		function checkLoadStat(pid, myDir) {
+			if (isCancelTriggered) {
+				const kill  = require('tree-kill');
+				isCancelTriggered = false;
+				kill(pid);
+				cleanupForTemp();
+				tmpDir = myDir;
+				$("#fullblack, .cancelBox").hide();
+				return true;
+			}
+			return false;
+		}
+
 		dialog.showOpenDialog(currentWindow,{
 			properties: ['openFile'],
 			filters: [
@@ -357,7 +374,7 @@ $(document).ready(function() {
 					let now = new Date().getTime();
 					let newVbsContent;
 					let preTmpDir;
-					const spawnSync = require( 'child_process' ).spawnSync;
+					const spawn2 = require( 'child_process' ).spawn;
 					preTmpDir = tmpDir;
 					tmpDir = process.env.TEMP + '/ppt_ndi';
 					if (!fs.existsSync(tmpDir)) {
@@ -372,119 +389,123 @@ $(document).ready(function() {
 					} else {
 						newVbsContent = vbsNoBg;
 					}
-					
+
 					try {
 						fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 					} catch(e) {
 						cleanupForTemp();
 						tmpDir = preTmpDir;
 						alert('Failed to access the temporary directory!');
-						$("#fullblack").hide();
+						$("#fullblack, .cancelBox").hide();
 						return;
 					}
-					res = spawnSync( 'cscript.exe', [ vbsDir, file, tmpDir, "//NOLOGO", '' ] );
-					$("#fullblack").hide();
-					if ( res.status !== 0 ) {
+					res = spawn2( 'cscript.exe', [ vbsDir, file, tmpDir, "//NOLOGO", '' ] );
+					$(".cancelBox").show();
+					res.stderr.on('data', (data) => {
 						maxSlideNum = 0;
 						cleanupForTemp();
 						tmpDir = preTmpDir;
 						alert('Failed to parse the presentation!');
-						$("#fullblack").hide();
+						$("#fullblack, .cancelBox").hide();
 						return;
-					}
-					maxSlideNum = 0;
-					fs.readdirSync(tmpDir).forEach(file2 => {
-						re = new RegExp("^Slide(\\d+)\\.png\$", "i");
-						if (re.exec(file2)) {
-							let rpc = file2.replace(re, "\$1");
-							fileArr.push(rpc);
-							maxSlideNum++;
+					});
+					res.on('close', (code) => {
+						let newMaxSlideNum = 0;
+						fs.readdirSync(tmpDir).forEach(file2 => {
+							re = new RegExp("^Slide(\\d+)\\.png\$", "i");
+							if (re.exec(file2)) {
+								let rpc = file2.replace(re, "\$1");
+								fileArr.push(rpc);
+								newMaxSlideNum++;
+							}
+						});
+						if (checkLoadStat(spawn2.pid, preTmpDir)) return;
+						if (fileArr === undefined || fileArr.length == 0) {
+							maxSlideNum = 0;
+							cleanupForTemp();
+							tmpDir = preTmpDir;
+							alert("Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.");
+							$("#fullblack, .cancelBox").hide();
+							return;
 						}
-					})
-					if (fileArr === undefined || fileArr.length == 0) {
-						maxSlideNum = 0;
-						cleanupForTemp();
-						tmpDir = preTmpDir;
-						alert("Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.");
-						$("#fullblack").hide();
-						return;
-					}
 
-					hiddenSlides = [];
-					if (fs.existsSync(tmpDir + "/hidden.dat")) {
-						const hs = fs.readFileSync(tmpDir + "/hidden.dat", { encoding: 'utf8' });
-						hiddenSlides = hs.split("\n");
-					}
-					hiddenSlides = hiddenSlides.filter(n => n);
-					for (i = 0, len = hiddenSlides.length; i < len; i++) { 
-						hiddenSlides[i] = parseInt(hiddenSlides[i], 10);
-					}
-
-					slideEffects = {};
-					if (fs.existsSync(tmpDir + "/slideEffect.dat")) {
-						const hs = fs.readFileSync(tmpDir + "/slideEffect.dat", { encoding: 'utf8' });
-						const lines = hs.split(/(\r|\n)+/);
-						for (i = 0; i < lines.length; i++) {
-							let ls = lines[i].split(",");
-							let obj = {
-								"effectName" : ls[1],
-								"duration" : ls[2]
-							};
-							slideEffects[ls[0].toString()] = obj;
+						hiddenSlides = [];
+						if (fs.existsSync(tmpDir + "/hidden.dat")) {
+							const hs = fs.readFileSync(tmpDir + "/hidden.dat", { encoding: 'utf8' });
+							hiddenSlides = hs.split("\n");
 						}
-					}
-
-					fileArr.sort((a, b) => a - b).forEach(file2 => {
-						let rpc = file2;
-						let isHidden = false;
-						options += '<option data-img-label="' + rpc + '"';
-
+						if (checkLoadStat(spawn2.pid, preTmpDir)) return;
+						hiddenSlides = hiddenSlides.filter(n => n);
 						for (i = 0, len = hiddenSlides.length; i < len; i++) { 
-							let num = hiddenSlides[i];
-							if (/^\d+$/.test(num)) {
-								if (num == parseInt(rpc, 10)) {
-									options += ' data-img-class="hiddenSlide" ';
-									isHidden = true;
+							hiddenSlides[i] = parseInt(hiddenSlides[i], 10);
+						}
+
+						slideEffects = {};
+						if (fs.existsSync(tmpDir + "/slideEffect.dat")) {
+							const hs = fs.readFileSync(tmpDir + "/slideEffect.dat", { encoding: 'utf8' });
+							const lines = hs.split(/(\r|\n)+/);
+							for (i = 0; i < lines.length; i++) {
+								let ls = lines[i].split(",");
+								let obj = {
+									"effectName" : ls[1],
+									"duration" : ls[2]
+								};
+								slideEffects[ls[0].toString()] = obj;
+							}
+						}
+						if (checkLoadStat(spawn2.pid, preTmpDir)) return;
+
+						fileArr.sort((a, b) => a - b).forEach(file2 => {
+							let rpc = file2;
+							let isHidden = false;
+							options += '<option data-img-label="' + rpc + '"';
+
+							for (i = 0, len = hiddenSlides.length; i < len; i++) { 
+								let num = hiddenSlides[i];
+								if (/^\d+$/.test(num)) {
+									if (num == parseInt(rpc, 10)) {
+										options += ' data-img-class="hiddenSlide" ';
+										isHidden = true;
+										break;
+									}
+								}
+							}
+							if (!isHidden && ( slideEffects[rpc].effectName !== "0" )) {
+								options += ' data-img-class="transSlide" ';
+							}
+
+							options += ' data-img-src="' + tmpDir + '/Slide' + rpc + '.png" value="' + rpc + '">Slide ' + rpc + "\n";
+							$("#slides_grp").html(options);
+							$("select").find('option[value="Current"]').prop('img-src', tmpDir + "/Slide1.png");
+							if (!fs.existsSync(tmpDir + "/Slide2.png")) {
+								$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide1.png");
+							} else {
+								$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide2.png");
+							}
+						})
+						$("#fullblack, .cancelBox, #reloadReq").hide();
+						maxSlideNum = newMaxSlideNum;
+						createNullSlide();
+						if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
+							selectSlide('1');
+						} else {
+							for (i = 1; i <= maxSlideNum; i++) {
+								if (!hiddenSlides.includes(i)) {
+									selectSlide(i.toString());
 									break;
 								}
 							}
 						}
-						if (!isHidden && ( slideEffects[rpc].effectName !== "0" )) {
-							options += ' data-img-class="transSlide" ';
-						}
 
-						options += ' data-img-src="' + tmpDir + '/Slide' + rpc + '.png" value="' + rpc + '">Slide ' + rpc + "\n";
-						$("#slides_grp").html(options);
-						$("select").find('option[value="Current"]').prop('img-src', tmpDir + "/Slide1.png");
-						if (!fs.existsSync(tmpDir + "/Slide2.png")) {
-							$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide1.png");
-						} else {
-							$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide2.png");
-						}
-					})
-					$("#fullblack").hide();
-					$("#reloadReq").hide();
-
-					if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
-						selectSlide('1');
-					} else {
-						for (i = 1; i <= maxSlideNum; i++) {
-							if (!hiddenSlides.includes(i)) {
-								selectSlide(i.toString());
-								break;
-							}
-						}
-					}
-
-					createNullSlide();
+					});
 				} else {
 					if (/\S/.test(file)) {
 						alert("Only allowed filename extensions are PPT and PPTX.");
 					}
-					$("#fullblack").hide();
+					$("#fullblack, .cancelBox").hide();
 				}
 			} else {
-				$("#fullblack").hide();
+				$("#fullblack, .cancelBox").hide();
 			}
 		});
 	});
@@ -823,6 +844,10 @@ $(document).ready(function() {
 		} else {
 			remote.BrowserWindow.getFocusedWindow().maximize();
 		}
+	});
+
+	$('#cancel').click(function() {
+		isCancelTriggered = true;
 	});
 
 	$('#trans_checker').click(function() {
