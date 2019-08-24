@@ -230,6 +230,7 @@ $(document).ready(function() {
 	let ignoreIoHook = false;
 	let ioHook = null;
 	let tmpDir = null;
+	let preFile = "";
 	let slideWidth = 0;
 	let slideHeight = 0;
 	let lastSignalTime = 0;
@@ -237,10 +238,10 @@ $(document).ready(function() {
 	let configData = {};
 	let pin = true;
 	let mustStop = false;
-	let child;
-	let res;
-	let res2;
-	let res3;
+	let child; // sendNDI
+	let res; // vbsBg & vbsNoBg
+	let res2; // vbsDirectCmd
+	let res3; // vbsCheckSlide
 	let duration = "";
 	let effect = "";
 	let slideIdx = "";
@@ -279,14 +280,14 @@ $(document).ready(function() {
 		const now = new Date().getTime();
 		const cmd = data.toString();
 		const Jimp = require('jimp');
-		const preFile = tmpDir + "/SlidePre.png";
 		let newSlideIdx;
+		preFile = tmpDir + "/SlidePre.png";
 		stopSlideTransition();
 		if (/^PPTNDI: Sent /.test(cmd)) {
 			let tmpCmd = cmd.replace(/^PPTNDI: Sent /, "");
-			newSlideIdx = tmpCmd.split(" ")[2].replace(/\s*.*$/, "");
-			duration = tmpCmd.split(" ")[0].replace(/\s*.*$/, "");
-			effect = tmpCmd.split(" ")[1].replace(/\s*.*$/, "");
+			duration = tmpCmd.split(" ")[0].trim();
+			effect = tmpCmd.split(" ")[1].trim();
+			newSlideIdx = tmpCmd.split(" ")[2].trim();
 		} else if(/^PPTNDI: White/.test(cmd)) {
 			file = tmpDir + "/SlideWhite.png";
 			newSlideIdx = "white";
@@ -300,7 +301,6 @@ $(document).ready(function() {
 			console.log(cmd);
 			return;
 		}
-		stopped = false;
 
 		if (/^PPTNDI: Sent /.test(cmd)) {
 			let fd;
@@ -359,16 +359,16 @@ $(document).ready(function() {
 				fillColor(0xFFFFFFFF);
 			}
 		} else {
-			// TO-DO: Implement Transition Effect
-			/*
-			if(/^\s*0\s*$/.test(effect) && $("#slide_tran").is(":checked")) {
-				if (fs.existsSync(preFile)) {
-					mustStop = false;
-					procTransition(file, data);
-					return;
+			if ($("#slide_tran").is(":checked")) {
+				if(!/^\s*0\s*$/.test(effect)) {
+					if (fs.existsSync(preFile)) {
+						mustStop = false;
+						procTransition(file, data);
+						return;
+					}
 				}
 			}
-			*/
+
 			try {
 				fs.copySync(file, preFile);
 			} catch(e) {
@@ -423,11 +423,9 @@ $(document).ready(function() {
 		ioHook.start();
 	}
 
-// TO-DO: Implement Transition Effect
-/*
 	function procTransition(file, data) {
 		const transLvl=9;
-		const preFile = tmpDir + "/SlidePre.png";
+		preFile = tmpDir + "/SlidePre.png";
 
 		try {
 			for (var i=2; i<=transLvl; i++) {
@@ -451,7 +449,7 @@ $(document).ready(function() {
 					} catch(e) {
 					}
 					if (fs.existsSync(file)) {
-						const preFile = tmpDir + "/SlidePre.png";
+						preFile = tmpDir + "/SlidePre.png";
 						try {
 							fs.copySync(file, preFile);
 						} catch(e) {
@@ -475,38 +473,31 @@ $(document).ready(function() {
 		}
 
 		function doTrans() {
-			let transSlidesCnt = 0;
-			let transSlidesCnt2 = 0;
 			const mergeImages = require('merge-images');
 			stopSlideTransition();
 			mustStop = false;
 
-			for (let i=2; i<=transLvl; i++) {	
+			for (let i=2; i<=transLvl; i++) {
 				mergeImages([
 					{ src: preFile, opacity: 1 - (0.1 * i) },
 					{ src: file, opacity: 0.1 * i }
 				])
 				.then(b64 => {
 					let b64data = b64.replace(/^data:image\/png;base64,/, "");
-					let newi = 0;
-					transSlidesCnt++;
-					newi = transSlidesCnt + 1;
-					fs.writeFile(tmpDir + "/t" + newi.toString() + ".png", b64data, 'base64', function(err) {
-						transSlidesCnt2++;
-						if (transSlidesCnt2 === 8) {
-							transSlidesCnt = 0;
-							transSlidesCnt2 = 0;
+					try {
+						fs.writeFileSync(tmpDir + "/t" + i.toString() + ".png", b64data, 'base64');
+						if (i === 8) {
 							for (var i2=2; i2<=transLvl; i2++) {
 								sendSlides(i2);
 							}
 						}
-					});
+					} catch(e) {
+					}
 				});
 			};
 		}
 		doTrans();
 	}
-*/
 
 	function init() {
 		const { remote } = require('electron');

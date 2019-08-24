@@ -272,8 +272,6 @@ $(document).ready(function() {
 					return;
 				}
 				*/
-				let transSlidesCnt = 0;
-				let transSlidesCnt2 = 0;
 
 				const mergeImages = require('merge-images');
 				stopSlideTransition();
@@ -286,19 +284,15 @@ $(document).ready(function() {
 					])
 					.then(b64 => {
 						let b64data = b64.replace(/^data:image\/png;base64,/, "");
-						let newi = 0;
-						transSlidesCnt++;
-						newi = transSlidesCnt + 1;
-						fs.writeFile(tmpDir + "/t" + newi.toString() + ".png", b64data, 'base64', function(err) {
-							transSlidesCnt2++;
-							if (transSlidesCnt2 === 8) {
-								transSlidesCnt = 0;
-								transSlidesCnt2 = 0;
+						try {
+							fs.writeFileSync(tmpDir + "/t" + i.toString() + ".png", b64data, 'base64');
+							if (i === 8) {
 								for (var i2=2; i2<=transLvl; i2++) {
 									sendSlides(i2);
 								}
 							}
-						});
+						} catch(e) {
+						}
 					});
 				};
 			}
