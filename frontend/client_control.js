@@ -227,11 +227,7 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const ffi = require('ffi');
-	const lib = ffi.Library('./PPTNDI', {
-		'init': [ 'int', [] ],
-		'destroy': [ 'int', [] ],
-		'send': [ 'int', [ "string" ] ]
-	});
+	let lib;
 	let ignoreIoHook = false;
 	let ioHook = null;
 	let tmpDir = null;
@@ -250,6 +246,17 @@ $(document).ready(function() {
 	let effect = "";
 	let slideIdx = "";
 	let slideTranTimers = [];
+
+	try {
+		lib = ffi.Library('./PPTNDI', {
+			'init': [ 'int', [] ],
+			'destroy': [ 'int', [] ],
+			'send': [ 'int', [ "string", "bool" ] ]
+		});
+	} catch(e) {
+		alert(e);
+		ipc.send('remote', "exit");
+	}
 
 	function runBin() {
 		if (lib.init() === 1) {
@@ -270,7 +277,7 @@ $(document).ready(function() {
 		const now = new Date().getTime();
 		const file = "null_slide.png";
 		$("#slidePreview").attr("src", file + "?" + now);
-		lib.send(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file);
+		lib.send(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file, false);
 	}
 
 	function sendNDI(file, data) {
@@ -341,7 +348,7 @@ $(document).ready(function() {
 					image2.opacity(1);
 					image2.write(file, function() {
 						$("#slidePreview").attr("src", file + "?" + now);
-						lib.send(file);
+						lib.send(file, false);
 					});
 				});
 			}
@@ -366,7 +373,7 @@ $(document).ready(function() {
 			} catch(e) {
 				console.log("file could not be generated: "+ preFile);
 			}
-			lib.send(file);
+			lib.send(file, false);
 		}
 	}
 
@@ -431,7 +438,7 @@ $(document).ready(function() {
 					return;
 				}
 				slideTranTimers[10] = setTimeout(function() {
-					lib.send(tmpDir + "/Slide.png");
+					lib.send(tmpDir + "/Slide.png", false);
 					if (fs.existsSync(file)) {
 						preFile = tmpDir + "/SlidePre.png";
 						try {
@@ -444,7 +451,7 @@ $(document).ready(function() {
 			}
 
 			slideTranTimers[i] = setTimeout(function() {
-				lib.send(tmpDir + "/t" + i.toString() + ".png");
+				lib.send(tmpDir + "/t" + i.toString() + ".png", true);
 			}, i * parseFloat(duration) * 50);
 			if (i === transLvl) {
 				const now = new Date().getTime();

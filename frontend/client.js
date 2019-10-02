@@ -124,11 +124,7 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const ffi = require('ffi');
-	const lib = ffi.Library('./PPTNDI', {
-		'init': [ 'int', [] ],
-		'destroy': [ 'int', [] ],
-		'send': [ 'int', [ "string" ] ]
-	});
+	let lib;
 	let ioHook;
 	let maxSlideNum = 0;
 	let prevSlide = 1;
@@ -152,6 +148,17 @@ $(document).ready(function() {
 	let repo;
 	let slideTranTimers = [];
 
+	
+	try {
+		lib = ffi.Library('./PPTNDI', {
+			'init': [ 'int', [] ],
+			'destroy': [ 'int', [] ],
+			'send': [ 'int', [ "string", "bool" ] ]
+		});
+	} catch(e) {
+		alert(e);
+		ipc.send('remote', "exit");
+	}
 	try {
 		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
 	} catch(e) {
@@ -246,11 +253,11 @@ $(document).ready(function() {
 						return;
 					}
 					slideTranTimers[10] = setTimeout(function() {
-						lib.send(tmpDir + "/Slide" + currentSlide.toString() + ".png");
+						lib.send(tmpDir + "/Slide" + currentSlide.toString() + ".png", false);
 					}, 10 * parseFloat(duration) * 50);
 				}
 				slideTranTimers[i] = setTimeout(function() {
-					lib.send(tmpDir + "/t" + i.toString() + ".png");
+					lib.send(tmpDir + "/t" + i.toString() + ".png", true);
 				}, i * parseFloat(duration) * 50);
 				if (i === transLvl) {
 					setLast();
@@ -291,7 +298,7 @@ $(document).ready(function() {
 
 		} else {
 			stopSlideTransition();
-			lib.send(curSli);
+			lib.send(curSli, false);
 		}
 		$("#slide_cnt").html("SLIDE " + currentSlide + " / " + maxSlideNum);
 	}
@@ -629,7 +636,7 @@ $(document).ready(function() {
 		$("select").find('option[value="Current"]').data('img-src', dirTo);
 		initImgPicker();
 
-		lib.send(dirTo);
+		lib.send(dirTo, false);
 	}
 
 	$('#blk').click(function() {
