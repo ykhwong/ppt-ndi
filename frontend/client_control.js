@@ -226,7 +226,12 @@ $(document).ready(function() {
 	const spawn = require( 'child_process' ).spawn;
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
-	const binPath = './bin/PPTNDI.EXE';
+	const ffi = require('ffi');
+	const lib = ffi.Library('./PPTNDI', {
+		'init': [ 'int', [] ],
+		'destroy': [ 'int', [] ],
+		'send': [ 'int', [ "string" ] ]
+	});
 	let ignoreIoHook = false;
 	let ioHook = null;
 	let tmpDir = null;
@@ -238,7 +243,6 @@ $(document).ready(function() {
 	let configData = {};
 	let pin = true;
 	let mustStop = false;
-	let child; // sendNDI
 	let res; // vbsBg & vbsNoBg
 	let res2; // vbsDirectCmd
 	let res3; // vbsCheckSlide
@@ -248,9 +252,7 @@ $(document).ready(function() {
 	let slideTranTimers = [];
 
 	function runBin() {
-		if (fs.existsSync(binPath)) {
-			child = spawn(binPath);
-		} else {
+		if (lib.init() === 1) {
 			alert('Failed to create a listening server!');
 			ipc.send('remote', "exit");
 			return;
@@ -268,12 +270,7 @@ $(document).ready(function() {
 		const now = new Date().getTime();
 		const file = "null_slide.png";
 		$("#slidePreview").attr("src", file + "?" + now);
-		try {
-			child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file + "\n");
-		} catch(e) {
-			runBin();
-			child.stdin.write(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file + "\n");
-		}
+		lib.send(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file);
 	}
 
 	function sendNDI(file, data) {
@@ -344,12 +341,7 @@ $(document).ready(function() {
 					image2.opacity(1);
 					image2.write(file, function() {
 						$("#slidePreview").attr("src", file + "?" + now);
-						try {
-							child.stdin.write(file + "\n");
-						} catch(e) {
-							runBin();
-							child.stdin.write(file + "\n");
-						}
+						lib.send(file);
 					});
 				});
 			}
@@ -374,12 +366,7 @@ $(document).ready(function() {
 			} catch(e) {
 				console.log("file could not be generated: "+ preFile);
 			}
-			try {
-				child.stdin.write(file + "\n");
-			} catch(e) {
-				runBin();
-				child.stdin.write(file + "\n");
-			}
+			lib.send(file);
 		}
 	}
 
@@ -444,10 +431,7 @@ $(document).ready(function() {
 					return;
 				}
 				slideTranTimers[10] = setTimeout(function() {
-					try {
-						child.stdin.write(tmpDir + "/Slide.png" + "\n");
-					} catch(e) {
-					}
+					lib.send(tmpDir + "/Slide.png");
 					if (fs.existsSync(file)) {
 						preFile = tmpDir + "/SlidePre.png";
 						try {
@@ -460,10 +444,7 @@ $(document).ready(function() {
 			}
 
 			slideTranTimers[i] = setTimeout(function() {
-				try {
-					child.stdin.write(tmpDir + "/t" + i.toString() + ".png" + "\n");
-				} catch(e) {
-				}
+				lib.send(tmpDir + "/t" + i.toString() + ".png");
 			}, i * parseFloat(duration) * 50);
 			if (i === transLvl) {
 				const now = new Date().getTime();
@@ -511,8 +492,6 @@ $(document).ready(function() {
 		} catch(e) {
 		}
 		runBin();
-		child.stdin.setEncoding('utf-8');
-		child.stdout.pipe(process.stdout);
 
 		tmpDir = process.env.TEMP + '/ppt_ndi';
 		if (!fs.existsSync(tmpDir)) {
@@ -610,10 +589,7 @@ $(document).ready(function() {
 	}
 
 	function cleanupForExit() {
-		try {
-			child.stdin.write("destroy\n");
-		} catch(e) {
-		}
+		lib.destroy();
 		cleanupForTemp();
 		ipc.send('remote', "exit");
 	}

@@ -119,11 +119,16 @@ Main
 `;
 
 $(document).ready(function() {
-	const spawn = require( 'child_process' ).spawn;
+	//const spawn = require( 'child_process' ).spawn;
 	const { remote } = require('electron');
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
-	const binPath = './bin/PPTNDI.EXE';
+	const ffi = require('ffi');
+	const lib = ffi.Library('./PPTNDI', {
+		'init': [ 'int', [] ],
+		'destroy': [ 'int', [] ],
+		'send': [ 'int', [ "string" ] ]
+	});
 	let ioHook;
 	let maxSlideNum = 0;
 	let prevSlide = 1;
@@ -144,7 +149,6 @@ $(document).ready(function() {
 	let numTypBuf = "";
 	let tmpDir = "";
 	let preTmpDir = "";
-	let child;
 	let repo;
 	let slideTranTimers = [];
 
@@ -152,14 +156,7 @@ $(document).ready(function() {
 		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
 	} catch(e) {
 	}
-	if (fs.existsSync(binPath)) {
-		child = spawn(binPath);
-		child.stdin.setEncoding('utf-8');
-		child.stdout.pipe(process.stdout);
-		//child.on('exit', function (code) {
-		//	alert("EXITED " + code);
-		//});
-	} else {
+	if (lib.init() === 1) {
 		alert('Failed to create a listening server!');
 		ipc.send('remote', "exit");
 		return;
@@ -249,17 +246,11 @@ $(document).ready(function() {
 						return;
 					}
 					slideTranTimers[10] = setTimeout(function() {
-						try {
-							child.stdin.write(tmpDir + "/Slide" + currentSlide.toString() + ".png" + "\n");
-						} catch(e) {
-						}
+						lib.send(tmpDir + "/Slide" + currentSlide.toString() + ".png");
 					}, 10 * parseFloat(duration) * 50);
 				}
 				slideTranTimers[i] = setTimeout(function() {
-					try {
-						child.stdin.write(tmpDir + "/t" + i.toString() + ".png" + "\n");
-					} catch(e) {
-					}
+					lib.send(tmpDir + "/t" + i.toString() + ".png");
 				}, i * parseFloat(duration) * 50);
 				if (i === transLvl) {
 					setLast();
@@ -300,10 +291,7 @@ $(document).ready(function() {
 
 		} else {
 			stopSlideTransition();
-			try {
-				child.stdin.write(curSli + "\n");
-			} catch(e) {
-			}
+			lib.send(curSli);
 		}
 		$("#slide_cnt").html("SLIDE " + currentSlide + " / " + maxSlideNum);
 	}
@@ -423,7 +411,6 @@ $(document).ready(function() {
 							$("#fullblack, .cancelBox").hide();
 							return;
 						}
-
 						hiddenSlides = [];
 						if (fs.existsSync(tmpDir + "/hidden.dat")) {
 							const hs = fs.readFileSync(tmpDir + "/hidden.dat", { encoding: 'utf8' });
@@ -449,7 +436,6 @@ $(document).ready(function() {
 							}
 						}
 						if (isCancelTriggered) return;
-
 						fileArr.sort((a, b) => a - b).forEach(file2 => {
 							let rpc = file2;
 							let isHidden = false;
@@ -481,7 +467,7 @@ $(document).ready(function() {
 						$("#fullblack, .cancelBox, #reloadReq").hide();
 						maxSlideNum = newMaxSlideNum;
 						createNullSlide();
-						if (hiddenSlides.length == 0 || maxSlideNum == hiddenSlides.length) {
+						if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
 							selectSlide('1');
 						} else {
 							for (i = 1; i <= maxSlideNum; i++) {
@@ -530,7 +516,6 @@ $(document).ready(function() {
 			  500, 'swing', function() {
 			  });
 		}
-
 		updateScreen();
 	}
 
@@ -644,10 +629,7 @@ $(document).ready(function() {
 		$("select").find('option[value="Current"]').data('img-src', dirTo);
 		initImgPicker();
 
-		try {
-			child.stdin.write(dirTo + "\n");
-		} catch(e) {
-		}
+		lib.send(dirTo);
 	}
 
 	$('#blk').click(function() {
@@ -786,10 +768,7 @@ $(document).ready(function() {
 	}
 
 	function cleanupForExit() {
-		try {
-			child.stdin.write("destroy\n");
-		} catch(e) {
-		}
+		lib.destroy();
 		cleanupForTemp(false);
 		ipc.send('remote', "exit");
 	}
