@@ -119,7 +119,6 @@ Main
 `;
 
 $(document).ready(function() {
-	//const spawn = require( 'child_process' ).spawn;
 	const { remote } = require('electron');
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
@@ -197,6 +196,12 @@ $(document).ready(function() {
 		});
 	}
 
+	function updateCurNext(curSli, nextSli) {
+		$("select").find('option[value="Current"]').data('img-src', curSli);
+		$("select").find('option[value="Next"]').data('img-src', nextSli);
+		initImgPicker();
+	}
+
 	function updateScreen() {
 		let curSli, nextSli;
 		let nextNum;
@@ -208,7 +213,6 @@ $(document).ready(function() {
 		curSli = rpc + currentSlide.toString() + '.png';
 		nextNum = currentSlide;
 		nextNum++;
-		$("select").find('option[value="Current"]').data('img-src', curSli);
 
 		if (nextNum > maxSlideNum) {
 			nextNum = 1;
@@ -227,9 +231,6 @@ $(document).ready(function() {
 			}
 		}
 
-		$("select").find('option[value="Next"]').data('img-src', nextSli);
-		initImgPicker();
-
 		if (
 		    $("#use_slide_transition").is(":checked") &&
 		    ! (Object.entries(slideEffects).length === 0 && slideEffects.constructor === Object) &&
@@ -246,18 +247,22 @@ $(document).ready(function() {
 			}
 			function sendSlides(i) {
 				if (mustStop) {
+					updateCurNext(curSli, nextSli);
 					return;
 				}
 				function setLast() {
 					if (mustStop) {
+						updateCurNext(curSli, nextSli);
 						return;
 					}
 					slideTranTimers[10] = setTimeout(function() {
 						lib.send(tmpDir + "/Slide" + currentSlide.toString() + ".png", false);
+						updateCurNext(curSli, nextSli);
 					}, 10 * parseFloat(duration) * 50);
 				}
 				slideTranTimers[i] = setTimeout(function() {
 					lib.send(tmpDir + "/t" + i.toString() + ".png", true);
+					$("img.image_picker_image:first").attr("src", tmpDir + "/t" + i.toString() + ".png");
 				}, i * parseFloat(duration) * 50);
 				if (i === transLvl) {
 					setLast();
@@ -298,6 +303,7 @@ $(document).ready(function() {
 
 		} else {
 			stopSlideTransition();
+			updateCurNext(curSli, nextSli);
 			lib.send(curSli, false);
 		}
 		$("#slide_cnt").html("SLIDE " + currentSlide + " / " + maxSlideNum);
