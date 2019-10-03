@@ -3,7 +3,7 @@
 ## INTRODUCTION
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Can be also used as a character generator because it supports transparency.
 
-The latest version is PPT NDI (20190827).
+The latest version is PPT NDI (20191003).
 
 ## BASIC USAGE
 1. Download PPT NDI from https://github.com/ykhwong/ppt-ndi/releases

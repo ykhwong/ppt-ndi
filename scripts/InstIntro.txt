@@ -2,13 +2,10 @@ PPT NDI
 
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Can be also used as a character generator because it supports transparency.
 
-Release Note (20190827):
+Release Note (20191003):
 
-ADD: Cancel button to cancel the loading PowerPoint slides (Classic Mode)
-ADD: Display the current screen resolution
-ADD: Transition effect (SlideShow Mode)
-FIX: Performance issue on the transition effect (Classic Mode)
-FIX: Minor bugs
+ADD: Support for NDI 4.0
+FIX: Transition effect not working properly with PowerPoint SlideShow mode
 
 Please also download and open the sample.pptx file to see some examples of the lower thirds:
 https://github.com/ykhwong/ppt-ndi/raw/master/resources/sample.pptx
