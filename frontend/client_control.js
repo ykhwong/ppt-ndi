@@ -258,7 +258,7 @@ $(document).ready(function() {
 		ipc.send('remote', "exit");
 	}
 
-	function runBin() {
+	function runLib() {
 		if (lib.init() === 1) {
 			alert('Failed to create a listening server!');
 			ipc.send('remote', "exit");
@@ -440,7 +440,6 @@ $(document).ready(function() {
 				slideTranTimers[10] = setTimeout(function() {
 					lib.send(tmpDir + "/Slide.png", false);
 					if (fs.existsSync(file)) {
-						preFile = tmpDir + "/SlidePre.png";
 						try {
 							fs.copySync(file, preFile);
 						} catch(e) {
@@ -466,9 +465,10 @@ $(document).ready(function() {
 			mustStop = false;
 
 			for (let i=2; i<=transLvl; i++) {
+				let now = new Date().getTime();
 				mergeImages([
-					{ src: preFile, opacity: 1 - (0.1 * i) },
-					{ src: file, opacity: 0.1 * i }
+					{ src: preFile + "?" + now, opacity: 1 - (0.1 * i) },
+					{ src: file + "?" + now, opacity: 0.1 * i }
 				])
 				.then(b64 => {
 					let b64data = b64.replace(/^data:image\/png;base64,/, "");
@@ -498,7 +498,7 @@ $(document).ready(function() {
 			process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
 		} catch(e) {
 		}
-		runBin();
+		runLib();
 
 		tmpDir = process.env.TEMP + '/ppt_ndi';
 		if (!fs.existsSync(tmpDir)) {
