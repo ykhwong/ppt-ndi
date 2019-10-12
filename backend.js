@@ -119,7 +119,7 @@ app.on('ready', function() {
 			}
 			if (/--classic/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(1200, 680, true, 'index.html', !startAsTray);
+				mainWindow2 = createWin(1200, 700, true, 'index.html', !startAsTray);
 				addMainWin2handler(!startAsTray);
 				break;
 			}
@@ -230,7 +230,7 @@ app.on('ready', function() {
 					mainWindow.destroy();
 					break;
 				case "select2":
-					mainWindow2 = createWin(1200, 680, true, 'index.html', true);
+					mainWindow2 = createWin(1200, 700, true, 'index.html', true);
 					addMainWin2handler(true);
 					mainWindow.destroy();
 					break;
