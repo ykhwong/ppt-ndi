@@ -6,10 +6,7 @@ Set objPPT = CreateObject("PowerPoint.Application")
 
 Sub Proc(ap)
 	Dim sl
-	Dim shGroup
-	Dim sngWidth
-	Dim sngHeight
-
+	Dim fn
 	For Each sl In ap.Slides
 		If sl.SlideShowTransition.Hidden Then
 			Set objFileToWrite = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/hidden.dat",8,true)
@@ -22,7 +19,12 @@ Sub Proc(ap)
 		objSlideEffect.WriteLine(sl.SlideIndex & "," & sl.SlideShowTransition.EntryEffect & "," & sl.SlideShowTransition.Duration)
 		objSlideEffect.Close
 
-		sl.Export Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png", "PNG"
+		fn = Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png"
+		If Wscript.Arguments.Item(2) = 0 Then
+			sl.Export fn, "PNG"
+		Else
+			sl.Export fn, "PNG", Wscript.Arguments.Item(2), Wscript.Arguments.Item(3)
+		End If
 	Next
 End Sub
 
@@ -78,10 +80,14 @@ Sub Proc(ap)
 		fn = Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png"
 		With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
 			Set shpGroup = sl.Shapes.Range()
-			shpGroup.Export fn, 2, , , 1
+			If Wscript.Arguments.Item(2) = 0 Then
+				shpGroup.Export fn, 2, , , 1
+			Else
+				shpGroup.Export fn, 2, Round(Wscript.Arguments.Item(2) / 1.33333333, 0), Round(Wscript.Arguments.Item(3) / 1.33333333, 0), 1
+			End If
 			.Delete
 		End With
-		
+
 		Set fso = CreateObject("Scripting.FileSystemObject")
 		If fso.FileExists(fn) Then
 			Set objFile = fso.GetFile(fn)
@@ -93,7 +99,11 @@ Sub Proc(ap)
 				Next
 				With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
 					Set shpGroup = sl.Shapes.Range()
-					shpGroup.Export fn, 2, , , 1
+					If Wscript.Arguments.Item(2) = 0 Then
+						shpGroup.Export fn, 2, , , 1
+					Else
+						shpGroup.Export fn, 2, Round(Wscript.Arguments.Item(2) / 1.33333333, 0), Round(Wscript.Arguments.Item(3) / 1.33333333, 0), 1
+					End If
 					.Delete
 				End With
 			End If
@@ -131,7 +141,9 @@ $(document).ready(function() {
 	let currentWindow = remote.getCurrentWindow();
 	let slideWidth = 0;
 	let slideHeight = 0;
-	let spawn2pid = 0;
+	let customSlideX = 0;
+	let customSlideY = 0;
+	let spawnpid = 0;
 	let hiddenSlides = [];
 	let slideEffects = {};
 	let configData = {};
@@ -144,12 +156,22 @@ $(document).ready(function() {
 	let numTypBuf = "";
 	let tmpDir = "";
 	let preTmpDir = "";
+	let pptPath = "";
 	let repo;
 	let slideTranTimers = [];
 
-	
 	try {
-		lib = ffi.Library('./PPTNDI', {
+		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
+	} catch(e) {
+	}
+	try {
+		let { RTLD_NOW, RTLD_GLOBAL } = ffi.DynamicLibrary.FLAGS;
+		ffi.DynamicLibrary(
+			remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
+			RTLD_NOW | RTLD_GLOBAL
+		);
+		//lib = ffi.Library('./PPTNDI.dll', {
+		lib = ffi.Library(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
 			'init': [ 'int', [] ],
 			'destroy': [ 'int', [] ],
 			'send': [ 'int', [ "string", "bool" ] ]
@@ -157,10 +179,6 @@ $(document).ready(function() {
 	} catch(e) {
 		alert(e);
 		ipc.send('remote', "exit");
-	}
-	try {
-		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
-	} catch(e) {
 	}
 	if (lib.init() === 1) {
 		alert('Failed to create a listening server!');
@@ -262,7 +280,9 @@ $(document).ready(function() {
 				}
 				slideTranTimers[i] = setTimeout(function() {
 					lib.send(tmpDir + "/t" + i.toString() + ".png", true);
-					$("img.image_picker_image:first").attr("src", tmpDir + "/t" + i.toString() + ".png");
+					if ( i % 2 === 0 ) {
+						$("img.image_picker_image:first").attr("src", tmpDir + "/t" + i.toString() + ".png");
+					}
 				}, i * parseFloat(duration) * 50);
 				if (i === transLvl) {
 					setLast();
@@ -315,9 +335,37 @@ $(document).ready(function() {
 		}
 	});
 
+	function askReloadFile(ele, description) {
+		const {dialog} = require('electron').remote;
+		let options;
+		let response;
+		
+		if (/\S/.test(description)) {
+			description = "\n" + description;
+		}
+		
+		options = {
+			type: 'question',
+			buttons: ['Yes', 'No'],
+			defaultId: 1,
+			//title: 'Include background',
+			message: 'Do you want to continue?',
+			detail: 'Changes require a reload to take effect.' + description
+		};
+
+		response = dialog.showMessageBoxSync(null, options);
+		if (response === 0) { // Yes
+			loadPPTX(pptPath);
+		} else { // No
+			if (ele !== undefined && /\S/.test(ele)) {
+				$(ele).prop("checked", !$(ele).prop("checked"));
+			}
+		}
+	}
+
 	$("#with_background").click(function() {
 		if (maxSlideNum > 0) {
-			$("#reloadReq").toggle();
+			askReloadFile(this, "");
 		}
 	});
 
@@ -336,20 +384,189 @@ $(document).ready(function() {
 		} else {
 			$("#right img").css('background-image', "url('null_slide.png')");
 		}
+		$("#below img").css('background', 'black');
+		$(window).trigger('resize');
 	}
 
 	function cancelLoad() {
 		const kill  = require('tree-kill');
-		kill(spawn2pid);
+		kill(spawnpid);
 		cleanupForTemp(false);
 		tmpDir = preTmpDir;
 		$("#fullblack, .cancelBox").hide();
 	}
-		
+
+	function loadPPTX(file) {
+		if (file === undefined) {
+			$("#fullblack, .cancelBox").hide();
+			return false;
+		}
+		$("#fullblack").show();
+		isCancelTriggered = false;
+		let re = new RegExp("\\.(ppt|pptx)\$", "i");
+		let vbsDir, res;
+		let fileArr = [];
+		let options = "";
+		let resX = 0;
+		let resY = 0;
+		if (re.exec(file)) {
+			let now = new Date().getTime();
+			let newVbsContent;
+			const spawn = require( 'child_process' ).spawn;
+			spawnpid = spawn.pid;
+			preTmpDir = tmpDir;
+			tmpDir = process.env.TEMP + '/ppt_ndi';
+			if (!fs.existsSync(tmpDir)) {
+				fs.mkdirSync(tmpDir);
+			}
+			tmpDir += '/' + now;
+			fs.mkdirSync(tmpDir);
+			vbsDir = tmpDir + '/wb.vbs';
+
+			if ($("#with_background").is(":checked")) {
+				newVbsContent = vbsBg;
+			} else {
+				newVbsContent = vbsNoBg;
+			}
+
+			try {
+				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
+			} catch(e) {
+				cleanupForTemp(false);
+				tmpDir = preTmpDir;
+				alert('Failed to access the temporary directory!');
+				$("#fullblack, .cancelBox").hide();
+				return;
+			}
+
+			if (customSlideX == 0 || customSlideY == 0 || !/\S/.test(customSlideX) || !/\S/.test(customSlideY)) {
+				resX = 0;
+				resY = 0;
+			} else {
+				resX = customSlideX;
+				resY = customSlideY;
+			}
+			
+			res = spawn( 'cscript.exe', [ vbsDir, file, tmpDir, resX, resY, "//NOLOGO", '' ] );
+			$(".cancelBox").show();
+			res.stderr.on('data', (data) => {
+				let myMsg = "Failed to parse the presentation!\n";
+				maxSlideNum = 0;
+				cleanupForTemp(false);
+				tmpDir = preTmpDir;
+				if (maxSlideNum > 0) {
+					alert(myMsg + "Please check the configuration.");
+				} else {
+					alert(myMsg + "Please make sure that Microsoft PowerPoint has been installed on the system.");
+				}
+				$("#fullblack, .cancelBox").hide();
+				return;
+			});
+			res.on('close', (code) => {
+				let newMaxSlideNum = 0;
+				if (tmpDir === "") {
+					return;
+				}
+				fs.readdirSync(tmpDir).forEach(file2 => {
+					re = new RegExp("^Slide(\\d+)\\.png\$", "i");
+					if (re.exec(file2)) {
+						let rpc = file2.replace(re, "\$1");
+						fileArr.push(rpc);
+						newMaxSlideNum++;
+					}
+				});
+				if (isCancelTriggered) return;
+				if (fileArr === undefined || fileArr.length == 0) {
+					maxSlideNum = 0;
+					cleanupForTemp(false);
+					tmpDir = preTmpDir;
+					alert("Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.");
+					$("#fullblack, .cancelBox").hide();
+					return;
+				}
+				hiddenSlides = [];
+				if (fs.existsSync(tmpDir + "/hidden.dat")) {
+					const hs = fs.readFileSync(tmpDir + "/hidden.dat", { encoding: 'utf8' });
+					hiddenSlides = hs.split("\n");
+				}
+				if (isCancelTriggered) return;
+				hiddenSlides = hiddenSlides.filter(n => n);
+				for (i = 0, len = hiddenSlides.length; i < len; i++) { 
+					hiddenSlides[i] = parseInt(hiddenSlides[i], 10);
+				}
+
+				slideEffects = {};
+				if (fs.existsSync(tmpDir + "/slideEffect.dat")) {
+					const hs = fs.readFileSync(tmpDir + "/slideEffect.dat", { encoding: 'utf8' });
+					const lines = hs.split(/(\r|\n)+/);
+					for (i = 0; i < lines.length; i++) {
+						let ls = lines[i].split(",");
+						let obj = {
+							"effectName" : ls[1],
+							"duration" : ls[2]
+						};
+						slideEffects[ls[0].toString()] = obj;
+					}
+				}
+				if (isCancelTriggered) return;
+				fileArr.sort((a, b) => a - b).forEach(file2 => {
+					let rpc = file2;
+					let isHidden = false;
+					options += '<option data-img-label="' + rpc + '"';
+
+					for (i = 0, len = hiddenSlides.length; i < len; i++) { 
+						let num = hiddenSlides[i];
+						if (/^\d+$/.test(num)) {
+							if (num == parseInt(rpc, 10)) {
+								options += ' data-img-class="hiddenSlide" ';
+								isHidden = true;
+								break;
+							}
+						}
+					}
+					if (!isHidden && ( slideEffects[rpc].effectName !== "0" )) {
+						options += ' data-img-class="transSlide" ';
+					}
+
+					options += ' data-img-src="' + tmpDir + '/Slide' + rpc + '.png" value="' + rpc + '">' + "\n";
+					$("select").find('option[value="Current"]').prop('img-src', tmpDir + "/Slide1.png");
+					if (!fs.existsSync(tmpDir + "/Slide2.png")) {
+						$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide1.png");
+					} else {
+						$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide2.png");
+					}
+				});
+				$("#slides_grp").html(options);
+				$("#fullblack, .cancelBox, #reloadReq").hide();
+				maxSlideNum = newMaxSlideNum;
+				createNullSlide();
+				if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
+					selectSlide('1');
+				} else {
+					for (i = 1; i <= maxSlideNum; i++) {
+						if (!hiddenSlides.includes(i)) {
+							selectSlide(i.toString());
+							break;
+						}
+					}
+				}
+				if (isLoaded) {
+					cleanupForTemp(true);
+				}
+				isLoaded = true;
+				pptPath = file;
+			});
+		} else {
+			if (/\S/.test(file)) {
+				alert("Only allowed filename extensions are PPT and PPTX.");
+			}
+			$("#fullblack, .cancelBox").hide();
+		}
+	}
+
 	$("#load_pptx").click(function() {
 		const {dialog} = require('electron').remote;
 		$("#fullblack").show();
-		isCancelTriggered = false;
 
 		dialog.showOpenDialog(currentWindow,{
 			properties: ['openFile'],
@@ -357,153 +574,8 @@ $(document).ready(function() {
 				{name: 'PowerPoint Presentations', extensions: ['pptx', 'ppt']},
 				{name: 'All Files', extensions: ['*']}
 			]
-		}, function (file) {
-			if (file !== undefined) {
-				let re = new RegExp("\\.(ppt|pptx)\$", "i");
-				let vbsDir, res;
-				let fileArr = [];
-				let options = "";
-				if (re.exec(file)) {
-					let now = new Date().getTime();
-					let newVbsContent;
-					const spawn2 = require( 'child_process' ).spawn;
-					spawn2pid = spawn2.pid;
-					preTmpDir = tmpDir;
-					tmpDir = process.env.TEMP + '/ppt_ndi';
-					if (!fs.existsSync(tmpDir)) {
-						fs.mkdirSync(tmpDir);
-					}
-					tmpDir += '/' + now;
-					fs.mkdirSync(tmpDir);
-					vbsDir = tmpDir + '/wb.vbs';
-
-					if ($("#with_background").is(":checked")) {
-						newVbsContent = vbsBg;
-					} else {
-						newVbsContent = vbsNoBg;
-					}
-
-					try {
-						fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
-					} catch(e) {
-						cleanupForTemp(false);
-						tmpDir = preTmpDir;
-						alert('Failed to access the temporary directory!');
-						$("#fullblack, .cancelBox").hide();
-						return;
-					}
-					res = spawn2( 'cscript.exe', [ vbsDir, file, tmpDir, "//NOLOGO", '' ] );
-					$(".cancelBox").show();
-					res.stderr.on('data', (data) => {
-						maxSlideNum = 0;
-						cleanupForTemp(false);
-						tmpDir = preTmpDir;
-						alert('Failed to parse the presentation!');
-						$("#fullblack, .cancelBox").hide();
-						return;
-					});
-					res.on('close', (code) => {
-						let newMaxSlideNum = 0;
-						if (tmpDir === "") {
-							return;
-						}
-						fs.readdirSync(tmpDir).forEach(file2 => {
-							re = new RegExp("^Slide(\\d+)\\.png\$", "i");
-							if (re.exec(file2)) {
-								let rpc = file2.replace(re, "\$1");
-								fileArr.push(rpc);
-								newMaxSlideNum++;
-							}
-						});
-						if (isCancelTriggered) return;
-						if (fileArr === undefined || fileArr.length == 0) {
-							maxSlideNum = 0;
-							cleanupForTemp(false);
-							tmpDir = preTmpDir;
-							alert("Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.");
-							$("#fullblack, .cancelBox").hide();
-							return;
-						}
-						hiddenSlides = [];
-						if (fs.existsSync(tmpDir + "/hidden.dat")) {
-							const hs = fs.readFileSync(tmpDir + "/hidden.dat", { encoding: 'utf8' });
-							hiddenSlides = hs.split("\n");
-						}
-						if (isCancelTriggered) return;
-						hiddenSlides = hiddenSlides.filter(n => n);
-						for (i = 0, len = hiddenSlides.length; i < len; i++) { 
-							hiddenSlides[i] = parseInt(hiddenSlides[i], 10);
-						}
-
-						slideEffects = {};
-						if (fs.existsSync(tmpDir + "/slideEffect.dat")) {
-							const hs = fs.readFileSync(tmpDir + "/slideEffect.dat", { encoding: 'utf8' });
-							const lines = hs.split(/(\r|\n)+/);
-							for (i = 0; i < lines.length; i++) {
-								let ls = lines[i].split(",");
-								let obj = {
-									"effectName" : ls[1],
-									"duration" : ls[2]
-								};
-								slideEffects[ls[0].toString()] = obj;
-							}
-						}
-						if (isCancelTriggered) return;
-						fileArr.sort((a, b) => a - b).forEach(file2 => {
-							let rpc = file2;
-							let isHidden = false;
-							options += '<option data-img-label="' + rpc + '"';
-
-							for (i = 0, len = hiddenSlides.length; i < len; i++) { 
-								let num = hiddenSlides[i];
-								if (/^\d+$/.test(num)) {
-									if (num == parseInt(rpc, 10)) {
-										options += ' data-img-class="hiddenSlide" ';
-										isHidden = true;
-										break;
-									}
-								}
-							}
-							if (!isHidden && ( slideEffects[rpc].effectName !== "0" )) {
-								options += ' data-img-class="transSlide" ';
-							}
-
-							options += ' data-img-src="' + tmpDir + '/Slide' + rpc + '.png" value="' + rpc + '">Slide ' + rpc + "\n";
-							$("#slides_grp").html(options);
-							$("select").find('option[value="Current"]').prop('img-src', tmpDir + "/Slide1.png");
-							if (!fs.existsSync(tmpDir + "/Slide2.png")) {
-								$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide1.png");
-							} else {
-								$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide2.png");
-							}
-						});
-						$("#fullblack, .cancelBox, #reloadReq").hide();
-						maxSlideNum = newMaxSlideNum;
-						createNullSlide();
-						if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
-							selectSlide('1');
-						} else {
-							for (i = 1; i <= maxSlideNum; i++) {
-								if (!hiddenSlides.includes(i)) {
-									selectSlide(i.toString());
-									break;
-								}
-							}
-						}
-						if (isLoaded) {
-							cleanupForTemp(true);
-						}
-						isLoaded = true;
-					});
-				} else {
-					if (/\S/.test(file)) {
-						alert("Only allowed filename extensions are PPT and PPTX.");
-					}
-					$("#fullblack, .cancelBox").hide();
-				}
-			} else {
-				$("#fullblack, .cancelBox").hide();
-			}
+		}, function(file) {
+			loadPPTX(file, 0, 0);
 		});
 	});
 
@@ -660,6 +732,9 @@ $(document).ready(function() {
 	$(document).keydown(function(e) {
 		let realNum = 0;
 		if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+			return;
+		}
+		if ($(":text").is(":focus")) {
 			return;
 		}
 		$("#below").trigger('click');
@@ -856,6 +931,7 @@ $(document).ready(function() {
 		} else {
 			$("#right img").css('background-image', "url('null_slide.png')");
 		}
+		$("#below img").css('background', 'black');
 	});
 
 	currentWindow.on('maximize', function (){
@@ -882,9 +958,33 @@ $(document).ready(function() {
 
 	window.addEventListener("keydown", function(e) {
 		if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
-			e.preventDefault();
+			if (!$(":text").is(":focus")) {
+				e.preventDefault();
+			}
 		}
 	}, false);
+
+	$(window).resize(function(){
+		let ss = $(document).height() - $("#top").height() - $("#rest1").height() - $("#rest2 img:first").height() - 50;
+		$("#below").height(ss);
+	});
+
+	$("#resWidth").val("0");
+	$("#resHeight").val("0");
+	$("#resWidth, #resHeight").click(function() {
+		$(this).val("");
+	});
+	$("#setRes").click(function() {
+		let resX = $("#resWidth").val();
+		let resY = $("#resHeight").val();
+		if (/^\d+$/.test(resX) && /^\d+$/.test(resY)) {
+			customSlideX = resX;
+			customSlideY = resY;
+			if (maxSlideNum > 0) {
+				askReloadFile(null, "IMPORTANT: Please maintain the original aspect ratio.");
+			}
+		}
+	});
 
 	initImgPicker();
 	startCurrentTime();

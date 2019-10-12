@@ -3,8 +3,8 @@
 <script src="jquery.min.js"></script>
 <script src="client.js"></script>
 <script src="image-picker.min.js"></script>
-<link rel="stylesheet" type="text/css" href="style.css">
 <link rel="stylesheet" type="text/css" href="common.css">
+<link rel="stylesheet" type="text/css" href="style.css">
 <link rel="stylesheet" type="text/css" href="image-picker.css">
 <script>if (window.module) module = window.module;</script>
 
@@ -13,80 +13,113 @@
 <title>-</title>
 </head>
 <body>
-<h1><h1><br />
+<h1><h1>
 <div id="top" style="-webkit-app-region: drag">
-<img src="big_icon.png" style="-webkit-app-region: drag">
-</div>
-<img id="minimize" src="min.png">
-<img id="max_restore" src="max.png">
-<img id="exit" src="close.png">
-
-<div id="left">
-	<br /><br />
-	<img id="load_pptx" class="button" src="open.png">
-	<br /><br />
-	<table id="bktbl" border="0">
-	  <tbody>
-		<tr>
-		  <td width="140px">Include Background</td>
-		  <td width="35px">
-			<label class="switch">
-			<input type="checkbox" id="with_background" class="checkbox" name="with_background" value="with_background">
-			<span class="slider"></span>
-			</label>
-		  </td>
-		  <td>
-			<div id="reloadReq">Reload required</div>
-		  </td>
-		</tr>
-		<tr>
-		  <td width="140px">Show Checkerboard</td>
-		  <td>
-			<label class="switch">
-			<input type="checkbox" id="trans_checker" class="checkbox" name="trans_checker" value="trans_checker" checked>
-			<span class="slider"></span>
-			</label>
-		</td>
-		</tr>
-		<tr>
-		  <td width="140px">Enable Slide Transition</td>
-		  <td>
-			<label class="switch">
-			<input type="checkbox" id="use_slide_transition" class="checkbox" name="use_slide_transition" value="use_slide_transition" checked>
-			<span class="slider"></span>
-			</label>
-		</td>
-		</tr>
-	  </tbody>
-	</table>
+	<img src="big_icon.png" style="-webkit-app-region: drag">
+	<img id="minimize" src="min.png">
+	<img id="max_restore" src="max.png">
+	<img id="exit" src="close.png">
 </div>
 
-<div id="right">
-	<div id="slide_cnt">SLIDE 0 / 0</div>
-	<div id="current_time">00:00 AM</div>
-	<div id="slide_res">0 x 0</div>
-	<select class="image-picker show-html">
-		<optgroup label="Screen" id="screen_grp">
-		<option data-img-label="CURRENT" data-img-src="null_slide.png" value="Current" disabled>Current</option>
-		<option data-img-label="NEXT" data-img-src="null_slide.png" value="Next" disabled>Next</option>
-		</optgroup>
-	</select>
-	<button type="button" class="button" id="prev">&nbsp;&lt;&nbsp;</button>
-	<button type="button" class="button" id="next">&nbsp;&gt;&nbsp;</button>
-	<button type="button" class="button" id="blk">&nbsp;B&nbsp;</button>
-	<button type="button" class="button" id="wht">&nbsp;W&nbsp;</button>
-	<button type="button" class="button" id="trn">&nbsp;T&nbsp;</button>
+<div id="rest">
+	<div id="rest1">
+		<img id="load_pptx" class="button" src="open.png">
+		<table id="bktbl" border="0">
+		  <tbody>
+			<tr>
+			  <td width="180px">Show Checkerboard</td>
+			  <td>
+				<label class="switch">
+				<input type="checkbox" id="trans_checker" class="checkbox" name="trans_checker" value="trans_checker" checked>
+				<span class="slider"></span>
+				</label>
+			</td>
+			</tr>
+			<tr>
+			  <td width="180px">Enable Slide Transition Effect</td>
+			  <td>
+				<label class="switch">
+				<input type="checkbox" id="use_slide_transition" class="checkbox" name="use_slide_transition" value="use_slide_transition" checked>
+				<span class="slider"></span>
+				</label>
+			</td>
+			</tr>
+			<tr>
+			  <td width="180px">Include Background</td>
+			  <td width="35px">
+				<label class="switch">
+				<input type="checkbox" id="with_background" class="checkbox" name="with_background" value="with_background">
+				<span class="slider"></span>
+				</label>
+			  </td>
+			</tr>
+		  </tbody>
+		</table>
+		<table id="bktbl2" border="0">
+			<tbody>
+				<tr>
+					<td width="120px">Custom Resolution</td>
+					<td width="300px">
+						<input type="text"
+						onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
+						id="resWidth">&nbsp;x&nbsp;<input type="text"
+						onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
+						id="resHeight"><div id="setRes">Set</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div id="slideInfo">
+		<div id="slide_cnt" class="slideInfo">SLIDE 0 / 0</div>
+		<div id="current_time" class="slideInfo">00:00 AM</div>
+		<div id="slide_res" class="slideInfo">0 x 0</div>
+	</div>
+	<div id="rest2">
+		<table id="right" border="0">
+		  <tbody>
+			<tr>
+			  <td width="50%">
+				<select class="image-picker show-html">
+					<optgroup label="Screen" id="screen_grp">
+					<option data-img-label="CURRENT" data-img-src="null_slide.png" value="Current" disabled>Current</option>
+					</optgroup>
+				</select>
+			  </td>
+			  <td width="40%" style="vertical-align: top;">
+				<select class="image-picker show-html">
+					<optgroup label="Screen" id="screen_grp">
+					<option data-img-label="NEXT" data-img-src="null_slide.png" value="Next" disabled>Next</option>
+					</optgroup>
+				</select>
+					<div id="buttons">
+						<button type="button" class="button" id="prev">&nbsp;&lt;&nbsp;</button>
+						<button type="button" class="button" id="next">&nbsp;&gt;&nbsp;</button>
+						<button type="button" class="button" id="blk">&nbsp;B&nbsp;</button>
+						<button type="button" class="button" id="wht">&nbsp;W&nbsp;</button>
+						<button type="button" class="button" id="trn">&nbsp;T&nbsp;</button>
+					</div>
+			  </td>
+			</tr>
+			<tr width="100%">
+				<td colspan="2">
+					<div id="below">
+						<select class="image-picker">
+							<optgroup label="Slides" id="slides_grp">
+							</optgroup>
+						</select>
+					</div>
+				</td>
+			</tr>
+		  </tbody>
+		</table>
+
+	</div>
+	<div id="fullblack"></div>
+	<div class="cancelBox">
+		<div id="loadingTxt">Loading</div>
+		<div id="cancel" class="button">Cancel</div>
+	</div>
 </div>
 
-<div id="below">
-<select class="image-picker">
-	<optgroup label="Slides" id="slides_grp">
-	</optgroup>
-</select>
-<div id="fullblack"></div>
-<div class="cancelBox">
-	<div id="loadingTxt">Loading</div>
-	<div id="cancel" class="button">Cancel</div>
-</div>
-</div>
 </html>

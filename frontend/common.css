@@ -10,6 +10,13 @@
 	font-style: normal;
 }
 
+html {
+	border-style: solid;
+	border-color: #10192c;
+	border-width: 1px;
+	box-sizing: border-box;
+}
+
 * {
 	font-family: 'open_sanslight';
 	padding: 0;

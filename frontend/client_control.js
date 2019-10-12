@@ -175,9 +175,12 @@ sub Main()
 					Wscript.Echo "Status: " & curPos
 					preSlideIdx = curPos
 				End If
+			Else
+				Wscript.Echo "Status: Ready"
 			End If
 		Else
 			preSlideIdx = 0
+			Wscript.Echo "Status: 0"
 		End If
 		Wscript.Sleep(500)
 	Loop
@@ -215,6 +218,16 @@ sub Main()
 					If cmd = "pause" Then
 						ap.SlideShowWindow.View.State = 5
 					End If
+					If left(cmd, 6) = "setRes" Then
+						Dim p1
+						Dim res
+						p1 = Replace(cmd, "setRes ", "")
+						res = Split(p1, "x")
+						With ap.PageSetup
+							.SlideWidth = Round(res(0) / 1.33333333, 0)
+							.SlideHeight = Round(res(1) / 1.33333333, 0)
+						End With
+					End If
 			End If
 		End If
 	Loop
@@ -247,18 +260,25 @@ $(document).ready(function() {
 	let slideIdx = "";
 	let slideTranTimers = [];
 
-	try {
-		lib = ffi.Library('./PPTNDI', {
-			'init': [ 'int', [] ],
-			'destroy': [ 'int', [] ],
-			'send': [ 'int', [ "string", "bool" ] ]
-		});
-	} catch(e) {
-		alert(e);
-		ipc.send('remote', "exit");
-	}
-
 	function runLib() {
+		try {
+			const { remote } = require('electron');
+			let { RTLD_NOW, RTLD_GLOBAL } = ffi.DynamicLibrary.FLAGS;
+			ffi.DynamicLibrary(
+				remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
+				RTLD_NOW | RTLD_GLOBAL
+			);
+			//lib = ffi.Library('./PPTNDI.dll', {
+			lib = ffi.Library(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
+				'init': [ 'int', [] ],
+				'destroy': [ 'int', [] ],
+				'send': [ 'int', [ "string", "bool" ] ]
+			});
+		} catch(e) {
+			alert(e);
+			ipc.send('remote', "exit");
+		}
+
 		if (lib.init() === 1) {
 			alert('Failed to create a listening server!');
 			ipc.send('remote', "exit");
@@ -549,6 +569,14 @@ $(document).ready(function() {
 
 		res3.stdout.on('data', function(data) {
 			let curSlideStat = data.toString().replace(/^Status: /, "");
+			if (/^\s*Ready\s*$/.test(curSlideStat)) {
+				// Ready
+			} else if (/^\s*0\s*$/.test(curSlideStat)) {
+				// OFF
+			} else {
+				// ON
+			}
+
 			if (/^\s*0\s*$/.test(lastSlideStat)) {
 				if (!/^\s*0\s*$/.test(curSlideStat)) {
 					if (slideIdx != curSlideStat) {
@@ -569,6 +597,19 @@ $(document).ready(function() {
 
 		registerIoHook();
 		reflectConfig();
+
+
+
+
+
+	$("#slideRes").click(function() {
+		//alert("b");
+		res2.stdin.write("setRes 640x480\n");
+	});
+
+
+
+
 	}
 
 	function cleanupForTemp() {

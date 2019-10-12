@@ -12,7 +12,7 @@ ul.thumbnails.image_picker_selector {
     list-style-image: none;
     list-style-position: outside;
     list-style-type: none;
-    padding: 0px;
+	padding: 0px;
     margin: 0px; }
   /* line 25, source/sass/image-picker.scss */
   ul.thumbnails.image_picker_selector li.group_title {
@@ -33,4 +33,4 @@ ul.thumbnails.image_picker_selector {
         -webkit-user-drag: none; }
     /* line 48, source/sass/image-picker.scss */
     ul.thumbnails.image_picker_selector li .thumbnail.selected {
-      background: #08C; }
+      background: rgb(0, 102, 255); }

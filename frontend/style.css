@@ -7,19 +7,19 @@ html, body {
 
 #exit {
 	position: absolute;
-	top: 0px;
+	top: 1px;
 	right: 5px;
 }
 
 #minimize {
 	position: absolute;
-	top: 0px;
+	top: 1px;
 	right: 82px;
 }
 
 #max_restore {
 	position: absolute;
-	top: 0px;
+	top: 1px;
 	right: 55px;
 }
 
@@ -32,44 +32,34 @@ html, body {
 }
 
 #bktbl {
-	width: 400px;
+	position: fixed;
+	top: 50px;
+	left: 120px;
+	width: 250px;
 	color: #79a9f7;
 }
 
-#reloadReq {
-	color: yellow;
-	display: none;
+#bktbl2 {
+	position: fixed;
+	top: 50px;
+	left: 420px;
+	width: 250px;
+	color: #79a9f7;
 }
 
 #top {
 	position: fixed;
-	top: 0px;
+	top: 1px;
+	left: 1px;
 	height: 37px;
 	width: 100%;
 	background-color: #000c18;
 }
 
-#top2 {
-	position: fixed;
-	top: 40px;
-	height: 37px;
-	right: 30px;
-	width: 100%;
-}
-
-#full {
-	position: fixed !important;
-	top: 0px;
-	left: 0px;
-	width: 100%;
-	height: 100%;
-	display: none;
-}
-
 #fullblack {
 	position: fixed !important;
 	top: 37px;
-	left: 0px;
+	left: 1px;
 	width: 100%;
 	height: 100%;
 	background-color: black !important;
@@ -81,8 +71,9 @@ html, body {
 	filter: grayscale(1);
 }
 
-.transSlide {
-	background-color: #3333cc;
+.transSlide img {
+	border-bottom: 2px solid red;
+	margin-bottom: -2px;
 }
 
 .combobox {
@@ -97,37 +88,67 @@ html, body {
 	color: #42f4a4;
 }
 
-#left {
+#rest {
 	position: fixed;
-	clear: center;
-	float: center;
-	text-align: left;
-	padding: 10px;
-	top: 37px;
-	background-color: #051336;
-	width:300px;
-	height:100%;
-	color: white;
+	top: 38px;
+	width: 100%;
+	height: 100%;
 }
 
-#right {
+#load_pptx {
 	position: fixed;
-	clear: center;
-	float: center;
-	align: left;
-	padding:10px;
-	left: 310px;
-	top: 57px;
-	background-color: #051336;
-	width:100%;
-	height:100%;
+	left: 5px;
+	top: 50px;
+	margin-bottom: 20px;
+}
+
+#slideInfo {
+	position: fixed;
+	top: 65px;
+	right: 20px;
 	color: #79a9f7;
 }
 
+.slideInfo {
+	font-size: 20px;
+}
+
+
+#buttons {
+	height: 35px;
+	padding: 10px;
+	white-space: nowrap;
+}
+
+#rest1 {
+	background-color: #000824;
+	width: 100%;
+	height: 85px;
+}
+
+#rest2 {
+	position: fixed;
+	top: 125px;
+	width: 100%;
+	height: 100%;
+}
+
+#right {
+	position: absolute;
+	left: 3px;
+	border: none;
+	color: #79a9f7;
+	width: 100%;
+	text-align: left;
+	align: left;
+	font-weight: bold;
+}
+
 #right img {
-    width: 400px;
-	height: 250px;
+	position: relative;
 	background-image: url('null_slide.png');
+	background-repeat: repeat;
+	width: 100%;
 }
 
 #slide_cnt, #progress, #current_time, #slide_res {
@@ -136,31 +157,50 @@ html, body {
 
 #progress, #current_time, #slide_res {
 	position: relative;
-	margin-left: 20px;
+	margin-left: 40px;
 }
 
 #below {
-	position: fixed;
-	left: 0px;
-	bottom: 0px;
-	right: 0px;
-	top: 470px;
-	padding-left: 10px;
+	position: relative;
+	height: 100%;
+	left: -4px;
+	bottom: 1px;
+	right: 1px;
+	padding-left: 0px;
 	overflow-x: hidden;
     overflow-y: scroll;
-	white-space: nowrap;
-}
-
-#below {
 	background-color: #060621;
-	color: white;
 }
 
 #below img {
-	height: 90px;
-	width: 160px;
+	height: 112px;
+	width: 200px;
 	background-color: black;
 	/*border: 2px solid black;*/
+}
+
+#resWidth,
+#resHeight {
+	width: 50px;
+	white-space: nowrap;
+	border-bottom: 1px solid #79a9f7;
+	border-left: none;
+	border-top: none;
+	border-right: none;
+	background: none;
+	height: 20px;
+	font-size: 15px;
+	color: #79a9f7;
+}
+
+#resWidth {
+	text-align: right;
+}
+
+#setRes {
+	background-color: #0066ff;
+	width: 113px;
+	text-align: center;
 }
 
 .button {
@@ -192,13 +232,15 @@ html, body {
 }
 
 #prev:hover, #next:hover, #cancel:hover,
-#load_pptx:hover, #blk:hover, #wht:hover, #trn:hover {
+#load_pptx:hover, #blk:hover, #wht:hover, #trn:hover,
+#setRes:hover {
 	filter: brightness(0.5);
 }
 
 #loadingTxt {
 	font-size: 20px;
 	text-align: center;
+	color: white;
 }
 
 #cancel {
@@ -209,7 +251,7 @@ html, body {
 	position: fixed;
 	display: none;
 	top: 250px;
-	left: 0px;
+	left: 1px;
 	width: 100%;
 	height: 300px;
 }
