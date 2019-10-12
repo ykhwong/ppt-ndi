@@ -9,14 +9,14 @@ html, body {
 
 #prevTxt {
 	position: fixed;
-	top: 180px;
+	top: 250px;
 	left: 15px;
 	color: #79a9f7;
 }
 
 #slidePreview {
 	position: fixed;
-	top: 200px;
+	top: 275px;
 	left: 15px;
     width: 200px;
 	height: 125px;
@@ -52,18 +52,55 @@ html, body {
 
 #bktbl {
 	position: fixed;
-	top: 100px;
-	width: 215px;
+	top: 110px;
+	width: 260px;
 	height: 20px;
 	left: 10px;
 	color: #79a9f7;
 }
 
+#bktbl2 {
+	position: fixed;
+	top: 185px;
+	width: 400px;
+	height: 20px;
+	left: 10px;
+	color: #79a9f7;
+}
+
+#resWidth,
+#resHeight {
+	width: 50px;
+	white-space: nowrap;
+	border-bottom: 1px solid #79a9f7;
+	border-left: none;
+	border-top: none;
+	border-right: none;
+	background: none;
+	height: 20px;
+	font-size: 15px;
+	color: #79a9f7;
+}
+
+#resWidth {
+	text-align: right;
+}
+
+#setRes {
+	background-color: #0066ff;
+	width: 113px;
+	text-align: center;
+}
+
+#setRes:hover {
+	filter: brightness(0.5);
+}
+
 #pin {
 	position: fixed;
 	width: 15px;
-	top: 300px;
-	left: 263px;
+	top: 375px;
+	left: 232px;
 	padding: 5px;
 	cursor: pointer;
 }
@@ -71,14 +108,14 @@ html, body {
 #pinTxt {
 	position: fixed;
 	font-size: 8px;
-	top: 280px;
-	left: 260px;
+	top: 350px;
+	left: 230px;
 	color: #79a9f7;
 }
 
 #slideRes {
 	position: fixed;
-	top: 180px;
+	top: 250px;
 	left: 90px;
 	color: #79a9f7;
 }

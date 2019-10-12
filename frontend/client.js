@@ -177,13 +177,24 @@ $(document).ready(function() {
 			'send': [ 'int', [ "string", "bool" ] ]
 		});
 	} catch(e) {
-		alert(e);
+		alertMsg(e);
 		ipc.send('remote', "exit");
 	}
 	if (lib.init() === 1) {
-		alert('Failed to create a listening server!');
+		alertMsg('Failed to create a listening server!');
 		ipc.send('remote', "exit");
 		return;
+	}
+
+	function alertMsg(myMsg) {
+		const {dialog} = require('electron').remote;
+		let options;
+		options = {
+			type: 'info',
+			message: myMsg,
+			buttons: ["OK"]
+		};
+		dialog.showMessageBoxSync(currentWindow, options);
 	}
 
 	function stopSlideTransition() {
@@ -353,7 +364,7 @@ $(document).ready(function() {
 			detail: 'Changes require a reload to take effect.' + description
 		};
 
-		response = dialog.showMessageBoxSync(null, options);
+		response = dialog.showMessageBoxSync(currentWindow, options);
 		if (response === 0) { // Yes
 			loadPPTX(pptPath);
 		} else { // No
@@ -434,7 +445,7 @@ $(document).ready(function() {
 			} catch(e) {
 				cleanupForTemp(false);
 				tmpDir = preTmpDir;
-				alert('Failed to access the temporary directory!');
+				alertMsg('Failed to access the temporary directory!');
 				$("#fullblack, .cancelBox").hide();
 				return;
 			}
@@ -455,9 +466,9 @@ $(document).ready(function() {
 				cleanupForTemp(false);
 				tmpDir = preTmpDir;
 				if (maxSlideNum > 0) {
-					alert(myMsg + "Please check the configuration.");
+					alertMsg(myMsg + "Please check the configuration.");
 				} else {
-					alert(myMsg + "Please make sure that Microsoft PowerPoint has been installed on the system.");
+					alertMsg(myMsg + "Please make sure that Microsoft PowerPoint has been installed on the system.");
 				}
 				$("#fullblack, .cancelBox").hide();
 				return;
@@ -480,7 +491,7 @@ $(document).ready(function() {
 					maxSlideNum = 0;
 					cleanupForTemp(false);
 					tmpDir = preTmpDir;
-					alert("Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.");
+					alertMsg("Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.");
 					$("#fullblack, .cancelBox").hide();
 					return;
 				}
@@ -558,7 +569,7 @@ $(document).ready(function() {
 			});
 		} else {
 			if (/\S/.test(file)) {
-				alert("Only allowed filename extensions are PPT and PPTX.");
+				alertMsg("Only allowed filename extensions are PPT and PPTX.");
 			}
 			$("#fullblack, .cancelBox").hide();
 		}

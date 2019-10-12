@@ -11,18 +11,9 @@
 <title>-</title>
 </head>
 <body>
-<div id="tip">Open a PowerPoint presentation and start<br />the slide show by pressing Alt-F5 or Alt-Shift-F5.</div>
+<div id="tip">Status:</div>
 <table id="bktbl" border="0">
   <tbody>
-    <tr>
-      <td>&nbsp;Include Background</td>
-      <td>
-		<label class="switch">
-		<input type="checkbox" id="bk" name="bk" value="bk">
-		<span class="slider"></span>
-		</label>
-	  </td>
-	</tr>
     <tr>
       <td>&nbsp;Show Checkerboard</td>
       <td>
@@ -41,8 +32,31 @@
 		</label>
 	  </td>
 	</tr>
+    <tr>
+      <td>&nbsp;Include Background</td>
+      <td>
+		<label class="switch">
+		<input type="checkbox" id="bk" name="bk" value="bk">
+		<span class="slider"></span>
+		</label>
+	  </td>
+	</tr>
   </tbody>
 </table>
+		<table id="bktbl2" border="0">
+			<tbody>
+				<tr>
+					<td width="150px">&nbsp;Custom Resolution</td>
+					<td width="300px">
+						<input type="text"
+						onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
+						id="resWidth">&nbsp;x&nbsp;<input type="text"
+						onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
+						id="resHeight"><div id="setRes">Set</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 <img id="closeImg" src="close.png">
 <img id="bigIconImg" src="big_icon2.png">
 <div id="prevTxt">NDI Preview</div>

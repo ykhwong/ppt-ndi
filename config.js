@@ -1,5 +1,5 @@
 {
-	"version": "20190702a",
+	"version": "20190714a",
 	"startAsTray": false,
 	"hotKeys": {
 		"prev": "",

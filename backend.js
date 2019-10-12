@@ -11,6 +11,24 @@ app.on('ready', function() {
 	let startAsTray = false;
 	let isMainWinShown = false;
 	let isMainWin2shown = false;
+	const winRes = {
+		"home" : {
+			"width" : 700,
+			"height" : 360
+		},
+		"control" : {
+			"width" : 277,
+			"height" : 430
+		},
+		"classic" : {
+			"width" : 1200,
+			"height" : 700
+		},
+		"config" : {
+			"width" : 340,
+			"height" : 345
+		}
+	}
 
 	function refreshTray() {
 		let isVisible = true;
@@ -73,7 +91,7 @@ app.on('ready', function() {
 		let configPath;
 		const configFile = 'config.js';
 		const fs = require("fs-extra");
-		mainWindow3 = createWin(340, 345, false, 'config.html', false);
+		mainWindow3 = createWin(winRes.config.width, winRes.config.height, false, 'config.html', false);
 		mainWindow3.on('close', function (event) {
 			event.preventDefault();
 			mainWindow3.hide();
@@ -113,13 +131,13 @@ app.on('ready', function() {
 			}
 			if (/--slideshow/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(300, 350, false, 'control.html', !startAsTray);
+				mainWindow2 = createWin(winRes.control.width, winRes.control.height, false, 'control.html', !startAsTray);
 				addMainWin2handler(!startAsTray);
 				break;
 			}
 			if (/--classic/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(1200, 700, true, 'index.html', !startAsTray);
+				mainWindow2 = createWin(winRes.classic.width, winRes.classic.height, true, 'index.html', !startAsTray);
 				addMainWin2handler(!startAsTray);
 				break;
 			}
@@ -128,7 +146,7 @@ app.on('ready', function() {
 	}
 
 	function loadMainWin(showWin) {
-		mainWindow = createWin(700, 360, false, 'main.html', showWin);
+		mainWindow = createWin(winRes.home.width, winRes.home.height, false, 'main.html', showWin);
 		mainWindow.on('closed', function(e) {
 			if (mainWindow2 === null) {
 				mainWindow = null;
@@ -225,12 +243,12 @@ app.on('ready', function() {
 					}
 					break;
 				case "select1":
-					mainWindow2 = createWin(300, 350, false, 'control.html', true);
+					mainWindow2 = createWin(winRes.control.width, winRes.control.height, false, 'control.html', true);
 					addMainWin2handler(true);
 					mainWindow.destroy();
 					break;
 				case "select2":
-					mainWindow2 = createWin(1200, 700, true, 'index.html', true);
+					mainWindow2 = createWin(winRes.classic.width, winRes.classic.height, true, 'index.html', true);
 					addMainWin2handler(true);
 					mainWindow.destroy();
 					break;

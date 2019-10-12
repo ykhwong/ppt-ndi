@@ -4,6 +4,9 @@ Dim objPPT
 Dim preState
 Dim ap
 Dim curPos
+Dim newWidth
+Dim newHeight
+
 On Error Resume Next
 Sub Proc()
 	Dim sl
@@ -16,7 +19,11 @@ Sub Proc()
 		isSaved = False
 	End If
 	With ap.Slides(objSlideShow.CurrentShowPosition)
-		.Export Wscript.Arguments.Item(0) & "/Slide.png", "PNG"
+		If newWidth = 0 Then
+			.Export Wscript.Arguments.Item(0) & "/Slide.png", "PNG"
+		Else
+			.Export Wscript.Arguments.Item(0) & "/Slide.png", "PNG", newWidth, newHeight
+		End If
 	End With
 	If isSaved = True Then
 		ap.Saved = True
@@ -28,6 +35,15 @@ Sub Proc()
 	Wscript.Echo "PPTNDI: Sent " & duration & " " & entryEffect & " " & objSlideShow.CurrentShowPosition
 End Sub
 sub Main()
+	newWidth = 0
+	newHeight = 0
+
+	If Wscript.Arguments.Item(1) = 0 Then
+	Else
+		newWidth = Wscript.Arguments.Item(1)
+		newHeight = Wscript.Arguments.Item(2)
+	End If
+
 	Do While True
 		On Error Resume Next
 		Err.Clear
@@ -58,7 +74,15 @@ sub Main()
 				End If
 			End If
 		End If
-		Wscript.StdIn.ReadLine()
+		cmd = Wscript.StdIn.ReadLine()
+		If left(cmd, 6) = "setRes" Then
+			Dim p1
+			Dim res
+			p1 = Replace(cmd, "setRes ", "")
+			res = Split(p1, "x")
+			newWidth = res(0)
+			newHeight = res(1)
+		End If
 	Loop
 End Sub
 Main
@@ -70,6 +94,9 @@ Dim objPPT
 Dim preState
 Dim ap
 Dim curPos
+Dim newWidth
+Dim newHeight
+
 On Error Resume Next
 Sub Proc()
 	Dim sl
@@ -91,6 +118,7 @@ Sub Proc()
 			isSaved = False
 		End If
 		origGrpCnt = ap.Slides(objSlideShow.CurrentShowPosition).Shapes.Range().Count
+
 		With .Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
 			Set shpGroup = ap.Slides(objSlideShow.CurrentShowPosition).Shapes.Range()
 			If shpGroup.Count = origGrpCnt Then
@@ -101,7 +129,11 @@ Sub Proc()
 				End If
 				Exit Sub
 			End If
-			shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", 2, , , 1
+			If newWidth = 0 Then
+				shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", 2, , , 1
+			Else
+				shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", 2, Round(newWidth / 1.33333333, 0), Round(newHeight / 1.33333333, 0), 1
+			End If
 			.Delete
 		End With
 		If isSaved = True Then
@@ -115,6 +147,15 @@ Sub Proc()
 	End With
 End Sub
 sub Main()
+	newWidth = 0
+	newHeight = 0
+
+	If Wscript.Arguments.Item(1) = 0 Then
+	Else
+		newWidth = Wscript.Arguments.Item(1)
+		newHeight = Wscript.Arguments.Item(2)
+	End If
+
 	Do While True
 		On Error Resume Next
 		Err.Clear
@@ -145,7 +186,15 @@ sub Main()
 				End If
 			End If
 		End If
-		Wscript.StdIn.ReadLine()
+		cmd = Wscript.StdIn.ReadLine()
+		If left(cmd, 6) = "setRes" Then
+			Dim p1
+			Dim res
+			p1 = Replace(cmd, "setRes ", "")
+			res = Split(p1, "x")
+			newWidth = res(0)
+			newHeight = res(1)
+		End If
 	Loop
 End Sub
 Main
@@ -176,7 +225,7 @@ sub Main()
 					preSlideIdx = curPos
 				End If
 			Else
-				Wscript.Echo "Status: Ready"
+				Wscript.Echo "Status: OFF"
 			End If
 		Else
 			preSlideIdx = 0
@@ -218,16 +267,6 @@ sub Main()
 					If cmd = "pause" Then
 						ap.SlideShowWindow.View.State = 5
 					End If
-					If left(cmd, 6) = "setRes" Then
-						Dim p1
-						Dim res
-						p1 = Replace(cmd, "setRes ", "")
-						res = Split(p1, "x")
-						With ap.PageSetup
-							.SlideWidth = Round(res(0) / 1.33333333, 0)
-							.SlideHeight = Round(res(1) / 1.33333333, 0)
-						End With
-					End If
 			End If
 		End If
 	Loop
@@ -247,6 +286,8 @@ $(document).ready(function() {
 	let preFile = "";
 	let slideWidth = 0;
 	let slideHeight = 0;
+	let customSlideX = 0;
+	let customSlideY = 0;
 	let lastSignalTime = 0;
 	let lastSlideStat = "0";
 	let configData = {};
@@ -259,6 +300,19 @@ $(document).ready(function() {
 	let effect = "";
 	let slideIdx = "";
 	let slideTranTimers = [];
+
+	function alertMsg(myMsg) {
+		const { remote } = require('electron');
+		const {dialog} = require('electron').remote;
+		let currentWindow = remote.getCurrentWindow();
+		let options;
+		options = {
+			type: 'info',
+			message: myMsg,
+			buttons: ["OK"]
+		};
+		dialog.showMessageBoxSync(currentWindow, options);
+	}
 
 	function runLib() {
 		try {
@@ -275,12 +329,12 @@ $(document).ready(function() {
 				'send': [ 'int', [ "string", "bool" ] ]
 			});
 		} catch(e) {
-			alert(e);
+			alertMsg(e);
 			ipc.send('remote', "exit");
 		}
 
 		if (lib.init() === 1) {
-			alert('Failed to create a listening server!');
+			alertMsg('Failed to create a listening server!');
 			ipc.send('remote', "exit");
 			return;
 		}
@@ -320,12 +374,14 @@ $(document).ready(function() {
 			newSlideIdx = "black";
 		} else if(/^PPTNDI: (Done|Paused)/.test(cmd)) {
 			//file = "null_slide.png";
+			$("#tip").html("Status: EXITED/PAUSED");
 			return;
 		} else {
 			console.log(cmd);
 			return;
 		}
 
+		$("#tip").html("Status: OK");
 		if (/^PPTNDI: Sent /.test(cmd)) {
 			let fd;
 			try {
@@ -535,7 +591,7 @@ $(document).ready(function() {
 		try {
 			fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 		} catch(e) {
-			alert('Failed to access the temporary directory!');
+			alertMsg('Failed to access the temporary directory!');
 			return;
 		}
 		try {
@@ -545,16 +601,26 @@ $(document).ready(function() {
 		try {
 			fs.writeFileSync(vbsDir3, vbsCheckSlide, 'utf-8');
 		} catch(e) {
-			alert('Failed to access the temporary directory!');
+			alertMsg('Failed to access the temporary directory!');
 			return;
 		}
 		if (fs.existsSync(vbsDir)) {
-			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, "//NOLOGO", '' ] );
+			let resX = 0;
+			let resY = 0;
+			if (customSlideX == 0 || customSlideY == 0 || !/\S/.test(customSlideX) || !/\S/.test(customSlideY)) {
+				resX = 0;
+				resY = 0;
+			} else {
+				resX = customSlideX;
+				resY = customSlideY;
+			}
+
+			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, resX, resY, "//NOLOGO", '' ] );
 			res.stdout.on('data', function(data) {
 				sendNDI(file, data);
 			});
 		} else {
-			alert('Failed to parse the presentation!');
+			alertMsg('Failed to parse the presentation!');
 			return;
 		}
 		if (fs.existsSync(vbsDir2)) {
@@ -563,18 +629,21 @@ $(document).ready(function() {
 		if (fs.existsSync(vbsDir3)) {
 			res3 = spawn( 'cscript.exe', [ vbsDir3, "//NOLOGO", '' ] );
 		} else {
-			alert('Failed to parse the presentation!');
+			alertMsg('Failed to parse the presentation!');
 			return;
 		}
 
 		res3.stdout.on('data', function(data) {
 			let curSlideStat = data.toString().replace(/^Status: /, "");
-			if (/^\s*Ready\s*$/.test(curSlideStat)) {
+			if (/^\s*OFF\s*$/.test(curSlideStat)) {
 				// Ready
+				$("#tip").html("Status: READY<br />In PowerPoint, start the Slide Show.");
 			} else if (/^\s*0\s*$/.test(curSlideStat)) {
-				// OFF
+				// Not found
+				$("#tip").html("Status: -");
 			} else {
 				// ON
+				$("#tip").html("Status: OK");
 			}
 
 			if (/^\s*0\s*$/.test(lastSlideStat)) {
@@ -598,17 +667,20 @@ $(document).ready(function() {
 		registerIoHook();
 		reflectConfig();
 
-
-
-
-
-	$("#slideRes").click(function() {
-		//alert("b");
-		res2.stdin.write("setRes 640x480\n");
-	});
-
-
-
+		$("#resWidth").val("0");
+		$("#resHeight").val("0");
+		$("#resWidth, #resHeight").click(function() {
+			$(this).val("");
+		});
+		$("#setRes").click(function() {
+			let resX = $("#resWidth").val();
+			let resY = $("#resHeight").val();
+			if (/^\d+$/.test(resX) && /^\d+$/.test(resY)) {
+				res.stdin.write("setRes " + resX + "x" + resY + "\n");
+				customSlideX = parseInt(resX, 10);
+				customSlideY = parseInt(resY, 10);
+			}
+		});
 
 	}
 
@@ -666,7 +738,7 @@ $(document).ready(function() {
 			try {
 				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 			} catch(e) {
-				alert('Failed to access the temporary directory!');
+				alertMsg('Failed to access the temporary directory!');
 				return;
 			}
 		} else {
@@ -674,7 +746,7 @@ $(document).ready(function() {
 			try {
 				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 			} catch(e) {
-				alert('Failed to access the temporary directory!');
+				alertMsg('Failed to access the temporary directory!');
 				return;
 			}
 		}
@@ -682,12 +754,21 @@ $(document).ready(function() {
 		res.kill();
 		res = null;
 		if (fs.existsSync(vbsDir)) {
-			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, "//NOLOGO", '' ] );
+			let resX = 0;
+			let resY = 0;
+			if (customSlideX == 0 || customSlideY == 0 || !/\S/.test(customSlideX) || !/\S/.test(customSlideY)) {
+				resX = 0;
+				resY = 0;
+			} else {
+				resX = customSlideX;
+				resY = customSlideY;
+			}
+			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, resX, resY, "//NOLOGO", '' ] );
 			res.stdout.on('data', function(data) {
 				sendNDI(file, data);
 			});
 		} else {
-			alert('Failed to parse the presentation!');
+			alertMsg('Failed to parse the presentation!');
 			return;
 		}
 	});

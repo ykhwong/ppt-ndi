@@ -18,6 +18,10 @@ html, body {
 	filter: brightness(1);
 }
 
+#saveConfig:hover {
+	filter: brightness(0.5);
+}
+
 #bktbl1 {
 	position: fixed;
 	top: 50px;
@@ -65,6 +69,10 @@ html, body {
 	top: 300px;
 	left: 15px;
 	width: 50px;
+	height: 20px;
+	background-color: #0066ff;
+	text-align: center;
+	padding: 3px;
 }
 
 ::placeholder {

@@ -19,6 +19,19 @@ $(document).ready(function() {
 	let configData = defaultData;
 	let configPath = "";
 
+	function alertMsg(myMsg) {
+		const { remote } = require('electron');
+		const {dialog} = require('electron').remote;
+		let currentWindow = remote.getCurrentWindow();
+		let options;
+		options = {
+			type: 'info',
+			message: myMsg,
+			buttons: ["OK"]
+		};
+		dialog.showMessageBoxSync(currentWindow, options);
+	}
+
 	function filterHotKey(key) {
 		return $(key).val().replace(/^.*-/, "");
 	}
@@ -55,9 +68,10 @@ $(document).ready(function() {
 		configData.hotKeys = hotKeys;
 		fs.writeFile(configPath, JSON.stringify(configData, null, "\t"), (err) => {
 			if (err) {
-				alert("Could not save the configuration.");
+				alertMsg("Could not save the configuration.");
 			} else {
 				ipc.send('remote', "reflectConfig");
+				alertMsg("Saved");
 			}
 		});
 	}
