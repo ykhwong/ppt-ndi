@@ -566,8 +566,13 @@ $(document).ready(function() {
 						}
 					}
 				} else {
+					let selectedDiv = "ul.thumbnails.image_picker_selector li .thumbnail.selected";
 					initImgPicker();
-					$("ul.thumbnails.image_picker_selector li .thumbnail.selected").css("background", "rgb(0, 0, 0, 0)");
+					$(selectedDiv).css("background", "rgb(0, 0, 0, 0)");
+					$(selectedDiv).click(function() {
+						selectSlide("1");
+						$(selectedDiv).off("click");
+					});
 				}
 				
 				if (isLoaded) {
