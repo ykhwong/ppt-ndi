@@ -618,7 +618,7 @@ $(document).ready(function() {
 	$("#edit_pptx").click(function() {
 		if (pptPath !== "") {
 			const { exec } = require('child_process');
-			exec(pptPath, (err, stdout, stderr) => {
+			exec('"' + pptPath + '"', (err, stdout, stderr) => {
 				if (err) {
 					return;
 				}
