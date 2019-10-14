@@ -102,6 +102,24 @@ html, body {
 	margin-bottom: 20px;
 }
 
+#edit_pptx {
+	position: fixed;
+	left: 420px;
+	top: 92px;
+	width: 89px;
+	height: 20px;
+	margin-bottom: 20px;
+}
+
+#reload {
+	position: fixed;
+	left: 520px;
+	top: 92px;
+	width: 89px;
+	height: 20px;
+	margin-bottom: 20px;
+}
+
 #slideInfo {
 	position: fixed;
 	top: 50px;
@@ -216,11 +234,25 @@ html, body {
 	border-color: black;
 	border-width: 2px 2px 2px 2px;
 	font-size: 20px;
+	text-align: center;
 	border-style: solid;
 	padding: 2px;
 	background: rgb(0, 102, 255);
 	cursor:pointer;
 	border-radius: 10%;
+}
+
+.button2 {
+	color: #bbaeff;
+	font-weight: normal;
+	border-color: black;
+	border-width: 2px 2px 2px 2px;
+	font-size: 13px;
+	text-align: center;
+	border-style: solid;
+	padding: 2px;
+	background: rgb(0, 102, 255);
+	cursor:pointer;
 }
 
 #blk {
@@ -240,7 +272,7 @@ html, body {
 
 #prev:hover, #next:hover, #cancel:hover,
 #load_pptx:hover, #blk:hover, #wht:hover, #trn:hover,
-#setRes:hover {
+#edit_pptx:hover, #reload:hover, #setRes:hover {
 	filter: brightness(0.5);
 }
 

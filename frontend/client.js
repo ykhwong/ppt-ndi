@@ -607,6 +607,23 @@ $(document).ready(function() {
 		});
 	});
 
+	$("#reload").click(function() {
+		if (maxSlideNum > 0) {
+			askReloadFile(null, "", "");
+		}
+	});
+
+	$("#edit_pptx").click(function() {
+		if (pptPath !== "") {
+			const { exec } = require('child_process');
+			exec(pptPath, (err, stdout, stderr) => {
+				if (err) {
+					return;
+				}
+			});
+		}
+	});
+
 	function selectSlide(num) {
 		blkBool = false;
 		whtBool = false;
