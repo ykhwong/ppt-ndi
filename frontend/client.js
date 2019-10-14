@@ -465,7 +465,9 @@ $(document).ready(function() {
 				maxSlideNum = 0;
 				cleanupForTemp(false);
 				tmpDir = preTmpDir;
-				if (maxSlideNum > 0) {
+				if (!fs.existsSync(file)) {
+					alertMsg(myMsg + "The file might have been moved or deleted.");
+				} else if (maxSlideNum > 0) {
 					alertMsg(myMsg + "Please check the configuration.");
 				} else {
 					alertMsg(myMsg + "Please make sure that Microsoft PowerPoint has been installed on the system.");
