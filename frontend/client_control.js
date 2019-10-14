@@ -374,14 +374,14 @@ $(document).ready(function() {
 			newSlideIdx = "black";
 		} else if(/^PPTNDI: (Done|Paused)/.test(cmd)) {
 			//file = "null_slide.png";
-			$("#tip").html("Status: EXITED/PAUSED");
+			$("#tip").html("Status: PAUSED/EXITED");
 			return;
 		} else {
 			console.log(cmd);
 			return;
 		}
 
-		$("#tip").html("Status: OK");
+		$("#tip").html("Status: OK<br />The request has been completed.");
 		if (/^PPTNDI: Sent /.test(cmd)) {
 			let fd;
 			try {
@@ -643,7 +643,7 @@ $(document).ready(function() {
 				$("#tip").html("Status: -");
 			} else {
 				// ON
-				$("#tip").html("Status: OK");
+				$("#tip").html("Status: OK<br />The request has been completed.");
 			}
 
 			if (/^\s*0\s*$/.test(lastSlideStat)) {
