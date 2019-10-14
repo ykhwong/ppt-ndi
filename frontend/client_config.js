@@ -3,11 +3,12 @@ $(document).ready(function() {
 	const fs = require("fs-extra");
 	const configFile = 'config.js';
 	const appDataPath = process.env.APPDATA + "/PPT-NDI";
-	const version = "20190714a";
+	const version = "20191014a";
 	const keyCombi = "Ctrl-Shift-";
 	const defaultData = {
 		"version" : version,
 		"startAsTray" : false,
+		"startWithTheFirstSlideSelected": false,
 		"hotKeys" : {
 			"prev" : "",
 			"next" : "",
@@ -43,8 +44,10 @@ $(document).ready(function() {
 	function loadConfig() {
 		$.getJSON(configPath, function(json) {
 			configData.startAsTray = json.startAsTray;
+			configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
 			configData.hotKeys = json.hotKeys;
 			$("#systray").prop('checked', configData.startAsTray);
+			$("#startWithFirstSlide").prop('checked', configData.startWithTheFirstSlideSelected);
 			$("#prevTxtBox").val(getHotKey(configData.hotKeys.prev));
 			$("#nextTxtBox").val(getHotKey(configData.hotKeys.next));
 			$("#transTxtBox").val(getHotKey(configData.hotKeys.transparent));
@@ -65,6 +68,7 @@ $(document).ready(function() {
 		};
 
 		configData.startAsTray = $("#systray").prop("checked");
+		configData.startWithTheFirstSlideSelected = $("#startWithFirstSlide").prop("checked");
 		configData.hotKeys = hotKeys;
 		fs.writeFile(configPath, JSON.stringify(configData, null, "\t"), (err) => {
 			if (err) {

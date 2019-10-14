@@ -157,6 +157,7 @@ $(document).ready(function() {
 	let tmpDir = "";
 	let preTmpDir = "";
 	let pptPath = "";
+	let pptTimestamp = 0;
 	let repo;
 	let slideTranTimers = [];
 
@@ -292,7 +293,8 @@ $(document).ready(function() {
 				slideTranTimers[i] = setTimeout(function() {
 					lib.send(tmpDir + "/t" + i.toString() + ".png", true);
 					if ( i % 2 === 0 ) {
-						$("img.image_picker_image:first").attr("src", tmpDir + "/t" + i.toString() + ".png");
+						let now = new Date().getTime();
+						$("img.image_picker_image:first").attr("src", tmpDir + "/t" + i.toString() + ".png?" + now);
 					}
 				}, i * parseFloat(duration) * 50);
 				if (i === transLvl) {
@@ -346,22 +348,20 @@ $(document).ready(function() {
 		}
 	});
 
-	function askReloadFile(ele, description) {
+	function askReloadFile(ele, msg, description) {
 		const {dialog} = require('electron').remote;
 		let options;
 		let response;
-		
-		if (/\S/.test(description)) {
-			description = "\n" + description;
-		}
+		let defaultMsg = 'Do you want to continue?';
+		let defaultDetail = 'Changes require a reload to take effect.';
 		
 		options = {
 			type: 'question',
 			buttons: ['Yes', 'No'],
 			defaultId: 1,
-			//title: 'Include background',
-			message: 'Do you want to continue?',
-			detail: 'Changes require a reload to take effect.' + description
+			//title: '',
+			message: (/\S/.test(msg)?msg:defaultMsg),
+			detail: (/\S/.test(description)?description:defaultDetail)
 		};
 
 		response = dialog.showMessageBoxSync(currentWindow, options);
@@ -376,7 +376,7 @@ $(document).ready(function() {
 
 	$("#with_background").click(function() {
 		if (maxSlideNum > 0) {
-			askReloadFile(this, "");
+			askReloadFile(this, "", "");
 		}
 	});
 
@@ -475,6 +475,8 @@ $(document).ready(function() {
 			});
 			res.on('close', (code) => {
 				let newMaxSlideNum = 0;
+				let stats;
+				let path = require("path");
 				if (tmpDir === "") {
 					return;
 				}
@@ -551,21 +553,31 @@ $(document).ready(function() {
 				$("#fullblack, .cancelBox, #reloadReq").hide();
 				maxSlideNum = newMaxSlideNum;
 				createNullSlide();
-				if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
-					selectSlide('1');
-				} else {
-					for (i = 1; i <= maxSlideNum; i++) {
-						if (!hiddenSlides.includes(i)) {
-							selectSlide(i.toString());
-							break;
+
+				if (configData.startWithTheFirstSlideSelected === true) {
+					if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
+						selectSlide('1');
+					} else {
+						for (i = 1; i <= maxSlideNum; i++) {
+							if (!hiddenSlides.includes(i)) {
+								selectSlide(i.toString());
+								break;
+							}
 						}
 					}
+				} else {
+					initImgPicker();
+					$("ul.thumbnails.image_picker_selector li .thumbnail.selected").css("background", "rgb(0, 0, 0, 0)");
 				}
+				
 				if (isLoaded) {
 					cleanupForTemp(true);
 				}
 				isLoaded = true;
 				pptPath = file;
+				stats = fs.statSync(pptPath);
+				pptTimestamp = stats.mtimeMs;
+				$("#ppt_filename").html(path.basename(pptPath));
 			});
 		} else {
 			if (/\S/.test(file)) {
@@ -586,7 +598,7 @@ $(document).ready(function() {
 				{name: 'All Files', extensions: ['*']}
 			]
 		}, function(file) {
-			loadPPTX(file, 0, 0);
+			loadPPTX(file[0], 0, 0);
 		});
 	});
 
@@ -902,6 +914,7 @@ $(document).ready(function() {
 		if (fs.existsSync(configPath)) {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
+				configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
 			});
 		} else {
 			// Do nothing
@@ -916,6 +929,26 @@ $(document).ready(function() {
 		if (data.msg == "reload") {
 			reflectConfig();
 			return;
+		}
+		if (data.msg == "focused") {
+			let stats;
+			let tmpPptTimestamp = 0;
+			if (pptTimestamp === 0) {
+				return;
+			}
+			try {
+				stats = fs.statSync(pptPath);
+				tmpPptTimestamp = stats.mtimeMs;
+				if (pptTimestamp === tmpPptTimestamp) {
+				} else {
+					pptTimestamp = tmpPptTimestamp;
+					askReloadFile("", "This file has been modified. Do you want to reload it?", "");
+				}
+			} catch(e) {
+			}
+		}
+		if (data.msg == "blurred") {
+			// we don't care here
 		}
 	});
 
@@ -992,7 +1025,7 @@ $(document).ready(function() {
 			customSlideX = resX;
 			customSlideY = resY;
 			if (maxSlideNum > 0) {
-				askReloadFile(null, "IMPORTANT: Please maintain the original aspect ratio.");
+				askReloadFile(null, "", "Changes require a reload to take effect.\nIMPORTANT: Please maintain the original aspect ratio.");
 			}
 		}
 	});

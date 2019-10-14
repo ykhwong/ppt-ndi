@@ -11,22 +11,26 @@ app.on('ready', function() {
 	let startAsTray = false;
 	let isMainWinShown = false;
 	let isMainWin2shown = false;
-	const winRes = {
+	const winData = {
 		"home" : {
 			"width" : 700,
-			"height" : 360
+			"height" : 360,
+			"dest" : "main.html"
 		},
 		"control" : {
 			"width" : 277,
-			"height" : 430
+			"height" : 430,
+			"dest" : "control.html"
 		},
 		"classic" : {
 			"width" : 1200,
-			"height" : 700
+			"height" : 700,
+			"dest" : "index.html"
 		},
 		"config" : {
 			"width" : 340,
-			"height" : 345
+			"height" : 345,
+			"dest" : "config.html"
 		}
 	}
 
@@ -91,7 +95,7 @@ app.on('ready', function() {
 		let configPath;
 		const configFile = 'config.js';
 		const fs = require("fs-extra");
-		mainWindow3 = createWin(winRes.config.width, winRes.config.height, false, 'config.html', false);
+		mainWindow3 = createWin(winData.config.width, winData.config.height, false, winData.config.dest, false);
 		mainWindow3.on('close', function (event) {
 			event.preventDefault();
 			mainWindow3.hide();
@@ -131,14 +135,15 @@ app.on('ready', function() {
 			}
 			if (/--slideshow/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(winRes.control.width, winRes.control.height, false, 'control.html', !startAsTray);
+				mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, !startAsTray);
 				addMainWin2handler(!startAsTray);
 				break;
 			}
 			if (/--classic/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(winRes.classic.width, winRes.classic.height, true, 'index.html', !startAsTray);
+				mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, !startAsTray);
 				addMainWin2handler(!startAsTray);
+				registerFocusInfo(mainWindow2);
 				break;
 			}
 		}
@@ -146,7 +151,7 @@ app.on('ready', function() {
 	}
 
 	function loadMainWin(showWin) {
-		mainWindow = createWin(winRes.home.width, winRes.home.height, false, 'main.html', showWin);
+		mainWindow = createWin(winData.home.width, winData.home.height, false, winData.home.dest, showWin);
 		mainWindow.on('closed', function(e) {
 			if (mainWindow2 === null) {
 				mainWindow = null;
@@ -227,6 +232,18 @@ app.on('ready', function() {
 		}
 	}
 
+	function registerFocusInfo(myWin) {
+		if (myWin == null) {
+			return;
+		}
+		myWin.on('focus', () => {
+			myWin.webContents.send('remote', { msg: 'focused' });
+		});
+		myWin.on('blur', () => {
+			myWin.webContents.send('remote', { msg: 'blurred' });
+		});
+	}
+
 	function loadIpc() {
 		const ipc = require('electron').ipcMain;
 		ipc.on('remote', (event, data) => {
@@ -243,13 +260,14 @@ app.on('ready', function() {
 					}
 					break;
 				case "select1":
-					mainWindow2 = createWin(winRes.control.width, winRes.control.height, false, 'control.html', true);
+					mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, true);
 					addMainWin2handler(true);
 					mainWindow.destroy();
 					break;
 				case "select2":
-					mainWindow2 = createWin(winRes.classic.width, winRes.classic.height, true, 'index.html', true);
+					mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, true);
 					addMainWin2handler(true);
+					registerFocusInfo(mainWindow2);
 					mainWindow.destroy();
 					break;
 				case "showConfig":

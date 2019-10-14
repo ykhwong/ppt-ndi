@@ -104,7 +104,7 @@ html, body {
 
 #slideInfo {
 	position: fixed;
-	top: 65px;
+	top: 50px;
 	right: 20px;
 	color: #79a9f7;
 }
@@ -153,6 +153,13 @@ html, body {
 
 #slide_cnt, #progress, #current_time, #slide_res {
 	display:inline;
+}
+
+#ppt_filename {
+	position: fixed;
+	top: 90px;
+	right: 20px;
+	color: #79a9f7;
 }
 
 #progress, #current_time, #slide_res {
