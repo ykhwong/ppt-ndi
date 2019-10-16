@@ -569,7 +569,9 @@ $(document).ready(function() {
 					}
 				} else {
 					let selectedDiv = "ul.thumbnails.image_picker_selector li .thumbnail.selected";
+					let tmpSrc = $("img.image_picker_image:first").attr('src');
 					initImgPicker();
+					$("img.image_picker_image:first").attr('src', tmpSrc);
 					$(selectedDiv).css("background", "rgb(0, 0, 0, 0)");
 					$(selectedDiv).click(function() {
 						selectSlide("1");
@@ -758,8 +760,7 @@ $(document).ready(function() {
 		if (!fs.existsSync(dirTo)) {
 			dirTo = __dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + color + "_slide.png";
 		}
-		$("select").find('option[value="Current"]').data('img-src', dirTo);
-		initImgPicker();
+		$("img.image_picker_image:first").attr('src', dirTo);
 
 		lib.send(dirTo, false);
 	}

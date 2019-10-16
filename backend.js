@@ -13,8 +13,8 @@ app.on('ready', function() {
 	let isMainWin2shown = false;
 	const winData = {
 		"home" : {
-			"width" : 700,
-			"height" : 360,
+			"width" : 600,
+			"height" : 330,
 			"dest" : "main.html"
 		},
 		"control" : {
@@ -28,7 +28,7 @@ app.on('ready', function() {
 			"dest" : "index.html"
 		},
 		"config" : {
-			"width" : 340,
+			"width" : 320,
 			"height" : 345,
 			"dest" : "config.html"
 		}

@@ -20,14 +20,17 @@ html, body {
 	width: 100%;
 	height: 100%;
 	background-color: #060621;
-	color: white;
+	color: #79a9f7;
 	-webkit-app-region: drag !important;
 }
 
 #modeTitle {
 	position: relative;
-	text-align: center;
-	font-size: 40px;
+	padding-left: 20px;
+	text-align: left;
+	font-weight: bold;
+	color: #79a9f7;
+	font-size: 30px;
 	padding-top:25px;
 	padding-bottom:25px;
 	-webkit-app-region: drag !important;

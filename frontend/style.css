@@ -7,19 +7,19 @@ html, body {
 
 #exit {
 	position: absolute;
-	top: 1px;
+	top: 0px;
 	right: 5px;
 }
 
 #minimize {
 	position: absolute;
-	top: 1px;
+	top: 0px;
 	right: 82px;
 }
 
 #max_restore {
 	position: absolute;
-	top: 1px;
+	top: 0px;
 	right: 55px;
 }
 

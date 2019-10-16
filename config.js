@@ -1,6 +1,7 @@
 {
-	"version": "20190714a",
+	"version": "20191014a",
 	"startAsTray": false,
+	"startWithTheFirstSlideSelected": false,
 	"hotKeys": {
 		"prev": "",
 		"next": "",
