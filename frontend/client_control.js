@@ -544,9 +544,8 @@ $(document).ready(function() {
 		});
 		ioHook.on('keydown', event => {
 			if (!ignoreIoHook) {
-				if (!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
-				//f5, enter, space, b, w, n, p, home, end, left, up, right, down
-				event.keycode === 65 ||
+				if (((event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && event.keycode === 63) ||
+				!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
 				event.keycode === 28 || event.keycode === 57 || event.keycode === 48 || event.keycode === 17 ||
 				event.keycode === 49 || event.keycode === 25 || event.keycode === 60999 || event.keycode === 61007 ||
 				event.keycode === 61003 || event.keycode === 61000 || event.keycode === 61005 || event.keycode === 61008
