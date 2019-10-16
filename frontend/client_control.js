@@ -480,10 +480,14 @@ $(document).ready(function() {
 			sendColorNDI(newSlideIdx);
 		} else {
 			if (preFile !== "") {
-				let buf1 = fs.readFileSync(preFile);
-				let buf2 = fs.readFileSync(file);
-				if (buf1.equals(buf2)) {
-					return;
+				let buf1;
+				let buf2;
+				if (fs.existsSync(preFile)) {
+					buf1 = fs.readFileSync(preFile);
+					buf2 = fs.readFileSync(file);
+					if (buf1.equals(buf2)) {
+						return;
+					}
 				}
 			}
 			if ($("#slide_tran").is(":checked")) {
