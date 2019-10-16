@@ -3,14 +3,14 @@
 	"version": "1.0.0",
 	"main": "backend.js",
 	"dependencies": {
+		"ffi": "git+https://github.com/ykhwong/node-ffi#electron-73",
 		"fs-extra": "^7.0.1",
 		"iohook": "git+https://github.com/wilix-team/iohook.git",
-		"jimp": "^0.6.4",
 		"merge-images": "^1.1.0",
-		"tree-kill": "^1.2.1",
 		"ref": "git+https://github.com/ykhwong/ref#electron-73",
 		"ref-struct": "git+https://github.com/ykhwong/ref-struct#electron-73",
-		"ffi": "git+https://github.com/ykhwong/node-ffi#electron-73"
+		"sharp": "^0.23.1",
+		"tree-kill": "^1.2.1"
 	},
 	"devDependencies": {},
 	"scripts": {},

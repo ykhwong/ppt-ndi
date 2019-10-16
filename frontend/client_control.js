@@ -357,7 +357,7 @@ $(document).ready(function() {
 	function sendNDI(file, data) {
 		const now = new Date().getTime();
 		const cmd = data.toString();
-		const Jimp = require('jimp');
+		const sharp = require('sharp');
 		let newSlideIdx;
 		preFile = tmpDir + "/SlidePre.png";
 		stopSlideTransition();
@@ -401,9 +401,10 @@ $(document).ready(function() {
 			}
 
 			$("#slidePreview").attr("src", file + "?" + now);
-			Jimp.read(file).then(image=> {
-				slideWidth = image.bitmap.width;
-				slideHeight = image.bitmap.height;
+			const image = sharp(file);
+			image.metadata().then(info => {
+				slideWidth = info.width;
+				slideHeight = info.height;
 				$("#slideRes").html("( " + slideWidth + " x " + slideHeight + " )");
 			});
 		}
@@ -419,19 +420,38 @@ $(document).ready(function() {
 
 		if (/^PPTNDI: (White|Black)/.test(cmd)) {
 			function fillColor(color) {
-				const Jimp = require('jimp');
-				new Jimp(slideWidth, slideHeight, color, (err, image2) => {
-					image2.opacity(1);
-					image2.write(file, function() {
-						$("#slidePreview").attr("src", file + "?" + now);
-						lib.send(file, false);
-					});
+				const sharp = require('sharp');
+				let colorInfo = {};
+				if (color === "b") {
+					colorInfo = {
+						r: 0,
+						g: 0,
+						b: 0
+					}
+				} else if (color === "w") {
+					colorInfo = {
+						r: 255,
+						g: 255,
+						b: 255
+					}
+				}
+				sharp({
+					create: {
+						width: slideWidth,
+						height: slideHeight,
+						channels: 3,
+						background: colorInfo
+					}
+				}).toFile(file).
+				then( data => {
+					$("#slidePreview").attr("src", file + "?" + now);
+					lib.send(file, false);
 				});
 			}
 			if (newSlideIdx === "black") {
-				fillColor(0x000000FF);
+				fillColor("b");
 			} else {
-				fillColor(0xFFFFFFFF);
+				fillColor("w");
 			}
 		} else {
 			if ($("#slide_tran").is(":checked")) {

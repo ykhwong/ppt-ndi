@@ -206,23 +206,35 @@ $(document).ready(function() {
 	}
 
 	function createNullSlide() {
-		const Jimp = require('jimp');
-		Jimp.read(tmpDir + "/Slide1.png").then(image=> {
-			slideWidth = image.bitmap.width;
-			slideHeight = image.bitmap.height;
+		const sharp = require('sharp');
+		const image = sharp(tmpDir + "/Slide1.png");
+		image.metadata().then(info => {
+			slideWidth = info.width;
+			slideHeight = info.height;
 			$("#slide_res").html(slideWidth + " x " + slideHeight);
-			new Jimp(image.bitmap.width, image.bitmap.height, (err, image2) => {
-				image2.opacity(0);
-				image2.write(tmpDir + "/Slide0.png");
-			});
-			new Jimp(image.bitmap.width, image.bitmap.height, 0x000000FF, (err, image2) => {
-				image2.opacity(1);
-				image2.write(tmpDir + "/SlideBlack.png");
-			});
-			new Jimp(image.bitmap.width, image.bitmap.height, 0xFFFFFFFF, (err, image2) => {
-				image2.opacity(1);
-				image2.write(tmpDir + "/SlideWhite.png");
-			});
+			sharp({
+				create: {
+					width: slideWidth,
+					height: slideHeight,
+					channels: 4,
+					background: { r: 255, g: 255, b: 255, alpha: 0 }
+				}
+			}).toFile(tmpDir + "/Slide0.png");
+			sharp({
+				create: {
+					width: slideWidth,
+					height: slideHeight,
+					background: { r: 255, g: 255, b: 255 }
+				}
+			}).toFile(tmpDir + "/SlideBlack.png");
+			sharp({
+				create: {
+					width: slideWidth,
+					height: slideHeight,
+					channels: 4,
+					background: { r: 0, g: 0, b: 0 }
+				}
+			}).toFile(tmpDir + "/SlideWhite.png");
 		});
 	}
 
@@ -232,7 +244,7 @@ $(document).ready(function() {
 		initImgPicker();
 	}
 
-	function updateScreen() {
+	function updateScreen(noTran) {
 		let curSli, nextSli;
 		let nextNum;
 		let re, rpc;
@@ -262,7 +274,7 @@ $(document).ready(function() {
 		}
 
 		if (
-		    $("#use_slide_transition").is(":checked") &&
+		    $("#use_slide_transition").is(":checked") && !(whtBool || trnBool || blkBool) && !noTran &&
 		    ! (Object.entries(slideEffects).length === 0 && slideEffects.constructor === Object) &&
 		    slideEffects[currentSlide.toString()].effectName !== "0"
 		) {
@@ -340,6 +352,9 @@ $(document).ready(function() {
 			lib.send(curSli, false);
 		}
 		$("#slide_cnt").html("SLIDE " + currentSlide + " / " + maxSlideNum);
+		blkBool = false;
+		whtBool = false;
+		trnBool = false;
 	}
 
 	$("select").change(function() {
@@ -387,13 +402,13 @@ $(document).ready(function() {
 			selected:function(select, picker_option, event) {
 				prevSlide = currentSlide;
 				currentSlide=$('.selected').text();
-				updateScreen();
+				updateScreen(false);
 			}
 		});
 		if ($("#trans_checker").is(":checked")) {
 			$("#right img").css('background-image', "url('trans_slide.png')");
 		} else {
-			$("#right img").css('background-image', "url('null_slide.png')");
+			$("#right img").css('background-image', "url('trans.png')");
 		}
 		$("#below img").css('background', 'black');
 		$(window).trigger('resize');
@@ -573,10 +588,8 @@ $(document).ready(function() {
 					initImgPicker();
 					$("img.image_picker_image:first").attr('src', tmpSrc);
 					$(selectedDiv).css("background", "rgb(0, 0, 0, 0)");
-					$(selectedDiv).click(function() {
-						selectSlide("1");
-						$(selectedDiv).off("click");
-					});
+					currentSlide = 0;
+					$("img.image_picker_image:eq(1)").attr("src", "null_slide.png");
 				}
 				
 				if (isLoaded) {
@@ -587,6 +600,9 @@ $(document).ready(function() {
 				stats = fs.statSync(pptPath);
 				pptTimestamp = stats.mtimeMs;
 				$("#ppt_filename").html(path.basename(pptPath));
+				blkBool = false;
+				whtBool = false;
+				trnBool = false;
 			});
 		} else {
 			if (/\S/.test(file)) {
@@ -650,7 +666,7 @@ $(document).ready(function() {
 			  500, 'swing', function() {
 			  });
 		}
-		updateScreen();
+		updateScreen(false);
 	}
 
 	function gotoPrev() {
@@ -721,7 +737,7 @@ $(document).ready(function() {
 				trnBool = false;
 				if (blkBool) {
 					blkBool = false;
-					updateScreen();
+					updateScreen(true);
 					return;
 				} else {
 					blkBool = true;
@@ -733,7 +749,7 @@ $(document).ready(function() {
 				trnBool = false;
 				if (whtBool) {
 					whtBool = false;
-					updateScreen();
+					updateScreen(true);
 					return;
 				} else {
 					whtBool = true;
@@ -745,7 +761,7 @@ $(document).ready(function() {
 				whtBool = false;
 				if (trnBool) {
 					trnBool = false;
-					updateScreen();
+					updateScreen(true);
 					return;
 				} else {
 					trnBool = true;
