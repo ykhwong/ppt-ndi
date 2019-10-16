@@ -479,6 +479,13 @@ $(document).ready(function() {
 		if (newSlideIdx === "black" || newSlideIdx === "white") {
 			sendColorNDI(newSlideIdx);
 		} else {
+			if (preFile !== "") {
+				let buf1 = fs.readFileSync(preFile);
+				let buf2 = fs.readFileSync(file);
+				if (buf1.equals(buf2)) {
+					return;
+				}
+			}
 			if ($("#slide_tran").is(":checked")) {
 				if(!/^\s*0\s*$/.test(effect)) {
 					if (fs.existsSync(preFile)) {
