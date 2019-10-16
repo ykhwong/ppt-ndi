@@ -58,6 +58,8 @@ sub Main()
 				curPos = ap.SlideShowWindow.View.CurrentShowPosition
 				If Err.Number = 0 Then
 					If ap.SlideShowWindow.View.State = -1 Then
+					ElseIf ap.SlideShowWindow.View.State = 1 Then
+						Proc()
 					ElseIf ap.SlideShowWindow.View.State = 2 Then
 						Wscript.Echo "PPTNDI: Paused"
 					ElseIf ap.SlideShowWindow.View.State = 3 Then
@@ -66,13 +68,14 @@ sub Main()
 						Wscript.Echo "PPTNDI: White"
 					ElseIf ap.SlideShowWindow.View.State = 5 Then
 						Wscript.Echo "PPTNDI: Done"
-					ElseIf ap.SlideShowWindow.View.State = 1 Or ap.SlideShowWindow.View.State = 2 Then
-						Proc()
 					End If
 				Else
+					Wscript.Echo "PPTNDI: Ready"
 					curPos = 0
 				End If
 			End If
+		Else
+			Wscript.Echo "PPTNDI: NoPPT"
 		End If
 		cmd = Wscript.StdIn.ReadLine()
 		If left(cmd, 6) = "setRes" Then
@@ -170,6 +173,8 @@ sub Main()
 				curPos = ap.SlideShowWindow.View.CurrentShowPosition
 				If Err.Number = 0 Then
 					If ap.SlideShowWindow.View.State = -1 Then
+					ElseIf ap.SlideShowWindow.View.State = 1 Then
+						Proc()
 					ElseIf ap.SlideShowWindow.View.State = 2 Then
 						Wscript.Echo "PPTNDI: Paused"
 					ElseIf ap.SlideShowWindow.View.State = 3 Then
@@ -178,13 +183,14 @@ sub Main()
 						Wscript.Echo "PPTNDI: White"
 					ElseIf ap.SlideShowWindow.View.State = 5 Then
 						Wscript.Echo "PPTNDI: Done"
-					ElseIf ap.SlideShowWindow.View.State = 1 Or ap.SlideShowWindow.View.State = 2 Then
-						Proc()
 					End If
 				Else
+					Wscript.Echo "PPTNDI: Ready"
 					curPos = 0
 				End If
 			End If
+		Else
+			Wscript.Echo "PPTNDI: NoPPT"
 		End If
 		cmd = Wscript.StdIn.ReadLine()
 		If left(cmd, 6) = "setRes" Then
@@ -300,6 +306,7 @@ $(document).ready(function() {
 	let effect = "";
 	let slideIdx = "";
 	let slideTranTimers = [];
+	let curStatus = "";
 
 	function alertMsg(myMsg) {
 		const { remote } = require('electron');
@@ -322,7 +329,6 @@ $(document).ready(function() {
 				remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
 				RTLD_NOW | RTLD_GLOBAL
 			);
-			//lib = ffi.Library('./PPTNDI.dll', {
 			lib = ffi.Library(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
 				'init': [ 'int', [] ],
 				'destroy': [ 'int', [] ],
@@ -347,17 +353,55 @@ $(document).ready(function() {
 		mustStop = true;
 	}
 
-	function sendNullNDI() {
+	function sendColorNDI(color) {
 		const now = new Date().getTime();
-		const file = "null_slide.png";
-		$("#slidePreview").attr("src", file + "?" + now);
-		lib.send(__dirname.replace(/app\.asar(\\|\/)frontend/, "") + "/" + file, false);
+		const sharp = require('sharp');
+		let file;
+		let colorInfo = {};
+		let mWidth = (slideWidth === 0 ? 1920 : slideWidth);
+		let mHeight = (slideHeight === 0 ? 1080 : slideHeight);
+
+		switch (color) {
+			case "black":
+				file = tmpDir + "/SlideBlack.png";
+				colorInfo = { r: 0, g: 0, b: 0, alpha: 1 }
+				break;
+			case "white":
+				file = tmpDir + "/SlideWhite.png";
+				colorInfo = { r: 255, g: 255, b: 255, alpha: 1 };
+				break;
+			case "tran":
+				file = tmpDir + "/SlideTran.png";
+				colorInfo = { r: 255, g: 255, b: 255, alpha: 0 };
+				break;
+		}
+
+		sharp({
+			create: {
+				width: mWidth,
+				height: mHeight,
+				channels: 4,
+				background: colorInfo
+			}
+		}).toFile(file).then( data => {
+			$("#slidePreview").attr("src", file + "?" + now);
+			lib.send(file, false);
+		});
+	}
+
+	function updateStat(cmd, details) {
+		let msg = "Status: ";
+		curStatus=cmd;
+		msg = msg + cmd;
+		if (/\S/.test(details)) {
+			msg = msg + "<br />" + details;
+		}
+		$("#tip").html(msg);
 	}
 
 	function sendNDI(file, data) {
 		const now = new Date().getTime();
 		const cmd = data.toString();
-		const sharp = require('sharp');
 		let newSlideIdx;
 		preFile = tmpDir + "/SlidePre.png";
 		stopSlideTransition();
@@ -372,23 +416,30 @@ $(document).ready(function() {
 		} else if(/^PPTNDI: Black/.test(cmd)) {
 			file = tmpDir + "/SlideBlack.png"
 			newSlideIdx = "black";
-		} else if(/^PPTNDI: (Done|Paused)/.test(cmd)) {
-			//file = "null_slide.png";
-			$("#tip").html("Status: PAUSED/EXITED");
+		} else if(/^PPTNDI: Done/.test(cmd)) {
+			updateStat("END OF SLIDE SHOW", "");
+			return;
+		} else if(/^PPTNDI: Paused/.test(cmd)) {
+			updateStat("PAUSED", "");
+			return;
+		} else if(/^PPTNDI: Ready/.test(cmd)) {
+			updateStat("READY", "In PowerPoint, start the Slide Show.");
+			return;
+		} else if(/^PPTNDI: NoPPT/.test(cmd)) {
+			updateStat("ERROR", "Microsoft PowerPoint not found.");
 			return;
 		} else {
 			console.log(cmd);
 			return;
 		}
 
-		$("#tip").html("Status: OK<br />The request has been completed.");
+		updateStat("OK", "The request has been completed.");
 		if (/^PPTNDI: Sent /.test(cmd)) {
 			let fd;
 			try {
 				fd = fs.openSync(file, 'r+');
 			} catch (err) {
 				if (err && err.code === 'EBUSY'){
-					//console.log("busy");
 					if (fd !== undefined) {
 						fs.closeSync(fd);
 					}
@@ -400,13 +451,20 @@ $(document).ready(function() {
 				fs.closeSync(fd);
 			}
 
-			$("#slidePreview").attr("src", file + "?" + now);
-			const image = sharp(file);
-			image.metadata().then(info => {
-				slideWidth = info.width;
-				slideHeight = info.height;
+			function getMeta(url, callback) {
+				var img = new Image();
+				img.src = url;
+				img.onload = function() { callback(this.width, this.height); }
+			}
+			getMeta(
+			  file + "?" + now,
+			  function(width, height) { 
+				slideWidth = width;
+				slideHeight = height;
 				$("#slideRes").html("( " + slideWidth + " x " + slideHeight + " )");
-			});
+			  }
+			);
+			$("#slidePreview").attr("src", file + "?" + now);
 		}
 
 		if (slideIdx === newSlideIdx) {
@@ -418,41 +476,8 @@ $(document).ready(function() {
 		slideIdx = newSlideIdx;
 		lastSignalTime = Date.now();
 
-		if (/^PPTNDI: (White|Black)/.test(cmd)) {
-			function fillColor(color) {
-				const sharp = require('sharp');
-				let colorInfo = {};
-				if (color === "b") {
-					colorInfo = {
-						r: 0,
-						g: 0,
-						b: 0
-					}
-				} else if (color === "w") {
-					colorInfo = {
-						r: 255,
-						g: 255,
-						b: 255
-					}
-				}
-				sharp({
-					create: {
-						width: slideWidth,
-						height: slideHeight,
-						channels: 3,
-						background: colorInfo
-					}
-				}).toFile(file).
-				then( data => {
-					$("#slidePreview").attr("src", file + "?" + now);
-					lib.send(file, false);
-				});
-			}
-			if (newSlideIdx === "black") {
-				fillColor("b");
-			} else {
-				fillColor("w");
-			}
+		if (newSlideIdx === "black" || newSlideIdx === "white") {
+			sendColorNDI(newSlideIdx);
 		} else {
 			if ($("#slide_tran").is(":checked")) {
 				if(!/^\s*0\s*$/.test(effect)) {
@@ -473,6 +498,34 @@ $(document).ready(function() {
 		}
 	}
 
+	function handleHook(cmd) {
+		switch (cmd) {
+			case "prev":
+			case "next":
+				res2.stdin.write(cmd + "\n");
+				res.stdin.write("\n");
+				break;
+			case "tran":
+				setTimeout(function() {
+					ignoreIoHook = true;
+					sendColorNDI("tran");
+					ignoreIoHook = false;
+				}, 500);
+				break;
+			case "black":
+			case "white":
+				if (slideWidth === 0 || curStatus === "READY") {
+					sendColorNDI(cmd);
+				} else {
+					res2.stdin.write(cmd + "\n");
+					res.stdin.write("\n");
+				}
+				break;
+			default:
+				break;
+		}
+	}
+
 	function registerIoHook() {
 		ioHook = require('iohook');
 		ioHook.on('keyup', event => {
@@ -480,24 +533,26 @@ $(document).ready(function() {
 				let chr = String.fromCharCode( event.rawcode );
 				if (chr === "") return;
 				switch (chr) {
-					case configData.hotKeys.prev: res2.stdin.write("prev\n"); res.stdin.write("\n"); break;
-					case configData.hotKeys.next: res2.stdin.write("next\n"); res.stdin.write("\n"); break;
-					case configData.hotKeys.transparent:
-						setTimeout(function() {
-							ignoreIoHook = true;
-							sendNullNDI();
-							ignoreIoHook = false;
-						}, 500);
-						break;
-					case configData.hotKeys.black: res2.stdin.write("black\n"); res.stdin.write("\n"); break;
-					case configData.hotKeys.white: res2.stdin.write("white\n"); res.stdin.write("\n"); break;
+					case configData.hotKeys.prev: handleHook("prev"); break;
+					case configData.hotKeys.next: handleHook("next"); break;
+					case configData.hotKeys.transparent: handleHook("tran"); break;
+					case configData.hotKeys.black: handleHook("black"); break;
+					case configData.hotKeys.white: handleHook("white"); break;
 					default: break;
 				}
 			}
 		});
 		ioHook.on('keydown', event => {
 			if (!ignoreIoHook) {
-				res.stdin.write("\n");
+				if (!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
+				//f5, enter, space, b, w, n, p, home, end, left, up, right, down
+				event.keycode === 65 ||
+				event.keycode === 28 || event.keycode === 57 || event.keycode === 48 || event.keycode === 17 ||
+				event.keycode === 49 || event.keycode === 25 || event.keycode === 60999 || event.keycode === 61007 ||
+				event.keycode === 61003 || event.keycode === 61000 || event.keycode === 61005 || event.keycode === 61008
+				)) {
+					res.stdin.write("\n");
+				}
 			}
 		});
 		ioHook.on('mouseup', event => {
@@ -657,13 +712,12 @@ $(document).ready(function() {
 			let curSlideStat = data.toString().replace(/^Status: /, "");
 			if (/^\s*OFF\s*$/.test(curSlideStat)) {
 				// Ready
-				$("#tip").html("Status: READY<br />In PowerPoint, start the Slide Show.");
+				updateStat("READY", "In PowerPoint, open a presentation file.");
 			} else if (/^\s*0\s*$/.test(curSlideStat)) {
 				// Not found
-				$("#tip").html("Status: -");
+				updateStat("-", "");
 			} else {
 				// ON
-				$("#tip").html("Status: OK<br />The request has been completed.");
 			}
 
 			if (/^\s*0\s*$/.test(lastSlideStat)) {

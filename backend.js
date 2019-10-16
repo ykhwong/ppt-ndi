@@ -2,6 +2,7 @@ const { app, Menu, Tray } = require('electron');
 const frontendDir = __dirname + '/frontend/';
 const iconFile = __dirname + '/icon.png';
 let tray = null;
+app.disableHardwareAcceleration();
 
 app.on('ready', function() {
 	let mainWindow = null;

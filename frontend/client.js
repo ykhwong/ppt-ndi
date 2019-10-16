@@ -171,7 +171,6 @@ $(document).ready(function() {
 			remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
 			RTLD_NOW | RTLD_GLOBAL
 		);
-		//lib = ffi.Library('./PPTNDI.dll', {
 		lib = ffi.Library(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
 			'init': [ 'int', [] ],
 			'destroy': [ 'int', [] ],
@@ -207,35 +206,34 @@ $(document).ready(function() {
 
 	function createNullSlide() {
 		const sharp = require('sharp');
-		const image = sharp(tmpDir + "/Slide1.png");
-		image.metadata().then(info => {
-			slideWidth = info.width;
-			slideHeight = info.height;
-			$("#slide_res").html(slideWidth + " x " + slideHeight);
+		const now = new Date().getTime();
+		function getMeta(url, callback) {
+			var img = new Image();
+			img.src = url;
+			img.onload = function() { callback(this.width, this.height); }
+		}
+		function createSli(redVal, greenVal, blueVal, alphaVal, fileVal) {
 			sharp({
 				create: {
 					width: slideWidth,
 					height: slideHeight,
 					channels: 4,
-					background: { r: 255, g: 255, b: 255, alpha: 0 }
+					background: { r: redVal, g: greenVal, b: blueVal, alpha: alphaVal }
 				}
-			}).toFile(tmpDir + "/Slide0.png");
-			sharp({
-				create: {
-					width: slideWidth,
-					height: slideHeight,
-					background: { r: 255, g: 255, b: 255 }
-				}
-			}).toFile(tmpDir + "/SlideBlack.png");
-			sharp({
-				create: {
-					width: slideWidth,
-					height: slideHeight,
-					channels: 4,
-					background: { r: 0, g: 0, b: 0 }
-				}
-			}).toFile(tmpDir + "/SlideWhite.png");
-		});
+			}).toFile(tmpDir + fileVal);
+		}
+		getMeta(
+			tmpDir + "/Slide1.png" + "?" + now,
+			function(width, height) { 
+				slideWidth = width;
+				slideHeight = height;
+				$("#slide_res").html(slideWidth + " x " + slideHeight);
+
+				createSli(255, 255, 255, 0, "/Slide0.png");
+				createSli(255, 255, 255, 1, "/SlideBlack.png");
+				createSli(0, 0, 0, 1, "/SlideWhite.png");
+			}
+		);
 	}
 
 	function updateCurNext(curSli, nextSli) {
