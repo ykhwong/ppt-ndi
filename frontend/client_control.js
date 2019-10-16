@@ -482,7 +482,7 @@ $(document).ready(function() {
 			if (preFile !== "") {
 				let buf1;
 				let buf2;
-				if (fs.existsSync(preFile)) {
+				if (fs.existsSync(preFile) && fs.existsSync(file)) {
 					buf1 = fs.readFileSync(preFile);
 					buf2 = fs.readFileSync(file);
 					if (buf1.equals(buf2)) {
@@ -557,6 +557,7 @@ $(document).ready(function() {
 			if (!ignoreIoHook) {
 				if (((event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && event.keycode === 63) ||
 				!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
+				event.keycode === 63 ||
 				event.keycode === 28 || event.keycode === 57 || event.keycode === 48 || event.keycode === 17 ||
 				event.keycode === 49 || event.keycode === 25 || event.keycode === 60999 || event.keycode === 61007 ||
 				event.keycode === 61003 || event.keycode === 61000 || event.keycode === 61005 || event.keycode === 61008
