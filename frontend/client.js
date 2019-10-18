@@ -230,8 +230,8 @@ $(document).ready(function() {
 				$("#slide_res").html(slideWidth + " x " + slideHeight);
 
 				createSli(255, 255, 255, 0, "/Slide0.png");
-				createSli(255, 255, 255, 1, "/SlideBlack.png");
-				createSli(0, 0, 0, 1, "/SlideWhite.png");
+				createSli(255, 255, 255, 1, "/SlideWhite.png");
+				createSli(0, 0, 0, 1, "/SlideBlack.png");
 			}
 		);
 	}
