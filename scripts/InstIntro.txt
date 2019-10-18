@@ -1,12 +1,13 @@
 PPT NDI
 
-PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Can be also used as a character generator because it supports transparency.
+PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
 
-Release Note (20191013):
+Release Note (20191019):
 
-ADD: Custom resolution
-FIX: Revamped user interface
-FIX: Removed runtime dependency called by PPTNDI.dll
+ADD: Edit button and Reload button (Classic Mode)
+FIX: Automatically reload upon PowerPoint file changes (Classic Mode)
+FIX: No automatic slide selection at startup (Classic Mode)
+FIX: Improved performance
 
 Please also download and open the sample.pptx file to see some examples of the lower thirds:
 https://github.com/ykhwong/ppt-ndi/raw/master/resources/sample.pptx
