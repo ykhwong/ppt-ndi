@@ -554,10 +554,11 @@ $(document).ready(function() {
 			}
 		});
 		ioHook.on('keydown', event => {
+			console.log(event.keycode);
 			if (!ignoreIoHook) {
 				if (((event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && event.keycode === 63) ||
 				!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
-				event.keycode === 63 ||
+				event.keycode === 63 || event.keycode === 3655 || event.keycode === 3663 ||
 				event.keycode === 28 || event.keycode === 57 || event.keycode === 48 || event.keycode === 17 ||
 				event.keycode === 49 || event.keycode === 25 || event.keycode === 60999 || event.keycode === 61007 ||
 				event.keycode === 61003 || event.keycode === 61000 || event.keycode === 61005 || event.keycode === 61008
