@@ -16,11 +16,8 @@ del /q libGLESv2.dll
 del /q chrome_*.pak
 del /q snapshot_blob.bin
 del /q version
-copy ..\ffmpeg.dll .\.
-copy ..\PPTNDI.dll .\.
-copy ..\Processing.NDI.Lib.x64.dll .\.
-copy ..\uiohook.dll .\.
-copy ..\*_slide.png .\resources\.
-copy ..\sample.pptx .\resources\.
+copy ..\deps\*.dll .\.
+copy ..\deps\*_slide.png .\resources\.
+copy ..\deps\sample.pptx .\resources\.
 :done
 pause >nul
