@@ -729,7 +729,7 @@ $(document).ready(function() {
 				updateStat("READY", "In PowerPoint, open a presentation file.");
 			} else if (/^\s*0\s*$/.test(curSlideStat)) {
 				// Not found
-				updateStat("-", "");
+				// updateStat("-", "");
 			} else {
 				// ON
 			}
