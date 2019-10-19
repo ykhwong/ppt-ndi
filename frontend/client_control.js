@@ -61,7 +61,8 @@ sub Main()
 					ElseIf ap.SlideShowWindow.View.State = 1 Then
 						Proc()
 					ElseIf ap.SlideShowWindow.View.State = 2 Then
-						Wscript.Echo "PPTNDI: Paused"
+						'Wscript.Echo "PPTNDI: Paused" -- breaks hotkeys
+						Proc()
 					ElseIf ap.SlideShowWindow.View.State = 3 Then
 						Wscript.Echo "PPTNDI: Black"
 					ElseIf ap.SlideShowWindow.View.State = 4 Then
@@ -176,7 +177,8 @@ sub Main()
 					ElseIf ap.SlideShowWindow.View.State = 1 Then
 						Proc()
 					ElseIf ap.SlideShowWindow.View.State = 2 Then
-						Wscript.Echo "PPTNDI: Paused"
+						'Wscript.Echo "PPTNDI: Paused" -- breaks hotkeys
+						Proc()
 					ElseIf ap.SlideShowWindow.View.State = 3 Then
 						Wscript.Echo "PPTNDI: Black"
 					ElseIf ap.SlideShowWindow.View.State = 4 Then
@@ -419,9 +421,9 @@ $(document).ready(function() {
 		} else if(/^PPTNDI: Done/.test(cmd)) {
 			updateStat("END OF SLIDE SHOW", "");
 			return;
-		} else if(/^PPTNDI: Paused/.test(cmd)) {
-			updateStat("PAUSED", "");
-			return;
+		//} else if(/^PPTNDI: Paused/.test(cmd)) {
+		//	updateStat("PAUSED", "");
+		//	return;
 		} else if(/^PPTNDI: Ready/.test(cmd)) {
 			updateStat("READY", "In PowerPoint, start the Slide Show.");
 			return;
