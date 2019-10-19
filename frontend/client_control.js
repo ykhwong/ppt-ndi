@@ -415,9 +415,11 @@ $(document).ready(function() {
 		} else if(/^PPTNDI: White/.test(cmd)) {
 			file = tmpDir + "/SlideWhite.png";
 			newSlideIdx = "white";
+			preFile = "";
 		} else if(/^PPTNDI: Black/.test(cmd)) {
 			file = tmpDir + "/SlideBlack.png"
 			newSlideIdx = "black";
+			preFile = "";
 		} else if(/^PPTNDI: Done/.test(cmd)) {
 			updateStat("END OF SLIDE SHOW", "");
 			return;
