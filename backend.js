@@ -1,6 +1,6 @@
 const { app, Menu, Tray } = require('electron');
 const frontendDir = __dirname + '/frontend/';
-const iconFile = __dirname + '/icon.png';
+let iconFile;
 let tray = null;
 app.disableHardwareAcceleration();
 
@@ -96,6 +96,13 @@ app.on('ready', function() {
 		let configPath;
 		const configFile = 'config.js';
 		const fs = require("fs-extra");
+
+		if (process.platform === 'win32') {
+			iconFile = __dirname + '/icon.ico';
+		} else {
+			iconFile = __dirname + '/icon.png';
+		}
+
 		mainWindow3 = createWin(winData.config.width, winData.config.height, false, winData.config.dest, false);
 		mainWindow3.on('close', function (event) {
 			event.preventDefault();
