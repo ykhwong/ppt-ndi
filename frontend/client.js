@@ -1,131 +1,134 @@
 const vbsBg = `
-Dim objPPT
-Dim TestFile
-Dim opres
-Set objPPT = CreateObject("PowerPoint.Application")
+var objPPT;
+var TestFile;
+objPPT = new ActiveXObject("PowerPoint.Application");
 
-Sub Proc(ap)
-	Dim sl
-	Dim fn
-	For Each sl In ap.Slides
-		If sl.SlideShowTransition.Hidden Then
-			Set objFileToWrite = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/hidden.dat",8,true)
-			objFileToWrite.WriteLine(sl.SlideIndex)
-			objFileToWrite.Close
-			Set objFileToWrite = Nothing
-		End If
+function proc(ap) {
+	var sl;
+	var fn;
+	for (var i=1; i<=ap.Slides.Count; i++) {
+		sl = ap.Slides.Item(i);
+		if (sl.SlideShowTransition.Hidden) {
+			var objFileToWrite = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(WScript.arguments(1) + "/hidden.dat",8,true);
+			objFileToWrite.WriteLine(sl.SlideIndex);
+			objFileToWrite.Close();
+			objFileToWrite = null;
+		}
 
-		Set objSlideEffect = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/slideEffect.dat",8,true)
-		objSlideEffect.WriteLine(sl.SlideIndex & "," & sl.SlideShowTransition.EntryEffect & "," & sl.SlideShowTransition.Duration)
-		objSlideEffect.Close
+		var objSlideEffect = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(WScript.arguments(1) + "/slideEffect.dat",8,true);
+		objSlideEffect.WriteLine(sl.SlideIndex + "," + sl.SlideShowTransition.EntryEffect + "," + sl.SlideShowTransition.Duration);
+		objSlideEffect.Close();
+		objSlideEffect = null;
+		fn = WScript.arguments(1) + "/Slide" + sl.SlideIndex + ".png";
+		if (WScript.arguments(2) === "0") {
+			sl.Export(fn, "PNG");
+		} else {
+			sl.Export(fn, "PNG", WScript.arguments(2), WScript.arguments(3));
+		}
+	}
+}
 
-		fn = Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png"
-		If Wscript.Arguments.Item(2) = 0 Then
-			sl.Export fn, "PNG"
-		Else
-			sl.Export fn, "PNG", Wscript.Arguments.Item(2), Wscript.Arguments.Item(3)
-		End If
-	Next
-End Sub
+function main() {
+	objPPT.DisplayAlerts = false;
+	ap = objPPT.Presentations.Open(WScript.arguments(0), false, false, false);
+	proc(ap);
 
-sub Main()
-	objPPT.DisplayAlerts = False
-	Set ap = objPPT.Presentations.Open(Wscript.Arguments.Item(0), , , msoFalse)
-	Proc(ap)
+	for (var i=0; i< objPPT.Presentations.length; i++) {
+		var opres = objPPT.Presentations[i];
+		TestFile = opres.FullName;
+		break;
+	}
 
-	For each opres In objPPT.Presentations
-		TestFile = opres.FullName
-		Exit For
-	Next
-
-	If TestFile = "" Then objPPT.Quit
-	Set objPPT = Nothing
-	Wscript.Echo "PPTNDI: Loaded"
-End Sub
-Main
+	if (TestFile === "") {
+		objPPT.quit;
+	}
+	objPPT = null;
+	WScript.Echo("PPTNDI: Loaded");
+}
+main();
 `
 
 const vbsNoBg = `
-Dim objPPT
-Dim TestFile
-Dim opres
-Set objPPT = CreateObject("PowerPoint.Application")
+var objPPT;
+var TestFile;
+var opres;
+objPPT = new ActiveXObject("PowerPoint.Application");
 
-Sub Proc(ap)
-	On Error Resume Next
-	Dim sl
-	Dim shGroup
-	Dim sngWidth
-	Dim sngHeight
+function proc(ap) {
+	var sl;
+	var fn;
+	var shGroup;
+	var sngWidth;
+	var sngHeight;
 
-	With ap.PageSetup
-		sngWidth = .SlideWidth
-		sngHeight = .SlideHeight
-	End With
+	sngWidth = ap.PageSetup.SlideWidth;
+	sngHeight = ap.PageSetup.SlideHeight;
 
-	For Each sl In ap.Slides
-		If sl.SlideShowTransition.Hidden Then
-			Set objFileToWrite = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/hidden.dat",8,true)
-			objFileToWrite.WriteLine(sl.SlideIndex)
-			objFileToWrite.Close
+	for (var i=1; i<=ap.Slides.Count; i++) {
+		sl = ap.Slides.Item(i);
+		if (sl.SlideShowTransition.Hidden) {
+			var objFileToWrite = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(WScript.arguments(1) + "/hidden.dat",8,true);
+			objFileToWrite.WriteLine(sl.SlideIndex);
+			objFileToWrite.Close();
+			objFileToWrite = null;
+		}
 
-			Set objFileToWrite = Nothing
-		End If
+		var objSlideEffect = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(WScript.arguments(1) + "/slideEffect.dat",8,true);
+		objSlideEffect.WriteLine(sl.SlideIndex + "," + sl.SlideShowTransition.EntryEffect + "," + sl.SlideShowTransition.Duration);
+		objSlideEffect.Close();
+		objSlideEffect = null;
 
-		Set objSlideEffect = CreateObject("Scripting.FileSystemObject").OpenTextFile(Wscript.Arguments.Item(1) & "/slideEffect.dat",8,true)
-		objSlideEffect.WriteLine(sl.SlideIndex & "," & sl.SlideShowTransition.EntryEffect & "," & sl.SlideShowTransition.Duration)
-		objSlideEffect.Close
+		fn = WScript.arguments(1) + "/Slide" + sl.SlideIndex + ".png";
+		var shp = sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight );
+		var shpGroup = sl.Shapes.Range();
+		if (WScript.arguments(2) === "0") {
+			shpGroup.Export(fn, 2, 0, 0, 1);
+		} else {
+			shpGroup.Export(fn, 2, Math.round(WScript.arguments(2) / 1.33333333), Math.round(WScript.arguments(3) / 1.33333333), 1);
+		}
+		shp.Delete();
 
-		Dim fn
-		fn = Wscript.Arguments.Item(1) & "/Slide" & sl.SlideIndex & ".png"
-		With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
-			Set shpGroup = sl.Shapes.Range()
-			If Wscript.Arguments.Item(2) = 0 Then
-				shpGroup.Export fn, 2, , , 1
-			Else
-				shpGroup.Export fn, 2, Round(Wscript.Arguments.Item(2) / 1.33333333, 0), Round(Wscript.Arguments.Item(3) / 1.33333333, 0), 1
-			End If
-			.Delete
-		End With
+		var fso = new ActiveXObject("Scripting.FileSystemObject");
+		if (fso.FileExists(fn)) {
+			var objFile = fso.GetFile(fn);
+			if (objFile.size === 0) {
+				for (var intShape = 1; i<=sl.Shapes.Count(); intShape++) {
+					if (sl.Shapes(intShape).Type === 7) {
+						sl.Shapes(intShape).Delete();
+					}
+				}
+				var shp2 = sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight);
+				var shpGroup2 = sl.Shapes.Range();
+				if (WScript.arguments(2) === "0") {
+					shpGroup2.Export(fn, 2, 0, 0, 1);
+				} else {
+					shpGroup2.Export(fn, 2, Math.round(WScript.arguments(2) / 1.33333333), Math.round(WScript.arguments(3) / 1.33333333), 1);
+				}
+				shp2.Delete();
+			}
+		}
 
-		Set fso = CreateObject("Scripting.FileSystemObject")
-		If fso.FileExists(fn) Then
-			Set objFile = fso.GetFile(fn)
-			If objFile.size = 0 Then
-				For intShape = 1 To sl.Shapes.Count
-					If sl.Shapes(intShape).Type = 7 Then
-						sl.Shapes(intShape).Delete
-					End If
-				Next
-				With sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight)
-					Set shpGroup = sl.Shapes.Range()
-					If Wscript.Arguments.Item(2) = 0 Then
-						shpGroup.Export fn, 2, , , 1
-					Else
-						shpGroup.Export fn, 2, Round(Wscript.Arguments.Item(2) / 1.33333333, 0), Round(Wscript.Arguments.Item(3) / 1.33333333, 0), 1
-					End If
-					.Delete
-				End With
-			End If
-		End If
-	Next
-End Sub
+	}
+}
 
-sub Main()
-	objPPT.DisplayAlerts = False
-	Set ap = objPPT.Presentations.Open(Wscript.Arguments.Item(0), , , msoFalse)
-	Proc(ap)
+function main() {
+	objPPT.DisplayAlerts = false;
+	ap = objPPT.Presentations.Open(WScript.arguments(0), false, false, false);
+	proc(ap);
 
-	For each opres In objPPT.Presentations
-		TestFile = opres.FullName
-		Exit For
-	Next
+	for (var i=0; i< objPPT.Presentations.length; i++) {
+		var opres = objPPT.Presentations[i];
+		TestFile = opres.FullName;
+		break;
+	}
 
-	If TestFile = "" Then objPPT.Quit
-	Set objPPT = Nothing
-	Wscript.Echo "PPTNDI: Loaded"
-End Sub
-Main
+	if (TestFile === "") {
+		objPPT.quit;
+	}
+	objPPT = null;
+	WScript.Echo("PPTNDI: Loaded");
+}
+main();
 `;
 
 $(document).ready(function() {
@@ -482,7 +485,7 @@ $(document).ready(function() {
 				resY = customSlideY;
 			}
 			
-			res = spawn( 'cscript.exe', [ vbsDir, file, tmpDir, resX, resY, "//NOLOGO", '' ] );
+			res = spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, tmpDir, resX, resY, '' ] );
 			$(".cancelBox").show();
 			res.stderr.on('data', (data) => {
 				let myMsg = "Failed to parse the presentation!\n";
