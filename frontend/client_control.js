@@ -357,8 +357,11 @@ $(document).ready(function() {
 
 	function sendColorNDI(color) {
 		const now = new Date().getTime();
-		const sharp = require('sharp');
+		const PNG = require('pngjs').PNG;
+
 		let file;
+		let png;
+		let buffer;
 		let colorInfo = {};
 		let mWidth = (slideWidth === 0 ? 1920 : slideWidth);
 		let mHeight = (slideHeight === 0 ? 1080 : slideHeight);
@@ -366,11 +369,11 @@ $(document).ready(function() {
 		switch (color) {
 			case "black":
 				file = tmpDir + "/SlideBlack.png";
-				colorInfo = { r: 0, g: 0, b: 0, alpha: 1 }
+				colorInfo = { r: 0, g: 0, b: 0, alpha: 255 }
 				break;
 			case "white":
 				file = tmpDir + "/SlideWhite.png";
-				colorInfo = { r: 255, g: 255, b: 255, alpha: 1 };
+				colorInfo = { r: 255, g: 255, b: 255, alpha: 255 };
 				break;
 			case "tran":
 				file = tmpDir + "/SlideTran.png";
@@ -378,17 +381,26 @@ $(document).ready(function() {
 				break;
 		}
 
-		sharp({
-			create: {
-				width: mWidth,
-				height: mHeight,
-				channels: 4,
-				background: colorInfo
-			}
-		}).toFile(file).then( data => {
-			$("#slidePreview").attr("src", file + "?" + now);
-			lib.send(file, false);
+		png = new PNG({
+			width: mWidth,
+			height: mHeight,
+			filterType: -1
 		});
+
+		for (var y = 0; y < png.height; y++) {
+			for (var x = 0; x < png.width; x++) {
+				var idx = (png.width * y + x) << 2;
+				png.data[idx  ] = colorInfo.r;
+				png.data[idx+1] = colorInfo.g;
+				png.data[idx+2] = colorInfo.b;
+				png.data[idx+3] = colorInfo.alpha;
+			}
+		}
+
+		buffer = PNG.sync.write(png);
+		fs.writeFileSync(file, buffer);
+		$("#slidePreview").attr("src", file + "?" + now);
+		lib.send(file, false);
 	}
 
 	function updateStat(cmd, details) {
@@ -558,7 +570,7 @@ $(document).ready(function() {
 			}
 		});
 		ioHook.on('keydown', event => {
-			console.log(event.keycode);
+			//console.log(event.keycode);
 			if (!ignoreIoHook) {
 				if (((event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && event.keycode === 63) ||
 				!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (

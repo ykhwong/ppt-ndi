@@ -3,20 +3,20 @@
 	"version": "1.0.0",
 	"main": "backend.js",
 	"dependencies": {
-		"ffi": "git+https://github.com/ykhwong/node-ffi#electron-73",
+		"ffi": "git+https://github.com/ykhwong/node-ffi#electron-75",
 		"fs-extra": "^7.0.1",
 		"iohook": "git+https://github.com/wilix-team/iohook.git",
 		"merge-images": "^1.1.0",
-		"ref": "git+https://github.com/ykhwong/ref#electron-73",
-		"ref-struct": "git+https://github.com/ykhwong/ref-struct#electron-73",
-		"sharp": "^0.23.1",
+		"pngjs": "^3.4.0",
+		"ref": "git+https://github.com/ykhwong/ref#electron-75",
+		"ref-struct": "git+https://github.com/ykhwong/ref-struct#electron-75",
 		"tree-kill": "^1.2.1"
 	},
 	"devDependencies": {},
 	"scripts": {},
 	"iohook": {
 		"targets": [
-			"electron-73"
+			"electron-75"
 		],
 		"platforms": [
 			"win32"

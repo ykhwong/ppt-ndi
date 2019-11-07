@@ -191,7 +191,7 @@ $(document).ready(function() {
 		let options;
 		options = {
 			type: 'info',
-			message: myMsg,
+			message: "" + myMsg,
 			buttons: ["OK"]
 		};
 		dialog.showMessageBoxSync(currentWindow, options);
@@ -205,22 +205,33 @@ $(document).ready(function() {
 	}
 
 	function createNullSlide() {
-		const sharp = require('sharp');
 		const now = new Date().getTime();
+		const PNG = require('pngjs').PNG;
+		let png;
+		let buffer;
 		function getMeta(url, callback) {
 			var img = new Image();
 			img.src = url;
 			img.onload = function() { callback(this.width, this.height); }
 		}
 		function createSli(redVal, greenVal, blueVal, alphaVal, fileVal) {
-			sharp({
-				create: {
-					width: slideWidth,
-					height: slideHeight,
-					channels: 4,
-					background: { r: redVal, g: greenVal, b: blueVal, alpha: alphaVal }
+			png = new PNG({
+				width: slideWidth,
+				height: slideHeight,
+				filterType: -1
+			});
+
+			for (var y = 0; y < png.height; y++) {
+				for (var x = 0; x < png.width; x++) {
+					var idx = (png.width * y + x) << 2;
+					png.data[idx  ] = redVal;
+					png.data[idx+1] = greenVal;
+					png.data[idx+2] = blueVal;
+					png.data[idx+3] = alphaVal;
 				}
-			}).toFile(tmpDir + fileVal);
+			}
+			buffer = PNG.sync.write(png);
+			fs.writeFileSync(tmpDir + fileVal, buffer);
 		}
 		getMeta(
 			tmpDir + "/Slide1.png" + "?" + now,
@@ -230,8 +241,8 @@ $(document).ready(function() {
 				$("#slide_res").html(slideWidth + " x " + slideHeight);
 
 				createSli(255, 255, 255, 0, "/Slide0.png");
-				createSli(255, 255, 255, 1, "/SlideWhite.png");
-				createSli(0, 0, 0, 1, "/SlideBlack.png");
+				createSli(255, 255, 255, 255, "/SlideWhite.png");
+				createSli(0, 0, 0, 255, "/SlideBlack.png");
 			}
 		);
 	}
@@ -373,7 +384,7 @@ $(document).ready(function() {
 			buttons: ['Yes', 'No'],
 			defaultId: 1,
 			//title: '',
-			message: (/\S/.test(msg)?msg:defaultMsg),
+			message: "" + (/\S/.test(msg)?msg:defaultMsg),
 			detail: (/\S/.test(description)?description:defaultDetail)
 		};
 
@@ -620,8 +631,10 @@ $(document).ready(function() {
 				{name: 'PowerPoint Presentations', extensions: ['pptx', 'ppt']},
 				{name: 'All Files', extensions: ['*']}
 			]
-		}, function(file) {
-			loadPPTX(file[0], 0, 0);
+		}).then(result => {
+			loadPPTX(result.filePaths[0], 0, 0);
+		}).catch(err => {
+			$("#fullblack").hide();
 		});
 	});
 
