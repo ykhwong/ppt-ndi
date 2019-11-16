@@ -3,7 +3,7 @@
 ## INTRODUCTION
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
 
-The latest version is PPT NDI (20191020).
+The latest version is PPT NDI (20191117).
 
 ## BASIC USAGE
 1. Download PPT NDI from https://github.com/ykhwong/ppt-ndi/releases
@@ -36,6 +36,10 @@ Click the Open icon to load a Powerpoint file. Please make sure to disable "Incl
 The features of PPT NDI can be tested with NDI Studio Monitor. Any NDI-compatible software or hardware can be also used for integration.
 
 ![PPT NDI Studio Monitor Integration](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_ndi_vmix_example.png)
+
+* obs-ndi users must set the latency mode to Low in the Properties for NDI Source window.
+* High-end users can enable high performance mode in the PPT-NDI configuration.
+
 
 ## OTHER NOTES
 
