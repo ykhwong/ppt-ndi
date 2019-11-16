@@ -92,7 +92,18 @@ html, body {
 	text-align: center;
 }
 
-#setRes:hover {
+#config {
+	position: fixed;
+	top: 25px;
+	right: 5px;
+	background-color: black;
+	border: 1px solid grey;
+	color: #79a9f7;
+	width: 80px;
+	text-align: center;
+}
+
+#setRes:hover, #config:hover {
 	filter: brightness(0.5);
 }
 

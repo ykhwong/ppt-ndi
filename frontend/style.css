@@ -106,16 +106,25 @@ html, body {
 	position: fixed;
 	left: 420px;
 	top: 92px;
-	width: 89px;
+	width: 50px;
 	height: 20px;
 	margin-bottom: 20px;
 }
 
 #reload {
 	position: fixed;
-	left: 520px;
+	left: 475px;
 	top: 92px;
-	width: 89px;
+	width: 70px;
+	height: 20px;
+	margin-bottom: 20px;
+}
+
+#config {
+	position: fixed;
+	left: 550px;
+	top: 92px;
+	width: 70px;
 	height: 20px;
 	margin-bottom: 20px;
 }
@@ -206,7 +215,7 @@ html, body {
 
 #resWidth,
 #resHeight {
-	width: 50px;
+	width: 57px;
 	white-space: nowrap;
 	border-bottom: 1px solid #79a9f7;
 	border-left: none;
@@ -224,7 +233,7 @@ html, body {
 
 #setRes {
 	background-color: #0066ff;
-	width: 113px;
+	width: 127px;
 	text-align: center;
 }
 
@@ -272,7 +281,7 @@ html, body {
 
 #prev:hover, #next:hover, #cancel:hover,
 #load_pptx:hover, #blk:hover, #wht:hover, #trn:hover,
-#edit_pptx:hover, #reload:hover, #setRes:hover {
+#edit_pptx:hover, #reload:hover, #setRes:hover, #config:hover {
 	filter: brightness(0.5);
 }
 

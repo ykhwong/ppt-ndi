@@ -1113,6 +1113,9 @@ $(document).ready(function() {
 			}
 		}
 	});
+	$("#config").click(function() {
+		ipc.send('remote', { name: "showConfig" });
+	});
 
 	initImgPicker();
 	startCurrentTime();

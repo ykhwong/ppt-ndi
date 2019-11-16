@@ -889,6 +889,10 @@ $(document).ready(function() {
 			pin = true;
 		}
 	});
+	
+	$('#config').click(function() {
+		ipc.send('remote', { name: "showConfig" });
+	});
 
 	init();
 });
