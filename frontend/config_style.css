@@ -40,6 +40,14 @@ html, body {
 	color: #79a9f7;
 }
 
+#version {
+	position: fixed;
+	top: 15px;
+	left: 15px;
+	width: 20px;
+	color: grey;
+}
+
 .txtBox {
 	width: 150px;
 	background-color: #78acff;

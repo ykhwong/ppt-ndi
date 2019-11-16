@@ -3,7 +3,7 @@ $(document).ready(function() {
 	const fs = require("fs-extra");
 	const configFile = 'config.js';
 	const appDataPath = process.env.APPDATA + "/PPT-NDI";
-	const version = "20191014a";
+	const version = "20191117a";
 	const keyCombi = "Ctrl-Shift-";
 	const defaultData = {
 		"version" : version,
@@ -135,5 +135,6 @@ $(document).ready(function() {
 			$(this).focus().val("").val(myVal);
 		}
 	});
+	$("#version").append(version);
 	init();
 });
