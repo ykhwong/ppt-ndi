@@ -135,9 +135,8 @@ $(document).ready(function() {
 	const { remote } = require('electron');
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
-	const ffi = require('ffi');
+	let ffi;
 	let lib;
-	let ioHook;
 	let maxSlideNum = 0;
 	let prevSlide = 1;
 	let currentSlide = 1;
@@ -168,24 +167,16 @@ $(document).ready(function() {
 		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
 	} catch(e) {
 	}
-	try {
-		let { RTLD_NOW, RTLD_GLOBAL } = ffi.DynamicLibrary.FLAGS;
-		ffi.DynamicLibrary(
-			remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
-			RTLD_NOW | RTLD_GLOBAL
-		);
-		lib = ffi.Library(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
-			'init': [ 'int', [] ],
-			'destroy': [ 'int', [] ],
-			'send': [ 'int', [ "string", "bool" ] ]
-		});
-	} catch(e) {
-		alertMsg(e);
-		ipc.send('remote', "exit");
+	ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
+	if ( ffi === -1 ) {
+		alertMsg("DLL init failed");
+		ipc.send('remote', { name: "exit" });
 	}
-	if (lib.init() === 1) {
+
+	lib = ipc.sendSync("require", { lib: "ffi", func: "init", args: null });
+	if (lib === 1) {
 		alertMsg('Failed to create a listening server!');
-		ipc.send('remote', "exit");
+		ipc.send('remote', { name: "exit" });
 		return;
 	}
 
@@ -310,12 +301,26 @@ $(document).ready(function() {
 						return;
 					}
 					slideTranTimers[10] = setTimeout(function() {
-						lib.send(tmpDir + "/Slide" + currentSlide.toString() + ".png", false);
+						ipc.sendSync("require", {
+							lib: "ffi",
+							func: "send",
+							args: [
+								tmpDir + "/Slide" + currentSlide.toString() + ".png",
+								false
+							]
+						});
 						updateCurNext(curSli, nextSli);
 					}, 10 * parseFloat(duration) * 50);
 				}
 				slideTranTimers[i] = setTimeout(function() {
-					lib.send(tmpDir + "/t" + i.toString() + ".png", true);
+					ipc.sendSync("require", {
+						lib: "ffi",
+						func: "send",
+						args: [
+							tmpDir + "/t" + i.toString() + ".png",
+							true
+						]
+					});
 					if ( i % 2 === 0 ) {
 						let now = new Date().getTime();
 						$("img.image_picker_image:first").attr("src", tmpDir + "/t" + i.toString() + ".png?" + now);
@@ -361,7 +366,14 @@ $(document).ready(function() {
 		} else {
 			stopSlideTransition();
 			updateCurNext(curSli, nextSli);
-			lib.send(curSli, false);
+			ipc.sendSync("require", {
+				lib: "ffi",
+				func: "send",
+				args: [
+					curSli,
+					false
+				]
+			});
 		}
 		$("#slide_cnt").html("SLIDE " + currentSlide + " / " + maxSlideNum);
 		blkBool = false;
@@ -792,7 +804,14 @@ $(document).ready(function() {
 		}
 		$("img.image_picker_image:first").attr('src', dirTo);
 
-		lib.send(dirTo, false);
+		ipc.sendSync("require", {
+			lib: "ffi",
+			func: "send",
+			args: [
+				dirTo,
+				false
+			]
+		});
 	}
 
 	$('#blk').click(function() {
@@ -934,27 +953,15 @@ $(document).ready(function() {
 	}
 
 	function cleanupForExit() {
-		lib.destroy();
+		ipc.sendSync("require", { lib: "ffi", func: "destroy", args: null });
 		cleanupForTemp(false);
-		ipc.send('remote', "exit");
+		ipc.send('remote', { name: "exit" });
 	}
 
 	function registerIoHook() {
-		ioHook = require('iohook');
-		ioHook.on('keyup', event => {
-			if (event.shiftKey && event.ctrlKey) {
-				let chr = String.fromCharCode( event.rawcode );
-				if (chr === "") return;
-				switch (chr) {
-					case configData.hotKeys.prev: gotoPrev(); break;
-					case configData.hotKeys.next: gotoNext(); break;
-					case configData.hotKeys.transparent: updateBlkWhtTrn("trn"); break;
-					case configData.hotKeys.black: updateBlkWhtTrn("black"); break;
-					case configData.hotKeys.white: updateBlkWhtTrn("white"); break;
-				}
-			}
-		});
-		ioHook.start();
+		let ioHook = ipc.sendSync("require", { lib: "iohook", on: null, args: null });
+		ipc.sendSync("require", { lib: "iohook", on: "keyup", args: null });
+		ipc.sendSync("require", { lib: "iohook", on: "start", args: null });
 	}
 
 	function reflectConfig() {
@@ -970,6 +977,7 @@ $(document).ready(function() {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
 				configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
+				ipc.send('remote', { name: "passConfigData", details: configData });
 			});
 		} else {
 			// Do nothing
@@ -977,34 +985,52 @@ $(document).ready(function() {
 	}
 
 	ipc.on('remote' , function(event, data){
-		if (data.msg == "exit") {
-			cleanupForExit();
-			return;
-		}
-		if (data.msg == "reload") {
-			reflectConfig();
-			return;
-		}
-		if (data.msg == "focused") {
-			let stats;
-			let tmpPptTimestamp = 0;
-			if (pptTimestamp === 0) {
-				return;
-			}
-			try {
-				stats = fs.statSync(pptPath);
-				tmpPptTimestamp = stats.mtimeMs;
-				if (pptTimestamp === tmpPptTimestamp) {
-				} else {
-					pptTimestamp = tmpPptTimestamp;
-					askReloadFile("", "This file has been modified. Do you want to reload it?", "");
+		switch (data.msg) {
+			case "exit":
+				cleanupForExit();
+				break;
+			case "reload":
+				reflectConfig();
+				break;
+			case "focused":
+				let stats;
+				let tmpPptTimestamp = 0;
+				if (pptTimestamp === 0) {
+					return;
 				}
-			} catch(e) {
-			}
+				try {
+					stats = fs.statSync(pptPath);
+					tmpPptTimestamp = stats.mtimeMs;
+					if (pptTimestamp === tmpPptTimestamp) {
+					} else {
+						pptTimestamp = tmpPptTimestamp;
+						askReloadFile("", "This file has been modified. Do you want to reload it?", "");
+					}
+				} catch(e) {
+				}
+				break;
+			case "blurred":
+				// we don't care here
+				break;
+			case "gotoPrev":
+				gotoPrev();
+				break;
+			case "gotoNext":
+				gotoNext();
+				break;
+			case "update_trn":
+				updateBlkWhtTrn("trn");
+				break;
+			case "update_black":
+				updateBlkWhtTrn("black");
+				break;
+			case "update_white":
+				updateBlkWhtTrn("white");
+				break;
+			default:
+				break;
 		}
-		if (data.msg == "blurred") {
-			// we don't care here
-		}
+		return;
 	});
 
 	$('#minimize').click(function() {

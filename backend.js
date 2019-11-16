@@ -12,6 +12,9 @@ app.on('ready', function() {
 	let startAsTray = false;
 	let isMainWinShown = false;
 	let isMainWin2shown = false;
+	let remoteLib = {};
+	let remoteVar = {};
+
 	const winData = {
 		"home" : {
 			"width" : 600,
@@ -201,8 +204,7 @@ app.on('ready', function() {
 			backgroundColor: '#060621',
 			webPreferences: {
 				webSecurity: false,
-				nodeIntegration: true,
-				nodeIntegrationInWorker: true
+				nodeIntegration: true
 			}
 		});
 		if (!maximizable) {
@@ -254,8 +256,9 @@ app.on('ready', function() {
 
 	function loadIpc() {
 		const ipc = require('electron').ipcMain;
+
 		ipc.on('remote', (event, data) => {
-			switch (data) {
+			switch (data.name) {
 				case "exit":
 					if (mainWindow2 != null) {
 						mainWindow2.destroy();
@@ -295,12 +298,133 @@ app.on('ready', function() {
 						mainWindow2.webContents.send('remote', { msg: 'reload' });
 					}
 					break;
+				case "passConfigData":
+					remoteVar.configData = data.details;
+					break;
+				case "passIgnoreIoHookVal":
+					remoteVar.ignoreIoHook = data.details;
+					break;
 				default:
-					console.log("Unhandled function - loadIpc()");
+					console.log("Unhandled function - loadIpc(): " + data);
 					mainWindow.destroy();
 					break;
 			}
 		});
+
+		ipc.on('require', (event, data) => {
+			/*
+				data.lib : string
+				data.func : string
+				data.on : string
+				data.args : array
+			*/
+			let ret = -1;
+			switch (data.lib) {
+				case "ffi":
+					if (data.func === null && data.args === null) {
+						remoteLib.ffi = require("ffi");
+						try {
+							//const { remote } = require('electron');
+							let { RTLD_NOW, RTLD_GLOBAL } = remoteLib.ffi.DynamicLibrary.FLAGS;
+							remoteLib.ffi.DynamicLibrary(
+								app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
+								RTLD_NOW | RTLD_GLOBAL
+							);
+							remoteVar.lib = remoteLib.ffi.Library(app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
+								'init': [ 'int', [] ],
+								'destroy': [ 'int', [] ],
+								'send': [ 'int', [ "string", "bool" ] ]
+							});
+							ret = remoteVar.lib;
+						} catch(e) {
+							console.log("remoteLib failed: " + e);
+						}
+					}
+					if (data.func === "init") {
+						let ret = -1;
+						if (typeof remoteVar.lib !== 'undefined') {
+							ret = remoteVar.lib.init();
+						}
+					} else if (data.func === "destroy") {
+						let ret = -1;
+						if (typeof remoteVar.lib !== 'undefined') {
+							ret = remoteVar.lib.destroy();
+						}
+					} else if (data.func === "send") {
+						let ret = -1;
+						if (typeof remoteVar.lib !== 'undefined') {
+							ret = remoteVar.lib.send( ...data.args );
+						}
+					}
+					break;
+				case "iohook":
+					if (data.on === null && data.args === null) {
+						remoteLib.ioHook = require('iohook');
+						ret = remoteLib.ioHook;
+					} else if (data.on === "start") {
+						ret = remoteLib.ioHook.start();
+					} else if (data.on === "keyup") {
+						remoteLib.ioHook.on('keyup', event => {
+							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null) return;
+							if (event.shiftKey && event.ctrlKey) {
+								let chr = String.fromCharCode( event.rawcode );
+								if (chr === "") return;
+								switch (chr) {
+									case remoteVar.configData.hotKeys.prev:
+										mainWindow2.webContents.send('remote', { msg: 'gotoPrev' });
+										break;
+									case remoteVar.configData.hotKeys.next:
+										mainWindow2.webContents.send('remote', { msg: 'gotoNext' });
+										break;
+									case remoteVar.configData.hotKeys.transparent:
+										mainWindow2.webContents.send('remote', { msg: 'update_trn' });
+										break;
+									case remoteVar.configData.hotKeys.black:
+										mainWindow2.webContents.send('remote', { msg: 'update_black' });
+										break;
+									case remoteVar.configData.hotKeys.white:
+										mainWindow2.webContents.send('remote', { msg: 'update_white' });
+										break;
+									default:
+										break;
+								}
+							}
+						});
+						ret = 1;
+					} else if (data.on === "keydown") {
+						remoteLib.ioHook.on('keydown', event => {
+							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
+							if (((event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && event.keycode === 63) ||
+							!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
+							event.keycode === 63 || event.keycode === 3655 || event.keycode === 3663 ||
+							event.keycode === 28 || event.keycode === 57 || event.keycode === 48 || event.keycode === 17 ||
+							event.keycode === 49 || event.keycode === 25 || event.keycode === 60999 || event.keycode === 61007 ||
+							event.keycode === 61003 || event.keycode === 61000 || event.keycode === 61005 || event.keycode === 61008
+							)) {
+								mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
+							}
+						});
+						ret = 1;
+					} else if (data.on === "mouseup") {
+						remoteLib.ioHook.on('mouseup', event => {
+							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
+							mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
+						});
+						ret = 1;
+					} else if (data.on === "mousewheel") {
+						remoteLib.ioHook.on('mousewheel', event => {
+							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
+							mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
+						});
+						ret = 1;
+					}
+					break;
+				default:
+					break;
+			}
+			event.returnValue = ret;
+		});
+
 	}
 
 	init();

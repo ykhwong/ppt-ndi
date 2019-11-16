@@ -2,12 +2,12 @@ const ipc = require('electron').ipcRenderer;
 
 $(document).ready(function() {
 	$("#select1img").click(function() {
-		ipc.send('remote', "select1");
+		ipc.send('remote', { name: "select1" });
 	});
 	$("#select2img").click(function() {
-		ipc.send('remote', "select2");
+		ipc.send('remote', { name: "select2" });
 	});
 	$("#closeImg").click(function() {
-		ipc.send('remote', "exit");
+		ipc.send('remote', { name: "exit" });
 	});
 });

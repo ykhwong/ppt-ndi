@@ -286,10 +286,8 @@ $(document).ready(function() {
 	const spawn = require( 'child_process' ).spawn;
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
-	const ffi = require('ffi');
+	let ffi;
 	let lib;
-	let ignoreIoHook = false;
-	let ioHook = null;
 	let tmpDir = null;
 	let preFile = "";
 	let slideWidth = 0;
@@ -324,26 +322,16 @@ $(document).ready(function() {
 	}
 
 	function runLib() {
-		try {
-			const { remote } = require('electron');
-			let { RTLD_NOW, RTLD_GLOBAL } = ffi.DynamicLibrary.FLAGS;
-			ffi.DynamicLibrary(
-				remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
-				RTLD_NOW | RTLD_GLOBAL
-			);
-			lib = ffi.Library(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
-				'init': [ 'int', [] ],
-				'destroy': [ 'int', [] ],
-				'send': [ 'int', [ "string", "bool" ] ]
-			});
-		} catch(e) {
-			alertMsg(e);
-			ipc.send('remote', "exit");
+		ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
+		if ( ffi === -1 ) {
+			alertMsg("DLL init failed");
+			ipc.send('remote', { name: "exit" });
 		}
 
-		if (lib.init() === 1) {
+		lib = ipc.sendSync("require", { lib: "ffi", func: "init", args: null });
+		if (lib === 1) {
 			alertMsg('Failed to create a listening server!');
-			ipc.send('remote', "exit");
+			ipc.send('remote', { name: "exit" });
 			return;
 		}
 	}
@@ -400,7 +388,11 @@ $(document).ready(function() {
 		buffer = PNG.sync.write(png);
 		fs.writeFileSync(file, buffer);
 		$("#slidePreview").attr("src", file + "?" + now);
-		lib.send(file, false);
+		ipc.sendSync("require", {
+			lib: "ffi",
+			func: "send",
+			args: [ file, false ]
+		});
 	}
 
 	function updateStat(cmd, details) {
@@ -521,7 +513,11 @@ $(document).ready(function() {
 			} catch(e) {
 				console.log("file could not be generated: "+ preFile);
 			}
-			lib.send(file, false);
+			ipc.sendSync("require", {
+				lib: "ffi",
+				func: "send",
+				args: [ file, false ]
+			});
 		}
 	}
 
@@ -534,9 +530,9 @@ $(document).ready(function() {
 				break;
 			case "tran":
 				setTimeout(function() {
-					ignoreIoHook = true;
+					ignoreIoHook(true);
 					sendColorNDI("tran");
-					ignoreIoHook = false;
+					ignoreIoHook(false);
 				}, 500);
 				break;
 			case "black":
@@ -553,47 +549,17 @@ $(document).ready(function() {
 		}
 	}
 
+	function ignoreIoHook(val) {
+		ipc.sendSync("remote", { name: "passIgnoreIoHookVal", details: val });
+	}
+
 	function registerIoHook() {
-		ioHook = require('iohook');
-		ioHook.on('keyup', event => {
-			if (event.shiftKey && event.ctrlKey) {
-				let chr = String.fromCharCode( event.rawcode );
-				if (chr === "") return;
-				switch (chr) {
-					case configData.hotKeys.prev: handleHook("prev"); break;
-					case configData.hotKeys.next: handleHook("next"); break;
-					case configData.hotKeys.transparent: handleHook("tran"); break;
-					case configData.hotKeys.black: handleHook("black"); break;
-					case configData.hotKeys.white: handleHook("white"); break;
-					default: break;
-				}
-			}
-		});
-		ioHook.on('keydown', event => {
-			//console.log(event.keycode);
-			if (!ignoreIoHook) {
-				if (((event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && event.keycode === 63) ||
-				!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
-				event.keycode === 63 || event.keycode === 3655 || event.keycode === 3663 ||
-				event.keycode === 28 || event.keycode === 57 || event.keycode === 48 || event.keycode === 17 ||
-				event.keycode === 49 || event.keycode === 25 || event.keycode === 60999 || event.keycode === 61007 ||
-				event.keycode === 61003 || event.keycode === 61000 || event.keycode === 61005 || event.keycode === 61008
-				)) {
-					res.stdin.write("\n");
-				}
-			}
-		});
-		ioHook.on('mouseup', event => {
-			if (!ignoreIoHook) {
-				res.stdin.write("\n");
-			}
-		});
-		ioHook.on('mousewheel', event => {
-			if (!ignoreIoHook) {
-				res.stdin.write("\n");
-			}
-		});
-		ioHook.start();
+		let ioHook = ipc.sendSync("require", { lib: "iohook", on: null, args: null });
+		ipc.sendSync("require", { lib: "iohook", on: "keyup", args: null });
+		ipc.sendSync("require", { lib: "iohook", on: "keydown", args: null });
+		ipc.sendSync("require", { lib: "iohook", on: "mouseup", args: null });
+		ipc.sendSync("require", { lib: "iohook", on: "mousewheel", args: null });
+		ipc.sendSync("require", { lib: "iohook", on: "start", args: null });
 	}
 
 	function procTransition(file, data) {
@@ -617,7 +583,11 @@ $(document).ready(function() {
 					return;
 				}
 				slideTranTimers[10] = setTimeout(function() {
-					lib.send(tmpDir + "/Slide.png", false);
+					ipc.sendSync("require", {
+						lib: "ffi",
+						func: "send",
+						args: [ tmpDir + "/Slide.png", false ]
+					});
 					if (fs.existsSync(file)) {
 						try {
 							fs.copySync(file, preFile);
@@ -629,7 +599,11 @@ $(document).ready(function() {
 			}
 
 			slideTranTimers[i] = setTimeout(function() {
-				lib.send(tmpDir + "/t" + i.toString() + ".png", true);
+				ipc.sendSync("require", {
+					lib: "ffi",
+					func: "send",
+					args: [ tmpDir + "/t" + i.toString() + ".png", false ]
+				});
 			}, i * parseFloat(duration) * 50);
 			if (i === transLvl) {
 				const now = new Date().getTime();
@@ -759,7 +733,7 @@ $(document).ready(function() {
 		});
 
 		// Enable Always On Top by default
-		ipc.send('remote', "onTop");
+		ipc.send('remote', { name: "onTop" });
 		$("#pin").attr("src", "pin_green.png");
 		pin = true;
 
@@ -804,6 +778,7 @@ $(document).ready(function() {
 		if (fs.existsSync(configPath)) {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
+				ipc.send('remote', { name: "passConfigData", details: configData });
 			});
 		} else {
 			// Do nothing
@@ -811,20 +786,39 @@ $(document).ready(function() {
 	}
 
 	function cleanupForExit() {
-		lib.destroy();
+		ipc.sendSync("require", { lib: "ffi", func: "destroy", args: null });
 		cleanupForTemp();
-		ipc.send('remote', "exit");
+		ipc.send('remote', { name: "exit" });
 	}
 
 	ipc.on('remote' , function(event, data){
-		if (data.msg == "exit") {
-			cleanupForExit();
-			return;
+		switch (data.msg) {
+			case "exit":
+				cleanupForExit();
+				break;
+			case "reload":
+				reflectConfig();
+				break;
+			case "stdin_write_newline":
+				res.stdin.write("\n");
+				break;
+			case "gotoPrev":
+				handleHook("prev");
+				break;
+			case "gotoNext":
+				handleHook("next");
+				break;
+			case "update_trn":
+				handleHook("tran");
+				break;
+			case "update_black":
+				handleHook("black");
+				break;
+			case "update_white":
+				handleHook("white");
+				break;
 		}
-		if (data.msg == "reload") {
-			reflectConfig();
-			return;
-		}
+		return;
 	});
 
 	$('#closeImg').click(function() {
@@ -885,11 +879,11 @@ $(document).ready(function() {
 	
 	$('#pin').click(function() {
 		if (pin) {
-			ipc.send('remote', "onTopOff");
+			ipc.send('remote', { name: "onTopOff" });
 			$("#pin").attr("src", "pin_grey.png");
 			pin = false;
 		} else {
-			ipc.send('remote', "onTop");
+			ipc.send('remote', { name: "onTop" });
 			$("#pin").attr("src", "pin_green.png");
 			pin = true;
 		}

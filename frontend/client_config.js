@@ -74,7 +74,7 @@ $(document).ready(function() {
 			if (err) {
 				alertMsg("Could not save the configuration.");
 			} else {
-				ipc.send('remote', "reflectConfig");
+				ipc.send('remote', { name: "reflectConfig" });
 				alertMsg("Saved");
 			}
 		});
@@ -96,7 +96,7 @@ $(document).ready(function() {
 	}
 
 	$('#closeImg').click(function() {
-		ipc.send('remote', "hideConfig");
+		ipc.send('remote', { name: "hideConfig" });
 	});
 	$('#saveConfig').click(function() {
 		setConfig();
