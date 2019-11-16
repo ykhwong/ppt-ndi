@@ -559,7 +559,7 @@ $(document).ready(function() {
 		ipc.sendSync("require", { lib: "iohook", on: "keydown", args: null });
 		ipc.sendSync("require", { lib: "iohook", on: "mouseup", args: null });
 		ipc.sendSync("require", { lib: "iohook", on: "mousewheel", args: null });
-		ipc.sendSync("require", { lib: "iohook", on: "start", args: null });
+		ipc.sendSync("require", { lib: "iohook", func: "start", args: null });
 	}
 
 	function procTransition(file, data) {
@@ -778,6 +778,7 @@ $(document).ready(function() {
 		if (fs.existsSync(configPath)) {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
+				configData.highPerformance = json.highPerformance;
 				ipc.send('remote', { name: "passConfigData", details: configData });
 			});
 		} else {

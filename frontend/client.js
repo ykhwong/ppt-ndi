@@ -961,7 +961,9 @@ $(document).ready(function() {
 	function registerIoHook() {
 		let ioHook = ipc.sendSync("require", { lib: "iohook", on: null, args: null });
 		ipc.sendSync("require", { lib: "iohook", on: "keyup", args: null });
-		ipc.sendSync("require", { lib: "iohook", on: "start", args: null });
+		ipc.sendSync("require", { lib: "iohook", on: "mouseup", args: null });
+		ipc.sendSync("require", { lib: "iohook", on: "mousedrag", args: null });
+		ipc.sendSync("require", { lib: "iohook", func: "start", args: null });
 	}
 
 	function reflectConfig() {
@@ -977,6 +979,7 @@ $(document).ready(function() {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
 				configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
+				configData.highPerformance = json.highPerformance;
 				ipc.send('remote', { name: "passConfigData", details: configData });
 			});
 		} else {

@@ -14,6 +14,8 @@ app.on('ready', function() {
 	let isMainWin2shown = false;
 	let remoteLib = {};
 	let remoteVar = {};
+	let lastImageArgs = null;
+	let loopPaused = false;
 
 	const winData = {
 		"home" : {
@@ -71,6 +73,7 @@ app.on('ready', function() {
 				mainWindow3.show();
 			}},
 			{ label: 'E&xit', click() {
+				loopPaused = true;
 				if (mainWindow2 != null) {
 					mainWindow2.destroy();
 				}
@@ -127,7 +130,7 @@ app.on('ready', function() {
 			loadMainWin(!startAsTray);
 		}
 		loadIpc();
-
+		sendLoop();
 		refreshTray();
 	}
 
@@ -225,6 +228,7 @@ app.on('ready', function() {
 	function addMainWin2handler(showWin) {
 		if (mainWindow2 !== null) {
 			mainWindow2.on('close', function(e) {
+				loopPaused = true;
 				e.preventDefault();
 				mainWindow2.webContents.send('remote', {
 					msg: 'exit'
@@ -254,12 +258,45 @@ app.on('ready', function() {
 		});
 	}
 
+	function sleep(ms){
+		return new Promise(resolve=>{
+			setTimeout(resolve,ms)
+		})
+	}
+
+	async function sendLoop() {
+		let sleepCnt = 0;
+		while (true) {
+			if (
+				loopPaused ||
+				typeof remoteVar.configData === 'undefined' ||
+				!remoteVar.configData.highPerformance
+			) {
+				await sleep(1000);
+				continue;
+			}
+			if (sleepCnt === 0) {
+				sleepCnt = 1000;
+			}
+			await sleep(sleepCnt);
+			if (lastImageArgs !== null) {
+				if (lastImageArgs[1] === false) {
+					sleepCnt = 100;
+					remoteVar.lib.send( ...lastImageArgs );
+				}
+			} else {
+				sleepCnt = 1000;
+			}
+		}
+	}
+
 	function loadIpc() {
 		const ipc = require('electron').ipcMain;
 
 		ipc.on('remote', (event, data) => {
 			switch (data.name) {
 				case "exit":
+					loopPaused = true;
 					if (mainWindow2 != null) {
 						mainWindow2.destroy();
 					}
@@ -324,7 +361,6 @@ app.on('ready', function() {
 					if (data.func === null && data.args === null) {
 						remoteLib.ffi = require("ffi");
 						try {
-							//const { remote } = require('electron');
 							let { RTLD_NOW, RTLD_GLOBAL } = remoteLib.ffi.DynamicLibrary.FLAGS;
 							remoteLib.ffi.DynamicLibrary(
 								app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
@@ -353,6 +389,7 @@ app.on('ready', function() {
 					} else if (data.func === "send") {
 						let ret = -1;
 						if (typeof remoteVar.lib !== 'undefined') {
+							lastImageArgs = data.args;
 							ret = remoteVar.lib.send( ...data.args );
 						}
 					}
@@ -361,7 +398,7 @@ app.on('ready', function() {
 					if (data.on === null && data.args === null) {
 						remoteLib.ioHook = require('iohook');
 						ret = remoteLib.ioHook;
-					} else if (data.on === "start") {
+					} else if (data.func === "start") {
 						ret = remoteLib.ioHook.start();
 					} else if (data.on === "keyup") {
 						remoteLib.ioHook.on('keyup', event => {
@@ -408,6 +445,7 @@ app.on('ready', function() {
 					} else if (data.on === "mouseup") {
 						remoteLib.ioHook.on('mouseup', event => {
 							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
+							loopPaused=false;
 							mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
 						});
 						ret = 1;
@@ -415,6 +453,14 @@ app.on('ready', function() {
 						remoteLib.ioHook.on('mousewheel', event => {
 							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
 							mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
+						});
+						ret = 1;
+					} else if (data.on === "mousedrag") {
+						remoteLib.ioHook.on('mousedrag', event => {
+							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
+							if (loopPaused === false) {
+								loopPaused=true;
+							}
 						});
 						ret = 1;
 					}
@@ -432,6 +478,7 @@ app.on('ready', function() {
 
 app.on('window-all-closed', (e) => {
 	if (process.platform != 'darwin') {
+		loopPaused = true;
 		app.quit();
 	}
 });

@@ -9,6 +9,7 @@ $(document).ready(function() {
 		"version" : version,
 		"startAsTray" : false,
 		"startWithTheFirstSlideSelected": false,
+		"highPerformance": false,
 		"hotKeys" : {
 			"prev" : "",
 			"next" : "",
@@ -45,9 +46,11 @@ $(document).ready(function() {
 		$.getJSON(configPath, function(json) {
 			configData.startAsTray = json.startAsTray;
 			configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
+			configData.highPerformance = json.highPerformance;
 			configData.hotKeys = json.hotKeys;
 			$("#systray").prop('checked', configData.startAsTray);
 			$("#startWithFirstSlide").prop('checked', configData.startWithTheFirstSlideSelected);
+			$("#highPerformance").prop('checked', configData.highPerformance);
 			$("#prevTxtBox").val(getHotKey(configData.hotKeys.prev));
 			$("#nextTxtBox").val(getHotKey(configData.hotKeys.next));
 			$("#transTxtBox").val(getHotKey(configData.hotKeys.transparent));
@@ -69,6 +72,7 @@ $(document).ready(function() {
 
 		configData.startAsTray = $("#systray").prop("checked");
 		configData.startWithTheFirstSlideSelected = $("#startWithFirstSlide").prop("checked");
+		configData.highPerformance = $("#highPerformance").prop("checked");
 		configData.hotKeys = hotKeys;
 		fs.writeFile(configPath, JSON.stringify(configData, null, "\t"), (err) => {
 			if (err) {
