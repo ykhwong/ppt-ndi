@@ -173,7 +173,7 @@ $(document).ready(function() {
 	if ( ffi === -1 ) {
 		const initFailMsg = "DLL init failed.";
 		alertMsg("DLL init failed.");
-		if (fs.existsSync("PPTNDI.DLL")) {
+		if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
 			const execRuntime = require('child_process').execSync;
 			execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
 				callback(stdout); 
@@ -713,7 +713,7 @@ $(document).ready(function() {
 	function gotoPrev() {
 		let curSli;
 		let re;
-		if (!repo) {
+		if (!repo || maxSlideNum === 0) {
 			return;
 		}
 		curSli = currentSlide;
@@ -739,7 +739,7 @@ $(document).ready(function() {
 	function gotoNext() {
 		let curSli;
 		let re;
-		if (!repo) {
+		if (!repo || maxSlideNum === 0) {
 			return;
 		}
 		curSli = currentSlide;

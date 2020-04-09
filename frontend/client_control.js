@@ -326,7 +326,7 @@ $(document).ready(function() {
 		ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
 		if ( ffi === -1 ) {
 			alertMsg("DLL init failed.");
-			if (fs.existsSync("PPTNDI.DLL")) {
+			if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
 				const execRuntime = require('child_process').execSync;
 				execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
 					callback(stdout);
