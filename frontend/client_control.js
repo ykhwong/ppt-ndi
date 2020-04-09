@@ -286,6 +286,7 @@ $(document).ready(function() {
 	const spawn = require( 'child_process' ).spawn;
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
+	const runtimeUrl = "https://aka.ms/vs/16/release/vc_redist.x64.exe";
 	let ffi;
 	let lib;
 	let tmpDir = null;
