@@ -135,6 +135,7 @@ $(document).ready(function() {
 	const { remote } = require('electron');
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
+	const runtimeUrl = "https://aka.ms/vs/16/release/vc_redist.x64.exe";
 	let ffi;
 	let lib;
 	let maxSlideNum = 0;
@@ -167,10 +168,17 @@ $(document).ready(function() {
 		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
 	} catch(e) {
 	}
-	ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
 
+	ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
 	if ( ffi === -1 ) {
-		alertMsg("DLL init failed");
+		const initFailMsg = "DLL init failed.";
+		alertMsg("DLL init failed.");
+		if (fs.existsSync("PPTNDI.DLL")) {
+			const execRuntime = require('child_process').execSync;
+			execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
+				callback(stdout); 
+			});
+		}
 		ipc.send('remote', { name: "exit" });
 	}
 

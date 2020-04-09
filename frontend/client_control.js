@@ -324,7 +324,13 @@ $(document).ready(function() {
 	function runLib() {
 		ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
 		if ( ffi === -1 ) {
-			alertMsg("DLL init failed");
+			alertMsg("DLL init failed.");
+			if (fs.existsSync("PPTNDI.DLL")) {
+				const execRuntime = require('child_process').execSync;
+				execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
+					callback(stdout);
+				});
+			}
 			ipc.send('remote', { name: "exit" });
 		}
 
