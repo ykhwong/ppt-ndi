@@ -5,6 +5,33 @@ html, body {
 	background-color: #051336;
 }
 
+.button {
+	color: #bbaeff;
+	font-weight: bold;
+	border-color: black;
+	border-width: 2px 2px 2px 2px;
+	font-size: 20px;
+	text-align: center;
+	border-style: solid;
+	padding: 2px;
+	background: rgb(0, 102, 255);
+	cursor:pointer;
+	border-radius: 10%;
+}
+
+.button2 {
+	color: #bbaeff;
+	font-weight: normal;
+	border-color: black;
+	border-width: 2px 2px 2px 2px;
+	font-size: 13px;
+	text-align: center;
+	border-style: solid;
+	padding: 2px;
+	background: rgb(0, 102, 255);
+	cursor:pointer;
+}
+
 #exit {
 	position: absolute;
 	top: 0px;
@@ -106,25 +133,27 @@ html, body {
 	position: fixed;
 	left: 420px;
 	top: 92px;
-	width: 50px;
+	width: 52px;
 	height: 20px;
 	margin-bottom: 20px;
+	background-color: #a6200c;
+	color: white;
 }
 
 #reload {
 	position: fixed;
-	left: 475px;
+	left: 478px;
 	top: 92px;
-	width: 70px;
+	width: 71px;
 	height: 20px;
 	margin-bottom: 20px;
 }
 
 #config {
 	position: fixed;
-	left: 550px;
+	left: 555px;
 	top: 92px;
-	width: 70px;
+	width: 80px;
 	height: 20px;
 	margin-bottom: 20px;
 }
@@ -215,14 +244,14 @@ html, body {
 
 #resWidth,
 #resHeight {
-	width: 57px;
+	width: 55px;
 	white-space: nowrap;
 	border-bottom: 1px solid #79a9f7;
 	border-left: none;
 	border-top: none;
 	border-right: none;
 	background: none;
-	height: 20px;
+	height: 22px;
 	font-size: 15px;
 	color: #79a9f7;
 }
@@ -233,35 +262,26 @@ html, body {
 
 #setRes {
 	background-color: #0066ff;
-	width: 127px;
+	width: 145px;
 	text-align: center;
+	display: inline-block;
+	cursor:pointer;
 }
 
-.button {
-	color: #bbaeff;
-	font-weight: bold;
-	border-color: black;
-	border-width: 2px 2px 2px 2px;
-	font-size: 20px;
+#listRes {
+	background-color: #0066ff;
+	display: inline-block;
 	text-align: center;
-	border-style: solid;
-	padding: 2px;
-	background: rgb(0, 102, 255);
+	width: 18px;
 	cursor:pointer;
-	border-radius: 10%;
 }
 
-.button2 {
-	color: #bbaeff;
-	font-weight: normal;
-	border-color: black;
-	border-width: 2px 2px 2px 2px;
-	font-size: 13px;
-	text-align: center;
-	border-style: solid;
-	padding: 2px;
-	background: rgb(0, 102, 255);
-	cursor:pointer;
+#listResList {
+	background-color: black;
+	color: white;
+	width: 145px;
+	display: inline-block;
+	height: 22px;
 }
 
 #blk {
@@ -281,7 +301,7 @@ html, body {
 
 #prev:hover, #next:hover, #cancel:hover,
 #load_pptx:hover, #blk:hover, #wht:hover, #trn:hover,
-#edit_pptx:hover, #reload:hover, #setRes:hover, #config:hover {
+#edit_pptx:hover, #reload:hover, #setRes:hover, #listRes:hover, #config:hover {
 	filter: brightness(0.5);
 }
 

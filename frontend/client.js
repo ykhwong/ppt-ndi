@@ -168,6 +168,7 @@ $(document).ready(function() {
 	} catch(e) {
 	}
 	ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
+
 	if ( ffi === -1 ) {
 		alertMsg("DLL init failed");
 		ipc.send('remote', { name: "exit" });
@@ -420,7 +421,7 @@ $(document).ready(function() {
 	});
 
 	function initImgPicker() {
-		$("select").imagepicker({
+		$("#right select").imagepicker({
 			hide_select: true,
 			show_label: true,
 			selected:function(select, picker_option, event) {
@@ -591,7 +592,7 @@ $(document).ready(function() {
 					}
 				});
 				$("#slides_grp").html(options);
-				$("#fullblack, .cancelBox, #reloadReq").hide();
+				$("#fullblack, .cancelBox").hide();
 				maxSlideNum = newMaxSlideNum;
 				createNullSlide();
 
@@ -614,6 +615,12 @@ $(document).ready(function() {
 					$(selectedDiv).css("background", "rgb(0, 0, 0, 0)");
 					currentSlide = 0;
 					$("img.image_picker_image:eq(1)").attr("src", "null_slide.png");
+					if (maxSlideNum === 1) {
+						$("#below .thumbnail").click(function() {
+							selectSlide('1');
+							$(this).off('click');
+						});
+					}
 				}
 				
 				if (isLoaded) {
@@ -1109,14 +1116,35 @@ $(document).ready(function() {
 			customSlideX = resX;
 			customSlideY = resY;
 			if (maxSlideNum > 0) {
-				askReloadFile(null, "", "Changes require a reload to take effect.\nIMPORTANT: Please maintain the original aspect ratio.");
+				// slideWidth : slideHeight = customSlideX : customSlideY
+				if (slideHeight*customSlideX/slideWidth !== parseInt(customSlideY, 10)) {
+					alertMsg("The original aspect ratio does not match. The layout can be corrupted due to the different ratios.");
+				}
+				askReloadFile(null, "", "");
 			}
+		}
+	});
+	$("#listRes").click(function() {
+		$(".resText").hide();
+		$("#listResList").val("0x0");
+		$("#listResList").show();
+	});
+	$("#listResList").change(function() {
+		let resVal = $(this).val();
+		if (resVal === "custom") {
+			$("#listResList").hide();
+			$(".resText").show();
+		} else {
+			$("#resWidth").val(resVal.replace(/x.*/, ""));
+			$("#resHeight").val(resVal.replace(/.*x/, ""));
 		}
 	});
 	$("#config").click(function() {
 		ipc.send('remote', { name: "showConfig" });
 	});
 
+	$(".resText").hide();
+	$("#listResList").show();
 	initImgPicker();
 	startCurrentTime();
 	registerIoHook();

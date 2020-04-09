@@ -132,7 +132,7 @@ $(document).ready(function() {
 		} else if (e.keyCode == 8 || e.keyCode == 46) {
 			$(this).focus().val("");
 		} else {
-			$(this).focus().val("").val(myVal);
+			//$(this).focus().val("").val(myVal);
 		}
 	});
 	$("#version").append(version);

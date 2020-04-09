@@ -61,13 +61,46 @@
 		<table id="bktbl2" border="0">
 			<tbody>
 				<tr>
-					<td width="120px">Custom Resolution</td>
+					<td width="120px">Resolution</td>
 					<td width="300px">
-						<input type="text"
-						onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
-						id="resWidth">&nbsp;x&nbsp;<input type="text"
-						onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
-						id="resHeight"><div id="setRes">SET</div>
+						<div class="resText">
+							<input type="text"
+							onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
+							id="resWidth">&nbsp;x&nbsp;<input type="text"
+							onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))"
+							id="resHeight">
+							<div id="listRes">...</div>
+						</div>
+						<select id="listResList">
+							<option value="0x0">Default</option>
+							<option value="custom">Custom</option>
+							<option value="640x480">4:3 | 640 x 480</option>
+							<option value="800x600">4:3 | 800 x 600</option>
+							<option value="960x720">4:3 | 960 x 720</option>
+							<option value="1024x768">4:3 | 1024 x 768</option>
+							<option value="1152x864">4:3 | 1152 x 864</option>
+							<option value="1280x960">4:3 | 1280 x 960</option>
+							<option value="1400x1050">4:3 | 1400 x 1050</option>
+							<option value="1440x1080">4:3 | 1440 x 1080</option>
+							<option value="1600x1200">4:3 | 1600 x 1200</option>
+							<option value="1856x1392">4:3 | 1856 x 1392</option>
+							<option value="1920x1440">4:3 | 1920 x 1440</option>
+							<option value="2048x1536">4:3 | 2048 x 1536</option>
+							<option value="1024x576">16:9 | 1024 x 576</option>
+							<option style="color: #9cffa9" value="1280x720">16:9 | 1280 x 720</option>
+							<option value="1600x900">16:9 | 1600 x 900</option>
+							<option style="color: #9cffa9" value="1920x1080">16:9 | 1920 x 1080</option>
+							<option value="2560x1440">16:9 | 2560 x 1440</option>
+							<option style="color: #9cffa9" value="3840x2160">16:9 | 3840 x 2160</option>
+							<option value="1280x800">16:10 | 1280 x 800</option>
+							<option value="1440x900">16:10 | 1440 x 900</option>
+							<option value="1680x1050">16:10 | 1680 x 1050</option>
+							<option value="1920x1200">16:10 | 1920 x 1200</option>
+							<option value="2560x1600">16:10 | 2560 x 1600</option>
+							<option value="2560x1080">21:9 | 2560 x 1080</option>
+							<option value="3840x1080">32:9 | 3840 x 1080</option>
+						</select>
+						<div id="setRes">SET</div>
 					</td>
 				</tr>
 			</tbody>
