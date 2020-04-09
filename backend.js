@@ -3,6 +3,7 @@ const frontendDir = __dirname + '/frontend/';
 let iconFile;
 let tray = null;
 app.disableHardwareAcceleration();
+app.allowRendererProcessReuse = true;
 
 app.on('ready', function() {
 	let mainWindow = null;
@@ -114,6 +115,7 @@ app.on('ready', function() {
 			event.preventDefault();
 			mainWindow3.hide();
 		});
+		mainWindow3.setAlwaysOnTop(true);
 
 		configPath = configFile;
 		if (!fs.existsSync(configPath)) {
@@ -468,7 +470,11 @@ app.on('ready', function() {
 				default:
 					break;
 			}
-			event.returnValue = ret;
+			if (ret < 0 || ret > 0) {
+				event.returnValue = ret;
+			} else {
+				event.returnValue = 0;
+			}
 		});
 
 	}
