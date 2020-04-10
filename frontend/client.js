@@ -1207,6 +1207,7 @@ $(document).ready(function() {
 			return;
 		}
 		assignMonitor($("#monitorList").prop('selectedIndex'));
+		$("#monitor_trans").is(":checked") ? enableMonitorTransparent() : disableMonitorTransparent();
 		enableMonitor();
 	});
 
