@@ -1,6 +1,6 @@
 
 #define MyAppName "PPT NDI"
-#define MyAppVersion "20191117"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "ykhwong"
 #define MyAppURL "https://github.com/ykhwong/ppt-ndi"
 #define MyAppExeName "ppt-ndi.exe"

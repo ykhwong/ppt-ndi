@@ -15,6 +15,7 @@ del /q libEGL.dll
 del /q libGLESv2.dll
 del /q chrome_*.pak
 del /q snapshot_blob.bin
+del /q vk_swiftshader*
 del /q version
 copy ..\deps\*.dll .\.
 copy ..\deps\*_slide.png .\resources\.
