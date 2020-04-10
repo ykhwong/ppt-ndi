@@ -3,7 +3,9 @@
 ## INTRODUCTION
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
 
-The latest version is PPT NDI (20191117).
+It also provides SlideShow monitor functionality that supports alpha transparency and can be integrated into any third-party video players that do not support NDI.
+
+The latest version is PPT NDI v1.0.1.
 
 ## BASIC USAGE
 1. Download PPT NDI from https://github.com/ykhwong/ppt-ndi/releases
