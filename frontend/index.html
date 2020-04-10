@@ -15,6 +15,7 @@
 <body>
 <h1><h1>
 <div id="top" style="-webkit-app-region: drag">
+	<div id="ppt_filename"></div>
 	<img src="big_icon.png" style="-webkit-app-region: drag">
 	<img id="minimize" src="min.png">
 	<img id="max_restore" src="max.png">
@@ -111,7 +112,18 @@
 		<div id="current_time" class="slideInfo">00:00 AM</div>
 		<div id="slide_res" class="slideInfo">0 x 0</div>
 	</div>
-	<div id="ppt_filename"></div>
+	<div id="monitorControl">
+		<div id="monitorControlText">SlideShow Monitor</div>
+		<select id="monitorList">
+		</select>
+		<div id="monitorAlphaText">Alpha</div>
+		<label class="switch" id="monitor_trans_switch">
+		<input type="checkbox" id="monitor_trans" class="checkbox" name="monitor_trans" value="monitor_trans" checked>
+		<span class="slider"></span>
+		</label>
+		<div id="setMonitor">SET</div>
+		<div id=""></div>
+	</div>
 	<div id="rest2">
 		<table id="right" border="0">
 		  <tbody>

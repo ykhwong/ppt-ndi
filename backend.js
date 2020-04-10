@@ -1,4 +1,4 @@
-const { app, Menu, Tray } = require('electron');
+const { app, Menu, Tray, screen } = require('electron');
 const frontendDir = __dirname + '/frontend/';
 let iconFile;
 let tray = null;
@@ -9,6 +9,7 @@ app.on('ready', function() {
 	let mainWindow = null;
 	let mainWindow2 = null;
 	let mainWindow3 = null;
+	let monitorWin = null;
 	let debugMode = false;
 	let startAsTray = false;
 	let isMainWinShown = false;
@@ -38,6 +39,11 @@ app.on('ready', function() {
 			"width" : 320,
 			"height" : 345,
 			"dest" : "config.html"
+		},
+		"monitor" : {
+			"width" : 0,
+			"height" : 0,
+			"dest" : "monitor.html"
 		}
 	}
 
@@ -81,6 +87,9 @@ app.on('ready', function() {
 				if (mainWindow3 != null) {
 					mainWindow3.destroy();
 				}
+				if (monitorWin != null) {
+					monitorWin.destroy();
+				}
 				if (process.platform != 'darwin') {
 					app.quit();
 				}
@@ -110,7 +119,7 @@ app.on('ready', function() {
 			iconFile = __dirname + '/icon.png';
 		}
 
-		mainWindow3 = createWin(winData.config.width, winData.config.height, false, winData.config.dest, false);
+		mainWindow3 = createWin(winData.config.width, winData.config.height, false, winData.config.dest, false, false);
 		mainWindow3.on('close', function (event) {
 			event.preventDefault();
 			mainWindow3.hide();
@@ -134,6 +143,11 @@ app.on('ready', function() {
 		loadIpc();
 		sendLoop();
 		refreshTray();
+		monitorWin = createWin(winData.monitor.width, winData.monitor.height, false, winData.monitor.dest, false, true);
+		monitorWin.on('close', function (event) {
+			event.preventDefault();
+			monitorWin.hide();
+		});
 	}
 
 	function loadArg() {
@@ -151,13 +165,13 @@ app.on('ready', function() {
 			}
 			if (/--slideshow/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, !startAsTray);
+				mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, !startAsTray, false);
 				addMainWin2handler(!startAsTray);
 				break;
 			}
 			if (/--classic/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, !startAsTray);
+				mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, !startAsTray, false);
 				addMainWin2handler(!startAsTray);
 				registerFocusInfo(mainWindow2);
 				break;
@@ -167,7 +181,7 @@ app.on('ready', function() {
 	}
 
 	function loadMainWin(showWin) {
-		mainWindow = createWin(winData.home.width, winData.home.height, false, winData.home.dest, showWin);
+		mainWindow = createWin(winData.home.width, winData.home.height, false, winData.home.dest, showWin, false);
 		mainWindow.on('closed', function(e) {
 			if (mainWindow2 === null) {
 				mainWindow = null;
@@ -190,7 +204,7 @@ app.on('ready', function() {
 		}
 	}
 
-	function createWin(width, height, maximizable, winFile, showWin) {
+	function createWin(width, height, maximizable, winFile, showWin, isTransparent) {
 		const { BrowserWindow } = require('electron');
 		let retData;
 		if (debugMode) {
@@ -206,12 +220,14 @@ app.on('ready', function() {
 			frame: false,
 			resize: (maximizable ? true : false),
 			maximizable: maximizable,
-			backgroundColor: '#060621',
 			webPreferences: {
 				webSecurity: false,
 				nodeIntegration: true
-			}
+			},
+			transparent : isTransparent,
+			backgroundColor: isTransparent?'#00051336':'#060621'
 		});
+		
 		if (!maximizable) {
 			retData.setMaximumSize(width, height);
 		}
@@ -305,17 +321,20 @@ app.on('ready', function() {
 					if (mainWindow3 != null) {
 						mainWindow3.destroy();
 					}
+					if (monitorWin != null) {
+						monitorWin.destroy();
+					}
 					if (process.platform != 'darwin') {
 						app.quit();
 					}
 					break;
 				case "select1":
-					mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, true);
+					mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, true, false);
 					addMainWin2handler(true);
 					mainWindow.destroy();
 					break;
 				case "select2":
-					mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, true);
+					mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, true, false);
 					addMainWin2handler(true);
 					registerFocusInfo(mainWindow2);
 					mainWindow.destroy();
@@ -346,6 +365,74 @@ app.on('ready', function() {
 				default:
 					console.log("Unhandled function - loadIpc(): " + data);
 					mainWindow.destroy();
+					break;
+			}
+		});
+
+		ipc.on('monitor', (event, data) => {
+			switch (data.func) {
+				case "update":
+					monitorWin.webContents.send('monitor', data);
+					break;
+				case "get":
+					event.returnValue = screen.getAllDisplays();
+					/*
+					[
+					  {
+						id: 2528732444,
+						bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+						workArea: { x: 0, y: 0, width: 1920, height: 1040 },
+						accelerometerSupport: 'unknown',
+						monochrome: false,
+						colorDepth: 24,
+						colorSpace: '{primaries:BT709, transfer:IEC61966_2_1, matrix:RGB, range:FULL}',
+						depthPerComponent: 8,
+						size: { width: 1920, height: 1080 },
+						workAreaSize: { width: 1920, height: 1040 },
+						scaleFactor: 1,
+						rotation: 0,
+						internal: false,
+						touchSupport: 'unknown'
+					  }
+					]
+					*/
+					break;
+				case "assign":
+					if (data.monitorNo >= 1) {
+						let disps = screen.getAllDisplays();
+						let disp = disps[data.monitorNo - 1];
+						
+						if (disp) {
+							monitorWin.setBounds({
+								x: disp.bounds.x,
+								y: disp.bounds.y
+							});
+							monitorWin.width = disp.bounds.width;
+							monitorWin.height = disp.bounds.height;
+						}
+					}
+					break;
+				case "turnOn":
+					monitorWin.show();
+					monitorWin.setFullScreen(true);
+					break;
+				case "turnOff":
+					monitorWin.hide();
+					break;
+				case "transparentOn":
+					monitorWin.setBackgroundColor('#00051336');
+					monitorWin.webContents.send('monitor', data);
+					break;
+				case "transparentOff":
+					monitorWin.setBackgroundColor('black');
+					monitorWin.webContents.send('monitor', data);
+					break;
+				case "monitorBlack":
+				case "monitorWhite":
+				case "monitorTrans":
+					monitorWin.webContents.send('monitor', data);
+					break;
+				default:
 					break;
 			}
 		});

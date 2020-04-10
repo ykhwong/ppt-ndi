@@ -160,7 +160,7 @@ html, body {
 
 #slideInfo {
 	position: fixed;
-	top: 50px;
+	top: 47px;
 	right: 20px;
 	color: #79a9f7;
 }
@@ -213,9 +213,62 @@ html, body {
 
 #ppt_filename {
 	position: fixed;
-	top: 90px;
-	right: 20px;
+	top: 5px;
+	left: 0px;
+	width: 100%;
+	text-align: center;
 	color: #79a9f7;
+	-webkit-app-region: drag;
+}
+
+#monitorControl {
+	position: fixed;
+	top: 78px;
+	right: 22px;
+	width: 270px;
+	height: 40px;
+	color: #79a9f7;
+}
+
+#monitorControlText {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+#monitorAlphaText {
+	position: absolute;
+	top: 20px;
+	left: 40px;
+	display: inline-block;
+}
+
+#setMonitor {
+	position: absolute;
+	top: 23px;
+	left: 125px;
+	background-color: #0066ff;
+	width: 145px;
+	text-align: center;
+	display: inline-block;
+	cursor:pointer;
+}
+
+#monitor_trans_switch {
+	position: relative;
+	top: 20px;
+	left: 80px;
+}
+
+#monitorList {
+	position: absolute;
+	top: 0px;
+	left: 125px;
+	background-color: black;
+	color: white;
+	width: 145px;
+	display: inline-block;
+	height: 22px;
 }
 
 #progress, #current_time, #slide_res {

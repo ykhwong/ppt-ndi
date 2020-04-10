@@ -163,6 +163,7 @@ $(document).ready(function() {
 	let pptTimestamp = 0;
 	let repo;
 	let slideTranTimers = [];
+	let multipleMonitors;
 
 	try {
 		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
@@ -254,6 +255,10 @@ $(document).ready(function() {
 		$("select").find('option[value="Current"]').data('img-src', curSli);
 		$("select").find('option[value="Next"]').data('img-src', nextSli);
 		initImgPicker();
+		ipc.send("monitor", {
+			file: curSli,
+			func: "update"
+		});
 	}
 
 	function updateScreen(noTran) {
@@ -783,6 +788,9 @@ $(document).ready(function() {
 				} else {
 					blkBool = true;
 					dirTo = tmpDir + "/SlideBlack.png";
+					multipleMonitors = ipc.send("monitor", {
+						func: "monitorBlack"
+					});
 				}
 				break;
 			case "white":
@@ -795,6 +803,9 @@ $(document).ready(function() {
 				} else {
 					whtBool = true;
 					dirTo = tmpDir + "/SlideWhite.png";
+					multipleMonitors = ipc.send("monitor", {
+						func: "monitorWhite"
+					});
 				}
 				break;
 			case "trn":
@@ -808,6 +819,9 @@ $(document).ready(function() {
 					trnBool = true;
 					dirTo = tmpDir + "/Slide0.png";
 					color = "null";
+					multipleMonitors = ipc.send("monitor", {
+						func: "monitorTrans"
+					});
 				}
 				break;
 			default:
@@ -1002,6 +1016,58 @@ $(document).ready(function() {
 		}
 	}
 
+	function getMultipleMonitors() {
+		multipleMonitors = ipc.sendSync("monitor", {
+			func: "get"
+		});
+		return multipleMonitors;
+	}
+
+	function assignMonitor(num) {
+		ipc.send("monitor", {
+			func: "assign",
+			monitorNo: num
+		});
+	}
+
+	function enableMonitorTransparent() {
+		ipc.send("monitor", {
+			func: "transparentOn"
+		});
+	}
+
+	function disableMonitorTransparent() {
+		ipc.send("monitor", {
+			func: "transparentOff"
+		});
+	}
+
+	function enableMonitor() {
+		ipc.send("monitor", {
+			func: "turnOn"
+		});
+	}
+
+	function disableMonitor() {
+		ipc.send("monitor", {
+			func: "turnOff"
+		});
+	}
+
+	function updateMonitorList() {
+		$('#monitorList').html($('<option>', {
+			value: "none",
+			text: 'None'
+		}));
+		for (let i=0; i<getMultipleMonitors().length; i++) {
+			let monNum = i + 1;
+			$('#monitorList').append($('<option>', {
+				value: monNum,
+				text: 'Monitor ' + monNum
+			}));
+		}
+	}
+
 	ipc.on('remote' , function(event, data){
 		switch (data.msg) {
 			case "exit":
@@ -1117,6 +1183,7 @@ $(document).ready(function() {
 	$("#resWidth, #resHeight").click(function() {
 		$(this).val("");
 	});
+
 	$("#setRes").click(function() {
 		let resX = $("#resWidth").val();
 		let resY = $("#resHeight").val();
@@ -1132,11 +1199,31 @@ $(document).ready(function() {
 			}
 		}
 	});
+
+	$("#setMonitor").click(function() {
+		let idx = $("#monitorList").prop('selectedIndex');
+		if (idx === 0) {
+			disableMonitor();
+			return;
+		}
+		assignMonitor($("#monitorList").prop('selectedIndex'));
+		enableMonitor();
+	});
+
+	$('#monitor_trans').click(function() {
+		if ($("#monitor_trans").is(":checked")) {
+			enableMonitorTransparent();
+		} else {
+			disableMonitorTransparent();
+		}
+	});
+
 	$("#listRes").click(function() {
 		$(".resText").hide();
 		$("#listResList").val("0x0");
 		$("#listResList").show();
 	});
+
 	$("#listResList").change(function() {
 		let resVal = $(this).val();
 		if (resVal === "custom") {
@@ -1147,6 +1234,7 @@ $(document).ready(function() {
 			$("#resHeight").val(resVal.replace(/.*x/, ""));
 		}
 	});
+
 	$("#config").click(function() {
 		ipc.send('remote', { name: "showConfig" });
 	});
@@ -1157,4 +1245,5 @@ $(document).ready(function() {
 	startCurrentTime();
 	registerIoHook();
 	reflectConfig();
+	updateMonitorList();
 });
