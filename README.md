@@ -1,3 +1,5 @@
+[![Github All Releases](https://img.shields.io/github/downloads/ykhwong/ppt-ndi/total.svg)]()
+
 # PPT NDI
 
 ## INTRODUCTION
