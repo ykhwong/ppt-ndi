@@ -154,7 +154,7 @@ app.on('ready', function() {
 		let matched=false;
 		for (i = 0, len = process.argv.length; i < len; i++) {
 			let val = process.argv[i];
-			if (/--(h|help)/i.test(val)) {
+			if (/^(-h|--help|\/\?)/i.test(val)) {
 				const path = require('path');
 				let out = "PPT NDI\n";
 				out += " " + path.basename(process.argv[0]) + " [--slideshow] [--classic]\n";
@@ -162,19 +162,20 @@ app.on('ready', function() {
 				out += "     [--classic] : Classic Mode\n";
 				console.log(out);
 				process.exit(0);
-			}
-			if (/--slideshow/i.test(val)) {
+			} else if (/^--slideshow/i.test(val)) {
 				matched=true;
 				mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, !startAsTray, false);
 				addMainWin2handler(!startAsTray);
 				break;
-			}
-			if (/--classic/i.test(val)) {
+			} else if (/^--classic/i.test(val)) {
 				matched=true;
 				mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, !startAsTray, false);
 				addMainWin2handler(!startAsTray);
 				registerFocusInfo(mainWindow2);
 				break;
+			} else if (/^(-[^-]|--\S)/.test(val)) {
+				console.log("Unknown switch: " + val);
+				process.exit(0);
 			}
 		}
 		return matched;
