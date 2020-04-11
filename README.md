@@ -1,4 +1,5 @@
 [![Github All Releases](https://img.shields.io/github/downloads/ykhwong/ppt-ndi/total.svg)]()
+[![GitHub release](https://img.shields.io/github/release/ykhwong/ppt-ndi.svg)](https://GitHub.com/ykhwong/ppt-ndi/releases/)
 
 # PPT NDI
 
