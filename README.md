@@ -1,7 +1,6 @@
+# PPT NDI
 [![Github All Releases](https://img.shields.io/github/downloads/ykhwong/ppt-ndi/total.svg)]()
 [![GitHub release](https://img.shields.io/github/release/ykhwong/ppt-ndi.svg)](https://GitHub.com/ykhwong/ppt-ndi/releases/)
-
-# PPT NDI
 
 ## INTRODUCTION
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
