@@ -1,6 +1,6 @@
 {
 	"name": "PPT-NDI",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"main": "backend.js",
 	"dependencies": {
 		"ffi": "git+https://github.com/ykhwong/node-ffi#electron-75",

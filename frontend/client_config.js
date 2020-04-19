@@ -3,7 +3,7 @@ $(document).ready(function() {
 	const fs = require("fs-extra");
 	const configFile = 'config.js';
 	const appDataPath = process.env.APPDATA + "/PPT-NDI";
-	const version = "v1.0.1";
+	const version = "v" + require('electron').remote.app.getVersion();
 	const keyCombi = "Ctrl-Shift-";
 	const defaultData = {
 		"version" : version,
