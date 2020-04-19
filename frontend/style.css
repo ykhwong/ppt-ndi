@@ -354,7 +354,8 @@ html, body {
 
 #prev:hover, #next:hover, #cancel:hover,
 #load_pptx:hover, #blk:hover, #wht:hover, #trn:hover,
-#edit_pptx:hover, #reload:hover, #setRes:hover, #listRes:hover, #config:hover {
+#edit_pptx:hover, #reload:hover, #setRes:hover, #setMonitor:hover,
+#listRes:hover, #config:hover {
 	filter: brightness(0.5);
 }
 
