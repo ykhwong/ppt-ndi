@@ -1,5 +1,5 @@
 {
-	"name": "PPTNDI",
+	"name": "PPT-NDI",
 	"version": "1.0.0",
 	"main": "backend.js",
 	"dependencies": {
