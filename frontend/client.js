@@ -147,7 +147,7 @@ $(document).ready(function() {
 	let customSlideX = 0;
 	let customSlideY = 0;
 	let spawnpid = 0;
-	let belowImgWidth = 130;
+	let belowImgWidth = 180;
 	let hiddenSlides = [];
 	let slideEffects = {};
 	let configData = {};
@@ -459,6 +459,9 @@ $(document).ready(function() {
 			$("#right img").css('background-image', "url('trans.png')");
 		}
 		fitHeight();
+		$("img.image_picker_image:first, img.image_picker_image:eq(1)").click(function() {
+			gotoNext();
+		});
 		$(window).trigger('resize');
 	}
 
