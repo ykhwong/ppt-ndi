@@ -856,6 +856,19 @@ $(document).ready(function() {
 		});
 	}
 
+	function makePreviewSmaller() {
+		belowImgWidth -= 5;
+		$("#below img").css("width", belowImgWidth + "px");
+		fitHeight();
+	}
+
+	function makePreviewBigger() {
+		belowImgWidth += 5;
+		$("#below img").css("width", belowImgWidth + "px");
+		fitHeight();
+	}
+
+
 	$('#blk').click(function() {
 		updateBlkWhtTrn("black");
 	});
@@ -948,16 +961,21 @@ $(document).ready(function() {
 			updateBlkWhtTrn("white");
 		} else if(e.which === 189 || e.which === 109) {
 			// -
-			belowImgWidth -= 5;
-			$("#below img").css("width", belowImgWidth + "px");
-			fitHeight();
+			makePreviewSmaller();
 		} else if(e.which === 187 || e.which === 107) {
 			// +
-			belowImgWidth += 5;
-			$("#below img").css("width", belowImgWidth + "px");
-			fitHeight();
+			makePreviewBigger();
 		}
 	});
+
+	$('#smaller').click(function() {
+		makePreviewSmaller();
+	});
+
+	$('#bigger').click(function() {
+		makePreviewBigger();
+	});
+
 
 	$('.button, .checkbox').keydown(function(e){
 		if (e.which == 13 || e.which == 32) {

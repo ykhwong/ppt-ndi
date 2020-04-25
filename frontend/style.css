@@ -365,10 +365,35 @@ html, body {
 	filter: brightness(0.8);
 }
 
+#empty {
+	width: 35px;
+	height: 35px;
+	opacity: 0;
+	cursor: auto;
+}
+
+#smaller {
+	width: 35px;
+	height: 35px;
+	background-image: url('smaller.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 23px;
+}
+
+#bigger {
+	width: 35px;
+	height: 35px;
+	background-image: url('bigger.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 23px;
+}
+
 #prev:hover, #next:hover, #cancel:hover,
 #load_pptx:hover, #blk:hover, #wht:hover, #trn:hover,
 #edit_pptx:hover, #reload:hover, #setRes:hover, #setMonitor:hover,
-#listRes:hover, #config:hover {
+#listRes:hover, #config:hover, #smaller:hover, #bigger:hover {
 	filter: brightness(0.5);
 }
 
