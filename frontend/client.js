@@ -147,7 +147,7 @@ $(document).ready(function() {
 	let customSlideX = 0;
 	let customSlideY = 0;
 	let spawnpid = 0;
-	let belowImgWidth = 100;
+	let belowImgWidth = 130;
 	let hiddenSlides = [];
 	let slideEffects = {};
 	let configData = {};
@@ -869,8 +869,7 @@ $(document).ready(function() {
 		let realNum = 0;
 		if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
 			numTypBuf = "";
-			if (e.which === 87) {
-				// Prevents Ctrl-W
+			if (e.ctrlKey) {
 				e.preventDefault();
 				e.stopPropagation();
 			}
