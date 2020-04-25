@@ -31,7 +31,7 @@ app.on('ready', function() {
 			"dest" : "control.html"
 		},
 		"classic" : {
-			"width" : 1200,
+			"width" : 960,
 			"height" : 700,
 			"dest" : "index.html"
 		},

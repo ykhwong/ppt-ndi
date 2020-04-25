@@ -207,7 +207,7 @@ html, body {
 	width: 100%;
 }
 
-#slide_cnt, #progress, #current_time, #slide_res {
+#slide_cnt, #progress, #current_time {
 	display:inline;
 }
 
@@ -219,6 +219,19 @@ html, body {
 	text-align: center;
 	color: #79a9f7;
 	-webkit-app-region: drag;
+}
+
+#slide_res {
+	position: fixed;
+	top: 1px;
+	min-width: 50px;
+	right: 120px;
+	background-color: #79a9f7;
+	color: black;
+	text-align: center;
+	-webkit-app-region: drag;
+	font-size: 12.5px;
+	padding: 2px;
 }
 
 #monitorControl {
@@ -271,7 +284,7 @@ html, body {
 	height: 22px;
 }
 
-#progress, #current_time, #slide_res {
+#progress, #current_time {
 	position: relative;
 	margin-left: 40px;
 }
