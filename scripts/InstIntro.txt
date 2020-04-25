@@ -1,12 +1,13 @@
-PPT NDI v1.0.1
+PPT NDI v1.0.2
 
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
 
-Release Note (Apr 10 2020):
+Release Note (Apr 25 2020):
 
-ADD: Resolution list
-ADD: SlideShow Monitor
-FIX: Updated NDI to 4.5
+ADD: Icons to resize the slide previews
+FIX: Set the minimum width to 540px
+FIX: Non-admin user could not save the configuration
+FIX: Minor bugs
 
 Please also download and open the sample.pptx file to see some examples of the lower thirds:
 https://github.com/ykhwong/ppt-ndi/raw/master/resources/sample.pptx

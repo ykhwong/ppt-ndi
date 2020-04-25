@@ -1,13 +1,13 @@
 # PPT NDI
-[![Github All Releases](https://img.shields.io/github/downloads/ykhwong/ppt-ndi/total.svg)]()
-[![GitHub release](https://img.shields.io/github/release/ykhwong/ppt-ndi.svg)](https://GitHub.com/ykhwong/ppt-ndi/releases/)
+[![Github All Releases](https://img.shields.io/github/downloads/ykhwong/ppt-ndi/total.svg?style=flat-square)]()
+[![GitHub release](https://img.shields.io/github/release/ykhwong/ppt-ndi.svg?style=flat-square)](https://GitHub.com/ykhwong/ppt-ndi/releases/)
 
 ## INTRODUCTION
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
 
 It also provides SlideShow monitor functionality that supports alpha transparency and can be integrated into any third-party video players that do not support NDI.
 
-The latest version is PPT NDI v1.0.1.
+The latest version is PPT NDI v1.0.2.
 
 ## BASIC USAGE
 1. Download PPT NDI from https://github.com/ykhwong/ppt-ndi/releases
