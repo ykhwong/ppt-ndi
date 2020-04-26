@@ -495,7 +495,7 @@ app.on('ready', function() {
 							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null) return;
 							if (event.shiftKey && event.ctrlKey) {
 								let chr = String.fromCharCode( event.rawcode );
-								if (chr === "") return;
+								if (chr === "" || typeof remoteVar.configData === 'undefined') return;
 								switch (chr) {
 									case remoteVar.configData.hotKeys.prev:
 										mainWindow2.webContents.send('remote', { msg: 'gotoPrev' });
