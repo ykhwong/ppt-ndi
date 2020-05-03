@@ -692,12 +692,10 @@ $(document).ready(function() {
 					$(selectedDiv).css("background", "rgb(0, 0, 0, 0)");
 					currentSlide = 0;
 					$("img.image_picker_image:eq(1)").attr("src", "null_slide.png");
-					if (maxSlideNum === 1) {
-						$("#below .thumbnail").click(function() {
-							selectSlide('1');
-							$(this).off('click');
-						});
-					}
+					$("#below .thumbnail:first").click(function() {
+						selectSlide('1');
+						$(this).off('click');
+					});
 				}
 				
 				if (isLoaded) {
@@ -909,6 +907,9 @@ $(document).ready(function() {
 
 	function makePreviewSmaller() {
 		belowImgWidth -= 5;
+		if (belowImgWidth < 0) {
+			belowImgWidth = 0;
+		}
 		$("#below img").css("width", belowImgWidth + "px");
 		fitHeight();
 	}
