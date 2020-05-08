@@ -59,7 +59,6 @@ function deleteInvisibleTop(sl, sngHeight) {
 		var topSize = sl.Shapes(intShape).Top;
 		var heightSize = sl.Shapes(intShape).Height;
 
-		var shell = new ActiveXObject("WScript.Shell");
 		if (sngHeight - topSize <= 0) {
 			sl.Shapes(intShape).Delete();
 		} else if (topSize < 0) {
