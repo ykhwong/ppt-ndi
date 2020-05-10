@@ -915,6 +915,9 @@ $(document).ready(function() {
 
 	function makePreviewBigger() {
 		belowImgWidth += 5;
+		if ($("#below").height() < $("#below .thumbnail:first").height()) {
+			belowImgWidth -= 5;
+		}
 		$("#below img").css("width", belowImgWidth + "px");
 		fitHeight();
 	}
