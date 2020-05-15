@@ -172,7 +172,7 @@ html, body {
 
 #buttons {
 	height: 35px;
-	padding: 10px;
+	padding-right: 10px;
 	white-space: nowrap;
 }
 
@@ -198,6 +198,7 @@ html, body {
 	text-align: left;
 	align: left;
 	font-weight: bold;
+	table-layout: fixed;
 }
 
 #right img {
