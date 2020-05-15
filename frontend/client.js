@@ -915,7 +915,10 @@ $(document).ready(function() {
 
 	function makePreviewBigger() {
 		belowImgWidth += 5;
-		if ($("#below").height() < $("#below .thumbnail:first").height()) {
+		if (
+		$("#below").height() < $("#below .thumbnail:first").height() ||
+		$("#below").width() < $("#below .thumbnail:first").width()
+		) {
 			belowImgWidth -= 5;
 		}
 		$("#below img").css("width", belowImgWidth + "px");
