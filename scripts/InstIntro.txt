@@ -8,6 +8,7 @@ ADD: i18n support
 ADD: Support for SlideShowTransition.AdvanceTime
 FIX: First slide not initially selectable
 FIX: Off-slide elements shown
+FIX: UI issues when used with 9:16 aspect ratio
 FIX: Minor bugs
 
 Please also download and open the sample.pptx file to see some examples of the lower thirds:
