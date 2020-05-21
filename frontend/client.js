@@ -1188,6 +1188,7 @@ $(document).ready(function() {
 				configData.highPerformance = json.highPerformance;
 				configData.lang = json.lang;
 				setLangRsc();
+				updateMonitorList();
 				ipc.send('remote', { name: "passConfigData", details: configData });
 			});
 		} else {
@@ -1424,5 +1425,4 @@ $(document).ready(function() {
 	initImgPicker();
 	startCurrentTime();
 	registerIoHook();
-	updateMonitorList();
 });
