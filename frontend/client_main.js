@@ -1,6 +1,9 @@
-const ipc = require('electron').ipcRenderer;
-
 $(document).ready(function() {
+	const ipc = require('electron').ipcRenderer;
+	const fs = require("fs-extra");
+	let configData = {
+		"lang": "en"
+	};
 	$("#select1img").click(function() {
 		ipc.send('remote', { name: "select1" });
 	});
@@ -10,4 +13,37 @@ $(document).ready(function() {
 	$("#closeImg").click(function() {
 		ipc.send('remote', { name: "exit" });
 	});
+
+	function reflectConfig() {
+		const configFile = 'config.js';
+		let configPath = "";
+		const { remote } = require('electron');
+		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
+		if (!fs.existsSync(configPath)) {
+			const appDataPath = process.env.APPDATA + "/PPT-NDI";
+			configPath = appDataPath + "/" + configFile;
+		}
+		if (fs.existsSync(configPath)) {
+			$.getJSON(configPath, function(json) {
+				configData.lang = json.lang;
+				setLangRsc();
+				//ipc.send('remote', { name: "passConfigData", details: configData });
+			});
+		}
+	}
+
+	function setLangRsc() {
+		setLangRscDiv("#select1", "ui_main/select1", true, configData.lang);
+		setLangRscDiv("#select2", "ui_main/select2", true, configData.lang);
+	}
+
+	ipc.on('remote' , function(event, data){
+		switch (data.msg) {
+			case "reload":
+				reflectConfig();
+				break;
+		}
+	});
+	
+	reflectConfig();
 });

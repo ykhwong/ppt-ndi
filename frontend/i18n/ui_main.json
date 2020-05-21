@@ -1,0 +1,30 @@
+[
+{
+	"item": "select1",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "PowerPoint SlideShow Mode",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "PowerPoint 슬라이드쇼 모드",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "select2",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Classic Mode",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "클래식 모드",
+			"rev" : 0
+		}
+	}
+}
+]

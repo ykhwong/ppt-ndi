@@ -1,5 +1,6 @@
 const { app, Menu, Tray, screen } = require('electron');
 const frontendDir = __dirname + '/frontend/';
+const debugMode = false;
 let iconFile;
 let tray = null;
 app.disableHardwareAcceleration();
@@ -10,7 +11,6 @@ app.on('ready', function() {
 	let mainWindow2 = null;
 	let mainWindow3 = null;
 	let monitorWin = null;
-	let debugMode = false;
 	let startAsTray = false;
 	let isMainWinShown = false;
 	let isMainWin2shown = false;
@@ -353,6 +353,9 @@ app.on('ready', function() {
 					mainWindow2.setAlwaysOnTop(false);
 					break;
 				case "reflectConfig":
+					if (mainWindow != null) {
+						mainWindow.webContents.send('remote', { msg: 'reload' });
+					}
 					if (mainWindow2 !== null) {
 						mainWindow2.webContents.send('remote', { msg: 'reload' });
 					}
