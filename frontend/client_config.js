@@ -16,7 +16,8 @@ $(document).ready(function() {
 			"transparent" : "",
 			"black" : "",
 			"white" : ""
-		}
+		},
+		"lang": "en"
 	};
 	let configData = defaultData;
 	let configPath = "";
@@ -48,6 +49,7 @@ $(document).ready(function() {
 			configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
 			configData.highPerformance = json.highPerformance;
 			configData.hotKeys = json.hotKeys;
+			configData.lang = json.lang;
 			$("#systray").prop('checked', configData.startAsTray);
 			$("#startWithFirstSlide").prop('checked', configData.startWithTheFirstSlideSelected);
 			$("#highPerformance").prop('checked', configData.highPerformance);
@@ -56,7 +58,27 @@ $(document).ready(function() {
 			$("#transTxtBox").val(getHotKey(configData.hotKeys.transparent));
 			$("#blackTxtBox").val(getHotKey(configData.hotKeys.black));
 			$("#whiteTxtBox").val(getHotKey(configData.hotKeys.white));
+			if (typeof(configData.lang) === "undefined") {
+				$("#langList").val("lang_en");
+			} else {
+				$("#langList").val("lang_" + configData.lang);
+			}
+			setLangRsc();
 		});
+	}
+
+	function setLangRsc() {
+		setLangRscDiv("#minimize-systray", "ui_config/minimize-systray", true, configData.lang);
+		setLangRscDiv("#start-with-first-slide-selected", "ui_config/start-with-first-slide-selected", true, configData.lang);
+		setLangRscDiv("#enable-high-performance-mode", "ui_config/enable-high-performance-mode", true, configData.lang);
+		setLangRscDiv("#hotkeys", "ui_config/hotkeys", true, configData.lang);
+		setLangRscDiv("#prev", "ui_config/prev", true, configData.lang);
+		setLangRscDiv("#next", "ui_config/next", true, configData.lang);
+		setLangRscDiv("#black", "ui_config/black", true, configData.lang);
+		setLangRscDiv("#white", "ui_config/white", true, configData.lang);
+		setLangRscDiv("#trans", "ui_config/transparent", true, configData.lang);
+		setLangRscDiv("#localization", "ui_config/localization", true, configData.lang);
+		setLangRscDiv("#saveConfig", "ui_config/save", true, configData.lang);
 	}
 
 	function setConfig() {
@@ -74,12 +96,14 @@ $(document).ready(function() {
 		configData.startWithTheFirstSlideSelected = $("#startWithFirstSlide").prop("checked");
 		configData.highPerformance = $("#highPerformance").prop("checked");
 		configData.hotKeys = hotKeys;
+		configData.lang = $("#langList").val().replace(/^lang_/i, "");
 		fs.writeFile(configPath, JSON.stringify(configData, null, "\t"), (err) => {
 			if (err) {
-				alertMsg("Could not save the configuration.");
+				alertMsg(getLangRsc("ui_config/could-not-save-config", configData.lang));
 			} else {
 				ipc.send('remote', { name: "reflectConfig" });
-				alertMsg("Saved");
+				setLangRsc();
+				alertMsg(getLangRsc("ui_config/saved", configData.lang));
 			}
 		});
 	}
@@ -136,5 +160,13 @@ $(document).ready(function() {
 		}
 	});
 	$("#version").append(version);
+
 	init();
+	
+	$.each(getLangList(), function (i, item) {
+		$("#langList").append($('<option>', { 
+			value: "lang_" + item.langCode,
+			text : item.details
+		}));
+	});
 });

@@ -1,6 +1,7 @@
 <html>
 <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 <script src="jquery.min.js"></script>
+<script src="i18n.js"></script>
 <script src="client_config.js"></script>
 <link rel="stylesheet" type="text/css" href="config_style.css">
 <link rel="stylesheet" type="text/css" href="common.css">
@@ -14,7 +15,7 @@
 <table id="bktbl1" border="0">
   <tbody>
     <tr>
-      <td width=250>&nbsp;Minimize in the system tray on startup</td>
+      <td id="minimize-systray" width=250></td><!--Minimize in the system tray on startup-->
       <td>
 		<label class="switch">
 		<input type="checkbox" id="systray" name="systray" value="systray">
@@ -23,7 +24,7 @@
 	  </td>
 	</tr>
     <tr>
-      <td width=250>&nbsp;Start with the first slide selected</td>
+	  <td id="start-with-first-slide-selected" width=250></td><!--Start with the first slide selected-->
       <td>
 		<label class="switch">
 		<input type="checkbox" id="startWithFirstSlide" name="startWithFirstSlide" value="startWithFirstSlide">
@@ -32,7 +33,7 @@
 	  </td>
 	</tr>
     <tr>
-      <td width=250>&nbsp;Enable high performance mode</td>
+	  <td id="enable-high-performance-mode" width=250></td><!--Enable high performance mode-->
       <td>
 		<label class="switch">
 		<input type="checkbox" id="highPerformance" name="highPerformance" value="highPerformance">
@@ -49,35 +50,45 @@
 <table id="bktbl2" border="0">
   <tbody>
 	<tr>
-	  <td>&nbsp;Hotkeys</td>
+	  <td id="hotkeys"></td><!--Hotkeys-->
 	  <td>&nbsp;</td>
 	</tr>
     <tr>
-      <td class="alignRight">&nbsp;Prev</td>
+      <td id="prev" class="alignRight"></td><!--Prev-->
       <td><input class="txtBox" maxlength=1 id="prevTxtBox" name="prevTxtBox"></textarea></td>
 	</tr>
 	<tr>
-      <td class="alignRight">&nbsp;Next</td>
+      <td id="next" class="alignRight"></td><!--Next-->
 	  <td><input class="txtBox" maxlength=1 id="nextTxtBox" name="prevTxtBox"></textarea></td>
 	</tr>
 	<tr>
-      <td class="alignRight">&nbsp;Black</td>
+      <td id="black" class="alignRight"></td><!--Black-->
 	  <td><input class="txtBox" maxlength=1 id="blackTxtBox" name="blackTxtBox"></textarea></td>
 	</tr>
 	<tr>
-      <td class="alignRight">&nbsp;White</td>
+      <td id="white" class="alignRight"></td><!--White-->
 	  <td><input class="txtBox" maxlength=1 id="whiteTxtBox" name="whiteTxtBox"></textarea></td>
 	</tr>
 	<tr>
-      <td class="alignRight">&nbsp;Transparent</td>
+      <td id="trans" class="alignRight"></td><!--Transparent-->
 	  <td><input class="txtBox" maxlength=1 id="transTxtBox" name="transTxtBox"></textarea></td>
 	</tr>
-	<!--TO-DO: Slides-->
   </tbody>
 </table>
 
+<table id="bktbl3" border="0">
+  <tbody>
+	<tr>
+	  <td id="localization"></td><!--Localization-->
+	  <td>
+		<select id="langList">
+		</select>
+	  </td>
+	</tr>
+  </tbody>
+</table>
 <div id="version"></div>
-<div id="saveConfig">Save</div>
+<div id="saveConfig"></div><!--Save-->
 <img id="closeImg" src="close.png">
 </body>
 </html>

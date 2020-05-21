@@ -1,0 +1,14 @@
+{
+	"updated": "2020-05-21",
+	"enabledLangs" : [ "en", "ko" ],
+	"langDetails": {
+		"en" : {
+			"display_name" : "English",
+			"native_name" : "English"
+		},
+		"ko" : {
+			"display_name" : "Korean",
+			"native_name" : "한국어"
+		}
+	}
+}

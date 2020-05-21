@@ -10,7 +10,7 @@ app.on('ready', function() {
 	let mainWindow2 = null;
 	let mainWindow3 = null;
 	let monitorWin = null;
-	let debugMode = true;
+	let debugMode = false;
 	let startAsTray = false;
 	let isMainWinShown = false;
 	let isMainWin2shown = false;

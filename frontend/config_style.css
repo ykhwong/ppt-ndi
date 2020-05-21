@@ -40,6 +40,20 @@ html, body {
 	color: #79a9f7;
 }
 
+#bktbl3 {
+	position: fixed;
+	top: 300px;
+	width: 200px;
+	height: 20px;
+	left: 10px;
+	color: #79a9f7;
+}
+
+#langList {
+	background-color: black;
+	color: white;
+}
+
 #version {
 	position: fixed;
 	top: 15px;
@@ -74,7 +88,7 @@ html, body {
 
 #saveConfig {
 	position: fixed;
-	top: 300px;
+	top: 345px;
 	left: 15px;
 	width: 50px;
 	height: 20px;
