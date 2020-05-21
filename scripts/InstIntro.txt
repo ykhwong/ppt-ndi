@@ -5,6 +5,7 @@ PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek
 Release Note (-):
 
 ADD: i18n support
+ADD: Support for SlideShowTransition.AdvanceTime
 FIX: First slide not initially selectable
 FIX: Off-slide elements shown
 FIX: Minor bugs
