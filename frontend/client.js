@@ -252,6 +252,38 @@ $(document).ready(function() {
 		dialog.showMessageBoxSync(currentWindow, options);
 	}
 
+	function setLangRsc() {
+		setLangRscDiv("#edit_pptx", "ui_classic/edit_pptx", false, configData.lang);
+		setLangRscDiv("#reload", "ui_classic/reload", false, configData.lang);
+		setLangRscDiv("#config", "ui_classic/config", false, configData.lang);
+		setLangRscDiv("#show-checkerboard", "ui_classic/show-checkerboard", false, configData.lang);
+		setLangRscDiv("#enable-slide-transition-effect", "ui_classic/enable-slide-transition-effect", false, configData.lang);
+		setLangRscDiv("#include-background", "ui_classic/include-background", false, configData.lang);
+		setLangRscDiv("#resolution", "ui_classic/resolution", false, configData.lang);
+		setLangRscDiv("#resDefault", "ui_classic/resDefault", false, configData.lang);
+		setLangRscDiv("#resCustom", "ui_classic/resCustom", false, configData.lang);
+		setLangRscDiv("#setRes", "ui_classic/setRes", false, configData.lang);
+		setLangRscDiv("#monitorControlText", "ui_classic/monitorControlText", false, configData.lang);
+		setLangRscDiv("#monitorAlphaText", "ui_classic/monitorAlphaText", false, configData.lang);
+		setLangRscDiv("#setMonitor", "ui_classic/setMonitor", false, configData.lang);
+		/*
+		$("#currentSlideText").attr("data-img-label", getLangRsc("ui_classic/currentSlideText", configData.lang));
+		$("#nextSlideText").attr("data-img-label", getLangRsc("ui_classic/nextSlideText", configData.lang));
+		*/
+		setLangRscDiv("#loadingTxt", "ui_classic/loadingTxt", false, configData.lang);
+		setLangRscDiv("#cancel", "ui_classic/cancel", false, configData.lang);
+		
+		switch (configData.lang) {
+			case "ko":
+				$("#config").css("width", "56px");
+				break;
+			case "en":
+			default:
+				$("#config").css("width", "80px");
+				break;
+		}
+	}
+
 	function stopSlideTransition() {
 		for (var pp=2; pp<=9; pp++) {
 			clearTimeout(slideTranTimers[pp]);
@@ -1106,6 +1138,8 @@ $(document).ready(function() {
 				configData.hotKeys = json.hotKeys;
 				configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
 				configData.highPerformance = json.highPerformance;
+				configData.lang = json.lang;
+				setLangRsc();
 				ipc.send('remote', { name: "passConfigData", details: configData });
 			});
 		} else {

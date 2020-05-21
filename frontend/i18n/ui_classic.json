@@ -1,0 +1,240 @@
+[
+{
+	"item": "edit_pptx",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "EDIT",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "편집",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "reload",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "RELOAD",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "다시 로드",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "config",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "CONFIG",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "구성",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "show-checkerboard",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Show Checkerboard",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "체커보드 표시",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "enable-slide-transition-effect",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Enable Slide Transition Effect",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "슬라이드 전환 효과 사용",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "include-background",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Include Background",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "배경 포함",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "resolution",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Resolution",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "해상도",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "resDefault",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Default",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "기본값",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "resCustom",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Custom",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "사용자 지정",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "setRes",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "SET",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "설정",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "monitorControlText",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "SlideShow Monitor",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "슬라이드쇼 모니터",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "monitorAlphaText",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Alpha",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "알파",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "setMonitor",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "SET",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "설정",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "currentSlideText",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "CURRENT",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "현재",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "nextSlideText",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "NEXT",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "다음",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "loadingTxt",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "LOADING",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "불러오는 중",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "cancel",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Cancel",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "취소",
+			"rev" : 0
+		}
+	}
+}
+]

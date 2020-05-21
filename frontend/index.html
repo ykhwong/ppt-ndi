@@ -1,6 +1,7 @@
 <html>
 <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 <script src="jquery.min.js"></script>
+<script src="i18n.js"></script>
 <script src="client.js"></script>
 <script src="image-picker.min.js"></script>
 <link rel="stylesheet" type="text/css" href="common.css">
@@ -26,13 +27,13 @@
 <div id="rest">
 	<div id="rest1">
 		<img id="load_pptx" class="button" src="open.png">
-		<div id="edit_pptx" class="button2">EDIT</div>
-		<div id="reload" class="button2">RELOAD</div>
-		<div id="config" class="button2">CONFIG</div>
+		<div id="edit_pptx" class="button2"></div><!--EDIT-->
+		<div id="reload" class="button2"></div><!--RELOAD-->
+		<div id="config" class="button2"></div><!--CONFIG-->
 		<table id="bktbl" border="0">
 		  <tbody>
 			<tr>
-			  <td width="180px">Show Checkerboard</td>
+			  <td id="show-checkerboard" width="180px"></td><!--Show Checkerboard-->
 			  <td>
 				<label class="switch">
 				<input type="checkbox" id="trans_checker" class="checkbox" name="trans_checker" value="trans_checker" checked>
@@ -41,7 +42,7 @@
 			</td>
 			</tr>
 			<tr>
-			  <td width="180px">Enable Slide Transition Effect</td>
+			  <td id="enable-slide-transition-effect" width="180px"></td><!--Enable Slide Transition Effect-->
 			  <td>
 				<label class="switch">
 				<input type="checkbox" id="use_slide_transition" class="checkbox" name="use_slide_transition" value="use_slide_transition" checked>
@@ -50,7 +51,7 @@
 			</td>
 			</tr>
 			<tr>
-			  <td width="180px">Include Background</td>
+			  <td id="include-background" width="180px"></td><!--Include Background-->
 			  <td width="35px">
 				<label class="switch">
 				<input type="checkbox" id="with_background" class="checkbox" name="with_background" value="with_background">
@@ -63,7 +64,7 @@
 		<table id="bktbl2" border="0">
 			<tbody>
 				<tr>
-					<td width="120px">Resolution</td>
+					<td id="resolution" width="120px"></td><!--Resolution-->
 					<td width="300px">
 						<div class="resText">
 							<input type="text"
@@ -74,8 +75,8 @@
 							<div id="listRes">...</div>
 						</div>
 						<select id="listResList">
-							<option value="0x0">Default</option>
-							<option value="custom">Custom</option>
+							<option id="resDefault" value="0x0"></option><!--Default-->
+							<option id="resCustom" value="custom"></option><!--Custom-->
 							<option value="640x480">4:3 | 640 x 480</option>
 							<option value="800x600">4:3 | 800 x 600</option>
 							<option value="960x720">4:3 | 960 x 720</option>
@@ -113,15 +114,15 @@
 		<div id="current_time" class="slideInfo">00:00 AM</div>
 	</div>
 	<div id="monitorControl">
-		<div id="monitorControlText">SlideShow Monitor</div>
+		<div id="monitorControlText"></div><!--SlideShow Monitor-->
 		<select id="monitorList">
 		</select>
-		<div id="monitorAlphaText">Alpha</div>
+		<div id="monitorAlphaText"></div><!--Alpha-->
 		<label class="switch" id="monitor_trans_switch">
 		<input type="checkbox" id="monitor_trans" class="checkbox" name="monitor_trans" value="monitor_trans" checked>
 		<span class="slider"></span>
 		</label>
-		<div id="setMonitor">SET</div>
+		<div id="setMonitor"></div><!--SET-->
 		<div id=""></div>
 	</div>
 	<div id="rest2">
@@ -131,14 +132,14 @@
 			  <td width="50%">
 				<select class="image-picker show-html">
 					<optgroup label="Screen" id="screen_grp">
-					<option data-img-label="CURRENT" data-img-src="null_slide.png" value="Current" disabled>Current</option>
+					<option id="currentSlideText" data-img-label="CURRENT" data-img-src="null_slide.png" value="Current" disabled>Current</option>
 					</optgroup>
 				</select>
 			  </td>
 			  <td width="40%" style="vertical-align: top;">
 				<select class="image-picker show-html">
 					<optgroup label="Screen" id="screen_grp">
-					<option data-img-label="NEXT" data-img-src="null_slide.png" value="Next" disabled>Next</option>
+					<option id="nextSlideText" data-img-label="NEXT" data-img-src="null_slide.png" value="Next" disabled>Next</option>
 					</optgroup>
 				</select>
 					<div id="buttons">
@@ -169,8 +170,8 @@
 	</div>
 	<div id="fullblack"></div>
 	<div class="cancelBox">
-		<div id="loadingTxt">LOADING</div>
-		<div id="cancel" class="button">Cancel</div>
+		<div id="loadingTxt"></div><!--LOADING-->
+		<div id="cancel" class="button"></div><!--Cancel-->
 	</div>
 </div>
 

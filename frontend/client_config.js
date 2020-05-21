@@ -103,7 +103,9 @@ $(document).ready(function() {
 			} else {
 				ipc.send('remote', { name: "reflectConfig" });
 				setLangRsc();
-				alertMsg(getLangRsc("ui_config/saved", configData.lang));
+				setTimeout(function() {
+					alertMsg(getLangRsc("ui_config/saved", configData.lang));
+				}, 100);
 			}
 		});
 	}
