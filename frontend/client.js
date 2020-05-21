@@ -494,10 +494,10 @@ $(document).ready(function() {
 		blkBool = false;
 		whtBool = false;
 		trnBool = false;
-		if (/^\d+$/.test(advanceSlides[currentSlide])) {
+		if (/^(\d|\.)+$/.test(advanceSlides[currentSlide])) {
 			advanceTimeout = setTimeout(function() {
 				gotoNext();
-			}, parseInt(advanceSlides[currentSlide]) * 1000);
+			}, parseFloat(advanceSlides[currentSlide]) * 1000);
 		}
 	}
 
