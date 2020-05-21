@@ -73,7 +73,7 @@
 		"lang": {
 			"description": "",
 			"en": {
-				"msg": "SET",
+				"msg": "CONFIG",
 				"rev": 0
 			},
 			"ko": {
