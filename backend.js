@@ -81,13 +81,13 @@ app.on('ready', function() {
 			}},
 			{ label: 'E&xit', click() {
 				loopPaused = true;
-				if (mainWindow2 != null) {
+				if (mainWindow2 != null && !mainWindow2.isDestroyed()) {
 					mainWindow2.destroy();
 				}
-				if (mainWindow3 != null) {
+				if (mainWindow3 != null && !mainWindow3.isDestroyed()) {
 					mainWindow3.destroy();
 				}
-				if (monitorWin != null) {
+				if (monitorWin != null && !monitorWin.isDestroyed()) {
 					monitorWin.destroy();
 				}
 				if (process.platform != 'darwin') {
@@ -353,10 +353,10 @@ app.on('ready', function() {
 					mainWindow2.setAlwaysOnTop(false);
 					break;
 				case "reflectConfig":
-					if (mainWindow != null) {
+					if (mainWindow != null && !mainWindow.isDestroyed()) {
 						mainWindow.webContents.send('remote', { msg: 'reload' });
 					}
-					if (mainWindow2 !== null) {
+					if (mainWindow2 !== null && !mainWindow2.isDestroyed()) {
 						mainWindow2.webContents.send('remote', { msg: 'reload' });
 					}
 					break;
