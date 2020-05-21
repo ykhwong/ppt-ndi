@@ -322,6 +322,37 @@ $(document).ready(function() {
 		dialog.showMessageBoxSync(currentWindow, options);
 	}
 
+	function setLangRsc() {
+		setLangRscDiv("#show-checkerboard", "ui_slideshow/show-checkerboard", true, configData.lang);
+		setLangRscDiv("#enable-slide-transition-effect", "ui_slideshow/enable-slide-transition-effect", true, configData.lang);
+		setLangRscDiv("#include-background", "ui_slideshow/include-background", true, configData.lang);
+		setLangRscDiv("#customRes", "ui_slideshow/customRes", true, configData.lang);
+		setLangRscDiv("#setRes", "ui_slideshow/setRes", false, configData.lang);
+		setLangRscDiv("#config", "ui_slideshow/config", false, configData.lang);
+		setLangRscDiv("#prevTxt", "ui_slideshow/prevTxt", false, configData.lang);
+		setLangRscDiv("#pinTxt", "ui_slideshow/pinTxt", false, configData.lang);
+
+		switch (configData.lang) {
+			case "ko":
+				$("#slideRes").css("left", "100px");
+				$("#pinTxt").css({
+					"text-align": "center",
+					"font-size": "10px",
+					"left": "232px"
+				});
+				break;
+			case "en":
+			default:
+				$("#config").css("width", "90px");
+				$("#pinTxt").css({
+					"text-align": "center",
+					"font-size": "8px",
+					"left": "230px"
+				});
+				break;
+		}
+	}
+
 	function runLib() {
 		ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
 		if ( ffi === -1 ) {
@@ -786,6 +817,8 @@ $(document).ready(function() {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
 				configData.highPerformance = json.highPerformance;
+				configData.lang = json.lang;
+				setLangRsc();
 				ipc.send('remote', { name: "passConfigData", details: configData });
 			});
 		} else {
