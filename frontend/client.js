@@ -14,6 +14,12 @@ function proc(ap) {
 			objFileToWrite.Close();
 			objFileToWrite = null;
 		}
+		if (sl.SlideShowTransition.AdvanceTime > 0) {
+			var objFileToWrite = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(WScript.arguments(1) + "/advance.dat",8,true);
+			objFileToWrite.WriteLine(sl.SlideIndex + "\t" + sl.SlideShowTransition.AdvanceTime);
+			objFileToWrite.Close();
+			objFileToWrite = null;
+		}
 
 		var objSlideEffect = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(WScript.arguments(1) + "/slideEffect.dat",8,true);
 		objSlideEffect.WriteLine(sl.SlideIndex + "," + sl.SlideShowTransition.EntryEffect + "," + sl.SlideShowTransition.Duration);
@@ -116,6 +122,12 @@ function proc(ap) {
 			objFileToWrite.Close();
 			objFileToWrite = null;
 		}
+		if (sl.SlideShowTransition.AdvanceTime > 0) {
+			var objFileToWrite = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(WScript.arguments(1) + "/advance.dat",8,true);
+			objFileToWrite.WriteLine(sl.SlideIndex + "\t" + sl.SlideShowTransition.AdvanceTime);
+			objFileToWrite.Close();
+			objFileToWrite = null;
+		}
 
 		var objSlideEffect = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(WScript.arguments(1) + "/slideEffect.dat",8,true);
 		objSlideEffect.WriteLine(sl.SlideIndex + "," + sl.SlideShowTransition.EntryEffect + "," + sl.SlideShowTransition.Duration);
@@ -199,7 +211,9 @@ $(document).ready(function() {
 	let spawnpid = 0;
 	let belowImgWidth = 180;
 	let hiddenSlides = [];
+	let advanceSlides = {};
 	let slideEffects = {};
+	let advanceTimeout = null;
 	let configData = {};
 	let blkBool = false;
 	let whtBool = false;
@@ -351,6 +365,7 @@ $(document).ready(function() {
 		let curSli, nextSli;
 		let nextNum;
 		let re, rpc;
+		clearTimeout(advanceTimeout);
 		if(!repo) {
 			return;
 		}
@@ -479,6 +494,11 @@ $(document).ready(function() {
 		blkBool = false;
 		whtBool = false;
 		trnBool = false;
+		if (/^\d+$/.test(advanceSlides[currentSlide])) {
+			advanceTimeout = setTimeout(function() {
+				gotoNext();
+			}, parseInt(advanceSlides[currentSlide]) * 1000);
+		}
 	}
 
 	$("select").change(function() {
@@ -655,6 +675,18 @@ $(document).ready(function() {
 					const hs = fs.readFileSync(tmpDir + "/hidden.dat", { encoding: 'utf8' });
 					hiddenSlides = hs.split("\n");
 				}
+
+				advanceSlides = {};
+				if (fs.existsSync(tmpDir + "/advance.dat")) {
+					const as = fs.readFileSync(tmpDir + "/advance.dat", { encoding: 'utf8' });
+					const tmpAdvanceSlides = as.split(/\r\n|\n/);
+					for (let i=0; i < tmpAdvanceSlides.length; i++) {
+						let sNum = tmpAdvanceSlides[i].split("\t")[0];
+						let sSec = tmpAdvanceSlides[i].split("\t")[1];
+						advanceSlides[sNum] = sSec;
+					}
+				}
+
 				if (isCancelTriggered) return;
 				hiddenSlides = hiddenSlides.filter(n => n);
 				for (i = 0, len = hiddenSlides.length; i < len; i++) { 
@@ -959,7 +991,6 @@ $(document).ready(function() {
 		$("#below img").css("width", belowImgWidth + "px");
 		fitHeight();
 	}
-
 
 	$('#blk').click(function() {
 		updateBlkWhtTrn("black");
