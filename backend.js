@@ -10,7 +10,7 @@ app.on('ready', function() {
 	let mainWindow2 = null;
 	let mainWindow3 = null;
 	let monitorWin = null;
-	let debugMode = false;
+	let debugMode = true;
 	let startAsTray = false;
 	let isMainWinShown = false;
 	let isMainWin2shown = false;
@@ -37,7 +37,7 @@ app.on('ready', function() {
 		},
 		"config" : {
 			"width" : 320,
-			"height" : 345,
+			"height" : 385,
 			"dest" : "config.html"
 		},
 		"monitor" : {
