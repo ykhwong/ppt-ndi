@@ -356,7 +356,7 @@ $(document).ready(function() {
 	function runLib() {
 		ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
 		if ( ffi === -1 ) {
-			alertMsg("DLL init failed.");
+			alertMsg(getLangRsc("ui_slideshow/dll-init-failed", configData.lang));
 			if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
 				const execRuntime = require('child_process').execSync;
 				execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
@@ -368,7 +368,7 @@ $(document).ready(function() {
 
 		lib = ipc.sendSync("require", { lib: "ffi", func: "init", args: null });
 		if (lib === 1) {
-			alertMsg('Failed to create a listening server!');
+			alertMsg(getLangRsc("ui_slideshow/failed-to-create-listening-svr", configData.lang));
 			ipc.send('remote', { name: "exit" });
 			return;
 		}
@@ -434,8 +434,8 @@ $(document).ready(function() {
 	}
 
 	function updateStat(cmd, details) {
-		let msg = "Status: ";
-		curStatus=cmd;
+		let msg = getLangRsc("ui_slideshow/status", configData.lang);
+		curStatus = getLangRsc("ui_slideshow/status-ready", configData.lang);
 		msg = msg + cmd;
 		if (/\S/.test(details)) {
 			msg = msg + "<br />" + details;
@@ -463,23 +463,35 @@ $(document).ready(function() {
 			newSlideIdx = "black";
 			preFile = "";
 		} else if(/^PPTNDI: Done/.test(cmd)) {
-			updateStat("END OF SLIDE SHOW", "");
+			updateStat(
+				getLangRsc("ui_slideshow/status-end-of-slideshow", configData.lang),
+				""
+			);
 			return;
 		//} else if(/^PPTNDI: Paused/.test(cmd)) {
 		//	updateStat("PAUSED", "");
 		//	return;
 		} else if(/^PPTNDI: Ready/.test(cmd)) {
-			updateStat("READY", "In PowerPoint, start the Slide Show.");
+			updateStat(
+				getLangRsc("ui_slideshow/status-ready", configData.lang),
+				getLangRsc("ui_slideshow/status-ppt-start-slideshow", configData.lang)
+			);
 			return;
 		} else if(/^PPTNDI: NoPPT/.test(cmd)) {
-			updateStat("ERROR", "Microsoft PowerPoint not found.");
+			updateStat(
+				getLangRsc("ui_slideshow/status-error", configData.lang),
+				getLangRsc("ui_slideshow/status-ppt-not-found", configData.lang)
+			);
 			return;
 		} else {
 			console.log(cmd);
 			return;
 		}
 
-		updateStat("OK", "The request has been completed.");
+		updateStat(
+			getLangRsc("ui_slideshow/status-ok", configData.lang),
+			getLangRsc("ui_slideshow/status-request-complete", configData.lang)
+		);
 		if (/^PPTNDI: Sent /.test(cmd)) {
 			let fd;
 			try {
@@ -575,7 +587,7 @@ $(document).ready(function() {
 				break;
 			case "black":
 			case "white":
-				if (slideWidth === 0 || curStatus === "READY") {
+				if (slideWidth === 0 || curStatus === getLangRsc("ui_slideshow/status-ready", configData.lang)) {
 					sendColorNDI(cmd);
 				} else {
 					res2.stdin.write(cmd + "\n");
@@ -689,6 +701,10 @@ $(document).ready(function() {
 			process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
 		} catch(e) {
 		}
+		$.ajaxSetup({
+			async: false
+		});
+		reflectConfig();
 		runLib();
 
 		tmpDir = process.env.TEMP + '/ppt_ndi';
@@ -706,7 +722,7 @@ $(document).ready(function() {
 		try {
 			fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 		} catch(e) {
-			alertMsg('Failed to access the temporary directory!');
+			alertMsg(getLangRsc("ui_slideshow/failed-to-access-tempdir", configData.lang));
 			return;
 		}
 		try {
@@ -716,7 +732,7 @@ $(document).ready(function() {
 		try {
 			fs.writeFileSync(vbsDir3, vbsCheckSlide, 'utf-8');
 		} catch(e) {
-			alertMsg('Failed to access the temporary directory!');
+			alertMsg(getLangRsc("ui_slideshow/failed-to-access-tempdir", configData.lang));
 			return;
 		}
 		if (fs.existsSync(vbsDir)) {
@@ -735,7 +751,7 @@ $(document).ready(function() {
 				sendNDI(file, data);
 			});
 		} else {
-			alertMsg('Failed to parse the presentation!');
+			alertMsg(getLangRsc("ui_slideshow/failed-to-parse-presentation", configData.lang));
 			return;
 		}
 		if (fs.existsSync(vbsDir2)) {
@@ -744,7 +760,7 @@ $(document).ready(function() {
 		if (fs.existsSync(vbsDir3)) {
 			res3 = spawn( 'cscript.exe', [ vbsDir3, "//NOLOGO", '' ] );
 		} else {
-			alertMsg('Failed to parse the presentation!');
+			alertMsg(getLangRsc("ui_slideshow/failed-to-parse-presentation", configData.lang));
 			return;
 		}
 
@@ -752,7 +768,10 @@ $(document).ready(function() {
 			let curSlideStat = data.toString().replace(/^Status: /, "");
 			if (/^\s*OFF\s*$/.test(curSlideStat)) {
 				// Ready
-				updateStat("READY", "In PowerPoint, open a presentation file.");
+				updateStat(
+					getLangRsc("ui_slideshow/status-ready", configData.lang),
+					getLangRsc("ui_slideshow/open-ppt-file", configData.lang)
+				);
 			} else if (/^\s*0\s*$/.test(curSlideStat)) {
 				// Not found
 				// updateStat("-", "");
@@ -779,7 +798,6 @@ $(document).ready(function() {
 		$("#slidePreview").css('background-image', "url('trans_slide.png')");
 
 		registerIoHook();
-		reflectConfig();
 
 		$("#resWidth").val("0");
 		$("#resHeight").val("0");
@@ -875,7 +893,7 @@ $(document).ready(function() {
 			try {
 				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 			} catch(e) {
-				alertMsg('Failed to access the temporary directory!');
+				alertMsg(getLangRsc("ui_slideshow/failed-to-access-tempdir", configData.lang));
 				return;
 			}
 		} else {
@@ -883,7 +901,7 @@ $(document).ready(function() {
 			try {
 				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 			} catch(e) {
-				alertMsg('Failed to access the temporary directory!');
+				alertMsg(getLangRsc("ui_slideshow/failed-to-access-tempdir", configData.lang));
 				return;
 			}
 		}
@@ -905,7 +923,7 @@ $(document).ready(function() {
 				sendNDI(file, data);
 			});
 		} else {
-			alertMsg('Failed to parse the presentation!');
+			alertMsg(getLangRsc("ui_slideshow/failed-to-parse-presentation", configData.lang));
 			return;
 		}
 	});
