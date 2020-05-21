@@ -221,10 +221,13 @@ $(document).ready(function() {
 	} catch(e) {
 	}
 
+	$.ajaxSetup({
+		async: false
+	});
+	reflectConfig();
 	ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
 	if ( ffi === -1 ) {
-		const initFailMsg = "DLL init failed.";
-		alertMsg("DLL init failed.");
+		alertMsg(getLangRsc("ui_classic/dll-init-failed", configData.lang));
 		if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
 			const execRuntime = require('child_process').execSync;
 			execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
@@ -236,7 +239,7 @@ $(document).ready(function() {
 
 	lib = ipc.sendSync("require", { lib: "ffi", func: "init", args: null });
 	if (lib === 1) {
-		alertMsg('Failed to create a listening server!');
+		alertMsg(getLangRsc("ui_classic/failed-to-create-listening-svr", configData.lang));
 		ipc.send('remote', { name: "exit" });
 		return;
 	}
@@ -488,8 +491,8 @@ $(document).ready(function() {
 		const {dialog} = require('electron').remote;
 		let options;
 		let response;
-		let defaultMsg = 'Do you want to continue?';
-		let defaultDetail = 'Changes require a reload to take effect.';
+		let defaultMsg = getLangRsc("ui_classic/do-you-want-to-continue", configData.lang);
+		let defaultDetail = getLangRsc("ui_classic/changes-require-reload", configData.lang);
 		
 		options = {
 			type: 'question',
@@ -593,7 +596,7 @@ $(document).ready(function() {
 			} catch(e) {
 				cleanupForTemp(false);
 				tmpDir = preTmpDir;
-				alertMsg('Failed to access the temporary directory!');
+				alertMsg(getLangRsc("ui_classic/failed-to-access-tempdir", configData.lang));
 				$("#fullblack, .cancelBox").hide();
 				return;
 			}
@@ -609,16 +612,16 @@ $(document).ready(function() {
 			res = spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, tmpDir, resX, resY, '' ] );
 			$(".cancelBox").show();
 			res.stderr.on('data', (data) => {
-				let myMsg = "Failed to parse the presentation!\n";
+				let myMsg = getLangRsc("ui_classic/failed-to-parse-presentation", configData.lang);
 				maxSlideNum = 0;
 				cleanupForTemp(false);
 				tmpDir = preTmpDir;
 				if (!fs.existsSync(file)) {
-					alertMsg(myMsg + "The file might have been moved or deleted.");
+					alertMsg(myMsg + getLangRsc("ui_classic/file-moved-or-deleted", configData.lang));
 				} else if (maxSlideNum > 0) {
-					alertMsg(myMsg + "Please check the configuration.");
+					alertMsg(myMsg + getLangRsc("ui_classic/check-the-config", configData.lang));
 				} else {
-					alertMsg(myMsg + "Please make sure that Microsoft PowerPoint has been installed on the system.");
+					alertMsg(myMsg + getLangRsc("ui_classic/make-sure-ppt-installed", configData.lang));
 				}
 				$("#fullblack, .cancelBox").hide();
 				return;
@@ -643,7 +646,7 @@ $(document).ready(function() {
 					maxSlideNum = 0;
 					cleanupForTemp(false);
 					tmpDir = preTmpDir;
-					alertMsg("Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.");
+					alertMsg(getLangRsc("ui_classic/ppt-not-loaded", configData.lang));
 					$("#fullblack, .cancelBox").hide();
 					return;
 				}
@@ -743,7 +746,7 @@ $(document).ready(function() {
 			});
 		} else {
 			if (/\S/.test(file)) {
-				alertMsg("Only allowed filename extensions are PPT and PPTX.");
+				alertMsg(getLangRsc("ui_classic/only-allowed-filename", configData.lang));
 			}
 			$("#fullblack, .cancelBox").hide();
 		}
@@ -756,8 +759,8 @@ $(document).ready(function() {
 		dialog.showOpenDialog(currentWindow,{
 			properties: ['openFile'],
 			filters: [
-				{name: 'PowerPoint Presentations', extensions: ['pptx', 'ppt']},
-				{name: 'All Files', extensions: ['*']}
+				{name: getLangRsc("ui_classic/open-file-ppt-presentation", configData.lang), extensions: ['pptx', 'ppt']},
+				{name: getLangRsc("ui_classic/open-file-all-files", configData.lang), extensions: ['*']}
 			]
 		}).then(result => {
 			loadPPTX(result.filePaths[0], 0, 0);
@@ -1188,13 +1191,13 @@ $(document).ready(function() {
 	function updateMonitorList() {
 		$('#monitorList').html($('<option>', {
 			value: "none",
-			text: 'None'
+			text: getLangRsc("ui_classic/slideshow-monitor-none", configData.lang)
 		}));
 		for (let i=0; i<getMultipleMonitors().length; i++) {
 			let monNum = i + 1;
 			$('#monitorList').append($('<option>', {
 				value: monNum,
-				text: 'Monitor ' + monNum
+				text: getLangRsc("ui_classic/slideshow-monitor-monitor", configData.lang) + monNum
 			}));
 		}
 	}
@@ -1219,7 +1222,7 @@ $(document).ready(function() {
 					if (pptTimestamp === tmpPptTimestamp) {
 					} else {
 						pptTimestamp = tmpPptTimestamp;
-						askReloadFile("", "This file has been modified. Do you want to reload it?", "");
+						askReloadFile("", getLangRsc("ui_classic/ask-reload", configData.lang), "");
 					}
 				} catch(e) {
 				}
@@ -1324,7 +1327,7 @@ $(document).ready(function() {
 			if (maxSlideNum > 0) {
 				// slideWidth : slideHeight = customSlideX : customSlideY
 				if (slideHeight*customSlideX/slideWidth !== parseInt(customSlideY, 10)) {
-					alertMsg("The original aspect ratio does not match. The layout can be corrupted due to the different ratios.");
+					alertMsg(getLangRsc("ui_classic/original-aspect-ratio-not-match", configData.lang));
 				}
 				askReloadFile(null, "", "");
 			}
@@ -1376,6 +1379,5 @@ $(document).ready(function() {
 	initImgPicker();
 	startCurrentTime();
 	registerIoHook();
-	reflectConfig();
 	updateMonitorList();
 });
