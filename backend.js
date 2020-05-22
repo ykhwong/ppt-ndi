@@ -1,4 +1,5 @@
 const { app, Menu, Tray, screen } = require('electron');
+const multipleInstance = !app.requestSingleInstanceLock();
 const frontendDir = __dirname + '/frontend/';
 const debugMode = false;
 let iconFile;
@@ -47,6 +48,12 @@ app.on('ready', function() {
 		}
 	}
 
+	function destroyWin(win) {
+		if (win != null && !win.isDestroyed()) {
+			win.destroy();
+		}
+	}
+
 	function refreshTray() {
 		let isVisible = true;
 		let hideShowItem;
@@ -81,15 +88,9 @@ app.on('ready', function() {
 			}},
 			{ label: 'E&xit', click() {
 				loopPaused = true;
-				if (mainWindow2 != null && !mainWindow2.isDestroyed()) {
-					mainWindow2.destroy();
-				}
-				if (mainWindow3 != null && !mainWindow3.isDestroyed()) {
-					mainWindow3.destroy();
-				}
-				if (monitorWin != null && !monitorWin.isDestroyed()) {
-					monitorWin.destroy();
-				}
+				destroyWin(mainWindow2);
+				destroyWin(mainWindow3);
+				destroyWin(monitorWin);
 				if (process.platform != 'darwin') {
 					app.quit();
 				}
@@ -186,7 +187,7 @@ app.on('ready', function() {
 		mainWindow.on('closed', function(e) {
 			if (mainWindow2 === null) {
 				mainWindow = null;
-				mainWindow3.destroy();
+				destroyWin(mainWindow3);
 				if (process.platform != 'darwin') {
 					app.quit();
 				}
@@ -316,15 +317,9 @@ app.on('ready', function() {
 			switch (data.name) {
 				case "exit":
 					loopPaused = true;
-					if (mainWindow2 != null) {
-						mainWindow2.destroy();
-					}
-					if (mainWindow3 != null) {
-						mainWindow3.destroy();
-					}
-					if (monitorWin != null) {
-						monitorWin.destroy();
-					}
+					destroyWin(mainWindow2);
+					destroyWin(mainWindow3);
+					destroyWin(monitorWin);
 					if (process.platform != 'darwin') {
 						app.quit();
 					}
@@ -332,13 +327,13 @@ app.on('ready', function() {
 				case "select1":
 					mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, true, false);
 					addMainWin2handler(true);
-					mainWindow.destroy();
+					destroyWin(mainWindow);
 					break;
 				case "select2":
 					mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, true, false);
 					addMainWin2handler(true);
 					registerFocusInfo(mainWindow2);
-					mainWindow.destroy();
+					destroyWin(mainWindow);
 					break;
 				case "showConfig":
 					mainWindow3.show();
@@ -368,7 +363,7 @@ app.on('ready', function() {
 					break;
 				default:
 					console.log("Unhandled function - loadIpc(): " + data);
-					mainWindow.destroy();
+					destroyWin(mainWindow);
 					break;
 			}
 		});
@@ -441,6 +436,95 @@ app.on('ready', function() {
 			}
 		});
 
+		function iohook_proc(data) {
+			let ret = -1;
+			if (multipleInstance) {
+				return ret;
+			}
+			if (data.on === null && data.args === null) {
+				remoteLib.ioHook = require('iohook');
+				ret = remoteLib.ioHook;
+			} else if (data.func === "start") {
+				ret = remoteLib.ioHook.start();
+			} else if (data.on === "keyup") {
+				remoteLib.ioHook.on('keyup', event => {
+					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null) return;
+					if (event.shiftKey && event.ctrlKey) {
+						let chr = String.fromCharCode( event.rawcode );
+						if (chr === "" || typeof remoteVar.configData === 'undefined') return;
+						switch (chr) {
+							case remoteVar.configData.hotKeys.prev:
+								mainWindow2.webContents.send('remote', { msg: 'gotoPrev' });
+								break;
+							case remoteVar.configData.hotKeys.next:
+								mainWindow2.webContents.send('remote', { msg: 'gotoNext' });
+								break;
+							case remoteVar.configData.hotKeys.transparent:
+								mainWindow2.webContents.send('remote', { msg: 'update_trn' });
+								break;
+							case remoteVar.configData.hotKeys.black:
+								mainWindow2.webContents.send('remote', { msg: 'update_black' });
+								break;
+							case remoteVar.configData.hotKeys.white:
+								mainWindow2.webContents.send('remote', { msg: 'update_white' });
+								break;
+							default:
+								break;
+						}
+					}
+				});
+				ret = 1;
+			} else if (data.on === "keydown") {
+				remoteLib.ioHook.on('keydown', event => {
+					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
+					if (((event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && event.keycode === 63) ||
+					!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
+					event.keycode === 63 || event.keycode === 3655 || event.keycode === 3663 ||
+					event.keycode === 28 || event.keycode === 57 || event.keycode === 48 || event.keycode === 17 ||
+					event.keycode === 49 || event.keycode === 25 || event.keycode === 60999 || event.keycode === 61007 ||
+					event.keycode === 61003 || event.keycode === 61000 || event.keycode === 61005 || event.keycode === 61008
+					)) {
+						mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
+					}
+				});
+				ret = 1;
+			} else if (data.on === "mouseup") {
+				remoteLib.ioHook.on('mouseup', event => {
+					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
+					loopPaused=false;
+					mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
+				});
+				ret = 1;
+			} else if (data.on === "mousewheel") {
+				remoteLib.ioHook.on('mousewheel', event => {
+					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
+					mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
+				});
+				ret = 1;
+			} else if (data.on === "mousedrag") {
+				remoteLib.ioHook.on('mousedrag', event => {
+					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
+					if (loopPaused === false) {
+						loopPaused=true;
+					}
+				});
+				ret = 1;
+			}
+			return ret;
+		}
+
+		ipc.on('status', (event, data) => {
+			let ret = null;
+			switch (data.item) {
+				case "multipleInstance":
+					ret = multipleInstance;
+					break;
+				default:
+					break;
+			}
+			event.returnValue = ret;
+		});
+
 		ipc.on('require', (event, data) => {
 			/*
 				data.lib : string
@@ -454,12 +538,15 @@ app.on('ready', function() {
 					if (data.func === null && data.args === null) {
 						remoteLib.ffi = require("ffi");
 						try {
+							/*
 							let { RTLD_NOW, RTLD_GLOBAL } = remoteLib.ffi.DynamicLibrary.FLAGS;
 							remoteLib.ffi.DynamicLibrary(
 								app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
 								RTLD_NOW | RTLD_GLOBAL
 							);
-							remoteVar.lib = remoteLib.ffi.Library(app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
+							*/
+							remoteVar.lib = remoteLib.ffi.Library(
+								app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
 								'init': [ 'int', [] ],
 								'destroy': [ 'int', [] ],
 								'send': [ 'int', [ "string", "bool" ] ]
@@ -488,74 +575,21 @@ app.on('ready', function() {
 					}
 					break;
 				case "iohook":
-					if (data.on === null && data.args === null) {
-						remoteLib.ioHook = require('iohook');
-						ret = remoteLib.ioHook;
-					} else if (data.func === "start") {
-						ret = remoteLib.ioHook.start();
-					} else if (data.on === "keyup") {
-						remoteLib.ioHook.on('keyup', event => {
-							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null) return;
-							if (event.shiftKey && event.ctrlKey) {
-								let chr = String.fromCharCode( event.rawcode );
-								if (chr === "" || typeof remoteVar.configData === 'undefined') return;
-								switch (chr) {
-									case remoteVar.configData.hotKeys.prev:
-										mainWindow2.webContents.send('remote', { msg: 'gotoPrev' });
-										break;
-									case remoteVar.configData.hotKeys.next:
-										mainWindow2.webContents.send('remote', { msg: 'gotoNext' });
-										break;
-									case remoteVar.configData.hotKeys.transparent:
-										mainWindow2.webContents.send('remote', { msg: 'update_trn' });
-										break;
-									case remoteVar.configData.hotKeys.black:
-										mainWindow2.webContents.send('remote', { msg: 'update_black' });
-										break;
-									case remoteVar.configData.hotKeys.white:
-										mainWindow2.webContents.send('remote', { msg: 'update_white' });
-										break;
-									default:
-										break;
-								}
-							}
-						});
-						ret = 1;
-					} else if (data.on === "keydown") {
-						remoteLib.ioHook.on('keydown', event => {
-							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
-							if (((event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && event.keycode === 63) ||
-							!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
-							event.keycode === 63 || event.keycode === 3655 || event.keycode === 3663 ||
-							event.keycode === 28 || event.keycode === 57 || event.keycode === 48 || event.keycode === 17 ||
-							event.keycode === 49 || event.keycode === 25 || event.keycode === 60999 || event.keycode === 61007 ||
-							event.keycode === 61003 || event.keycode === 61000 || event.keycode === 61005 || event.keycode === 61008
-							)) {
-								mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
-							}
-						});
-						ret = 1;
-					} else if (data.on === "mouseup") {
-						remoteLib.ioHook.on('mouseup', event => {
-							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
-							loopPaused=false;
-							mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
-						});
-						ret = 1;
-					} else if (data.on === "mousewheel") {
-						remoteLib.ioHook.on('mousewheel', event => {
-							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
-							mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
-						});
-						ret = 1;
-					} else if (data.on === "mousedrag") {
-						remoteLib.ioHook.on('mousedrag', event => {
-							if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
-							if (loopPaused === false) {
-								loopPaused=true;
-							}
-						});
-						ret = 1;
+					if (data.func === "client") {
+						iohook_proc({ on: null, args: null });
+						iohook_proc({ on: "keyup", args: null });
+						iohook_proc({ on: "mouseup", args: null });
+						iohook_proc({ on: "mousedrag", args: null });
+						ret = iohook_proc({ func: "start", args: null });
+					} else if (data.func === "control") {
+						iohook_proc({ on: null, args: null });
+						iohook_proc({ on: "keyup", args: null });
+						iohook_proc({ on: "keydown", args: null });
+						iohook_proc({ on: "mouseup", args: null });
+						iohook_proc({ on: "mousewheel", args: null });
+						ret = iohook_proc({ func: "start", args: null });
+					} else {
+						ret = ioHook_proc(data);
 					}
 					break;
 				default:

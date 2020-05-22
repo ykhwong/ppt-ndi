@@ -2,10 +2,11 @@ PPT NDI v1.0.3
 
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
 
-Release Note (-):
+Release Note (May 22 2020):
 
 ADD: i18n support
 ADD: Support for SlideShowTransition.AdvanceTime
+ADD: Support for multiple instances (Classic mode)
 FIX: First slide not initially selectable
 FIX: Off-slide elements shown
 FIX: UI issues when used with 9:16 aspect ratio

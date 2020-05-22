@@ -1165,11 +1165,7 @@ $(document).ready(function() {
 	}
 
 	function registerIoHook() {
-		let ioHook = ipc.sendSync("require", { lib: "iohook", on: null, args: null });
-		ipc.sendSync("require", { lib: "iohook", on: "keyup", args: null });
-		ipc.sendSync("require", { lib: "iohook", on: "mouseup", args: null });
-		ipc.sendSync("require", { lib: "iohook", on: "mousedrag", args: null });
-		ipc.sendSync("require", { lib: "iohook", func: "start", args: null });
+		ipc.send("require", { lib: "iohook", func: "client", args: null });
 	}
 
 	function reflectConfig() {

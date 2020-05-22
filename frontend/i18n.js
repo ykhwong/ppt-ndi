@@ -1,9 +1,13 @@
 $(document).ready(function() {
-	const i18nDir = "./frontend/i18n";
+	const i18nDir = [ "./frontend/i18n", "./locales" ];
 	const fs = require("fs-extra");
 
 	function getPath(namespace) {
-		return i18nDir + "/" + namespace + ".json";
+		let tmpPath = i18nDir[0] + "/" + namespace + ".json";
+		if (!fs.existsSync(tmpPath)) {
+			tmpPath = i18nDir[1] + "/" + namespace + ".json";
+		}
+		return tmpPath;
 	}
 
 	getLangRsc=function(title, curLang) {

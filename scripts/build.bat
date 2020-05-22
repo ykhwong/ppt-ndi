@@ -8,6 +8,7 @@ cd ppt-ndi-win32-x64
 del /q d3dcompiler_47.dll
 rmdir /s /q .\swiftshader
 rmdir /s /q .\locales
+mkdir .\locales
 del /q LICENSE
 del /q LICENSES.chromium.html
 del /q osmesa.dll 2>nul
@@ -20,5 +21,6 @@ del /q version
 copy ..\deps\*.dll .\.
 copy ..\deps\*_slide.png .\resources\.
 copy ..\deps\sample.pptx .\resources\.
+copy ..\ppt-ndi\frontend\i18n\* .\locales\.
 :done
 pause >nul

@@ -604,12 +604,7 @@ $(document).ready(function() {
 	}
 
 	function registerIoHook() {
-		let ioHook = ipc.sendSync("require", { lib: "iohook", on: null, args: null });
-		ipc.sendSync("require", { lib: "iohook", on: "keyup", args: null });
-		ipc.sendSync("require", { lib: "iohook", on: "keydown", args: null });
-		ipc.sendSync("require", { lib: "iohook", on: "mouseup", args: null });
-		ipc.sendSync("require", { lib: "iohook", on: "mousewheel", args: null });
-		ipc.sendSync("require", { lib: "iohook", func: "start", args: null });
+		ipc.send("require", { lib: "iohook", func: "control", args: null });
 	}
 
 	function procTransition(file, data) {
@@ -697,6 +692,7 @@ $(document).ready(function() {
 		let vbsDir2;
 		let newVbsContent;
 		let now = new Date().getTime();
+		let multipleInstance = false;
 		try {
 			process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
 		} catch(e) {
@@ -813,7 +809,11 @@ $(document).ready(function() {
 				customSlideY = parseInt(resY, 10);
 			}
 		});
-
+		multipleInstance = ipc.sendSync("status", { item: "multipleInstance" });
+		if (multipleInstance) {
+			alertMsg(getLangRsc("ui_slideshow/no-support-multiple-instances", configData.lang));
+			cleanupForExit();
+		}
 	}
 
 	function cleanupForTemp() {

@@ -291,5 +291,19 @@
 				"rev": 0
 			}
 		}
+	},
+	{
+		"item": "no-support-multiple-instances",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "PPT NDI does not allow multiple instances for the SlideShow mode!",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "PPT NDI는 슬라이드쇼 모드에 대해 다중 인스턴스를 허용하지 않습니다!",
+				"rev": 0
+			}
+		}
 	}
 ]
