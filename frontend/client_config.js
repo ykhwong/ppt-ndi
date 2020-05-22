@@ -81,7 +81,7 @@ $(document).ready(function() {
 		setLangRscDiv("#saveConfig", "ui_config/save", true, configData.lang);
 	}
 
-	function setConfig() {
+	function setConfig(showInfo) {
 		// Save the config file
 
 		let hotKeys = {
@@ -103,9 +103,11 @@ $(document).ready(function() {
 			} else {
 				ipc.send('remote', { name: "reflectConfig" });
 				setLangRsc();
-				setTimeout(function() {
-					alertMsg(getLangRsc("ui_config/saved", configData.lang));
-				}, 100);
+				if (showInfo) {
+					setTimeout(function() {
+						alertMsg(getLangRsc("ui_config/saved", configData.lang));
+					}, 100);
+				}
 			}
 		});
 	}
@@ -121,6 +123,7 @@ $(document).ready(function() {
 				loadConfig();
 			} else {
 				// Do nothing
+				setConfig(false);
 			}
 		}
 	}
@@ -129,7 +132,7 @@ $(document).ready(function() {
 		ipc.send('remote', { name: "hideConfig" });
 	});
 	$('#saveConfig').click(function() {
-		setConfig();
+		setConfig(true);
 	});
 
 	$(".txtBox").on("click",function(){
@@ -163,12 +166,13 @@ $(document).ready(function() {
 	});
 	$("#version").append(version);
 
-	init();
-	
+
 	$.each(getLangList(), function (i, item) {
 		$("#langList").append($('<option>', { 
 			value: "lang_" + item.langCode,
 			text : item.details
 		}));
 	});
+
+	init();
 });
