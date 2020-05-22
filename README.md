@@ -7,7 +7,7 @@ PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek
 
 It also provides SlideShow monitor functionality that supports alpha transparency and can be integrated into any third-party video players that do not support NDI.
 
-The latest version is PPT NDI v1.0.3.
+The latest version is PPT NDI v1.0.3.1.
 
 ## BASIC USAGE
 1. Download PPT NDI from https://github.com/ykhwong/ppt-ndi/releases
