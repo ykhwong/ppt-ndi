@@ -58,11 +58,10 @@ $(document).ready(function() {
 			$("#transTxtBox").val(getHotKey(configData.hotKeys.transparent));
 			$("#blackTxtBox").val(getHotKey(configData.hotKeys.black));
 			$("#whiteTxtBox").val(getHotKey(configData.hotKeys.white));
-			if (typeof(configData.lang) === "undefined") {
-				$("#langList").val("lang_en");
-			} else {
-				$("#langList").val("lang_" + configData.lang);
+			if (typeof(configData.lang) === "undefined" || !/\S/.test(configData.lang)) {
+				configData.lang = "en";
 			}
+			$("#langList").val("lang_" + configData.lang);
 			setLangRsc();
 		});
 	}
@@ -121,8 +120,8 @@ $(document).ready(function() {
 			configPath = appDataPath + "/" + configFile;
 			if (fs.existsSync(configPath)) {
 				loadConfig();
+				setConfig(false);
 			} else {
-				// Do nothing
 				setConfig(false);
 			}
 		}
