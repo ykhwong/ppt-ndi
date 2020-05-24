@@ -42,8 +42,7 @@ The features of PPT NDI can be tested with NDI Studio Monitor. Any NDI-compatibl
 ![PPT NDI Studio Monitor Integration](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_ndi_vmix_example.png)
 
 * obs-ndi users must set the latency mode to Low in the Properties for NDI Source window.
-* High-end users can enable high performance mode in the PPT-NDI configuration.
-
+* High-end users can enable high performance mode in the PPT-NDI configuration. Enabling the high-performance mode lets the PPT-NDI send frames continuously, which could burden more performance loads. It may help in the case that third-party applications are not able to properly update the NDI image after switching the videos.
 
 ## OTHER NOTES
 
