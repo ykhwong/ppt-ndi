@@ -113,6 +113,9 @@ $(document).ready(function() {
 
 	function init() {
 		const { remote } = require('electron');
+		$.ajaxSetup({
+			async: false
+		});
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
 		if (fs.existsSync(configPath)) {
 			loadConfig();
