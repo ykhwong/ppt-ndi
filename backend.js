@@ -224,7 +224,8 @@ app.on('ready', function() {
 			maximizable: maximizable,
 			webPreferences: {
 				webSecurity: false,
-				nodeIntegration: true
+				nodeIntegration: true,
+				enableRemoteModule: true
 			},
 			transparent : isTransparent,
 			backgroundColor: isTransparent?'#00051336':'#060621'
@@ -536,7 +537,7 @@ app.on('ready', function() {
 			switch (data.lib) {
 				case "ffi":
 					if (data.func === null && data.args === null) {
-						remoteLib.ffi = require("ffi");
+						remoteLib.ffi = require("ffi-napi");
 						try {
 							/*
 							let { RTLD_NOW, RTLD_GLOBAL } = remoteLib.ffi.DynamicLibrary.FLAGS;
