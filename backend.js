@@ -145,6 +145,7 @@ app.on('ready', function() {
 		sendLoop();
 		refreshTray();
 		monitorWin = createWin(winData.monitor.width, winData.monitor.height, false, winData.monitor.dest, false, true);
+		monitorWin.setAlwaysOnTop(true);
 		monitorWin.on('close', function (event) {
 			event.preventDefault();
 			monitorWin.hide();
