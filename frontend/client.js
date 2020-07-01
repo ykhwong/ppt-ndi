@@ -226,7 +226,7 @@ $(document).ready(function() {
 	let preTmpDir = "";
 	let pptPath = "";
 	let modePostFix = "";
-	let modeUseBg = "";
+	let modeUseBg = false;
 	let mode1options = "";
 	let mode2options = "";
 	let pptTimestamp = 0;
