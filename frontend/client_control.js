@@ -814,6 +814,8 @@ $(document).ready(function() {
 			alertMsg(getLangRsc("ui_slideshow/no-support-multiple-instances", configData.lang));
 			cleanupForExit();
 		}
+		
+		reflectCache(false);
 	}
 
 	function cleanupForTemp() {
@@ -844,9 +846,65 @@ $(document).ready(function() {
 		}
 	}
 
+	function reflectCache(saveOnly) {
+		const configFile = 'cache_control.js';
+		let configPath = "";
+		const { remote } = require('electron');
+		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
+		const cacheData = {
+			"showCheckerboard": $("#trans_checker").is(":checked"),
+			"enableSlideTransition": $("#slide_tran").is(":checked"),
+			"includeBackground": $("#bk").is(":checked"),
+			"alwaysontop": pin
+		};
+		if (!fs.existsSync(configPath)) {
+			const appDataPath = process.env.APPDATA + "/PPT-NDI";
+			configPath = appDataPath + "/" + configFile;
+		}
+		
+		if (saveOnly || !fs.existsSync(configPath)) {
+			fs.writeFileSync(configPath, JSON.stringify(cacheData));
+			return;
+		}
+
+		$.getJSON(configPath, function(json) {
+			if (
+				(json.showCheckerboard && !cacheData.showCheckerboard) ||
+				(!json.showCheckerboard && cacheData.showCheckerboard)
+			) {
+				$('#trans_checker').trigger("click");
+			}
+
+			if (
+				(json.enableSlideTransition && !cacheData.enableSlideTransition) ||
+				(!json.enableSlideTransition && cacheData.enableSlideTransition)
+			) {
+				$('#slide_tran').trigger("click");
+			}
+
+			if (
+				(json.includeBackground && !cacheData.includeBackground) ||
+				(!json.includeBackground && cacheData.includeBackground)
+			) {
+				$('#bk').trigger("click");
+			}
+
+			if (json.alwaysontop) {
+				ipc.send('remote', { name: "onTop" });
+				$("#pin").attr("src", "pin_green.png");
+				pin = true;
+			} else {
+				ipc.send('remote', { name: "onTopOff" });
+				$("#pin").attr("src", "pin_grey.png");
+				pin = false;
+			}
+		});
+	}
+
 	function cleanupForExit() {
 		ipc.sendSync("require", { lib: "ffi", func: "destroy", args: null });
 		cleanupForTemp();
+		reflectCache(true);
 		ipc.send('remote', { name: "exit" });
 	}
 

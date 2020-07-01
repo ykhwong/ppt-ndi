@@ -1161,6 +1161,7 @@ $(document).ready(function() {
 	function cleanupForExit() {
 		ipc.sendSync("require", { lib: "ffi", func: "destroy", args: null });
 		cleanupForTemp(false);
+		reflectCache(true);
 		ipc.send('remote', { name: "exit" });
 	}
 
@@ -1190,6 +1191,58 @@ $(document).ready(function() {
 		} else {
 			// Do nothing
 		}
+	}
+
+	function reflectCache(saveOnly) {
+		const configFile = 'cache_client.js';
+		let configPath = "";
+		const { remote } = require('electron');
+		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
+		const cacheData = {
+			"showCheckerboard": $("#trans_checker").is(":checked"),
+			"enableSlideTransition": $("#use_slide_transition").is(":checked"),
+			"includeBackground": $("#with_background").is(":checked"),
+			"monitorAlpha": $("#monitor_trans").is(":checked")
+		};
+		if (!fs.existsSync(configPath)) {
+			const appDataPath = process.env.APPDATA + "/PPT-NDI";
+			configPath = appDataPath + "/" + configFile;
+		}
+		
+		if (saveOnly || !fs.existsSync(configPath)) {
+			fs.writeFileSync(configPath, JSON.stringify(cacheData));
+			return;
+		}
+
+		$.getJSON(configPath, function(json) {
+			if (
+				(json.showCheckerboard && !cacheData.showCheckerboard) ||
+				(!json.showCheckerboard && cacheData.showCheckerboard)
+			) {
+				$('#trans_checker').trigger("click");
+			}
+
+			if (
+				(json.enableSlideTransition && !cacheData.enableSlideTransition) ||
+				(!json.enableSlideTransition && cacheData.enableSlideTransition)
+			) {
+				$('#use_slide_transition').trigger("click");
+			}
+
+			if (
+				(json.includeBackground && !cacheData.includeBackground) ||
+				(!json.includeBackground && cacheData.includeBackground)
+			) {
+				$('#with_background').trigger("click");
+			}
+
+			if (
+				(json.monitorAlpha && !cacheData.monitorAlpha) ||
+				(!json.monitorAlpha && cacheData.monitorAlpha)
+			) {
+				$('#monitor_trans').trigger("click");
+			}
+		});
 	}
 
 	function getMultipleMonitors() {
@@ -1421,4 +1474,5 @@ $(document).ready(function() {
 	initImgPicker();
 	startCurrentTime();
 	registerIoHook();
+	reflectCache(false);
 });
