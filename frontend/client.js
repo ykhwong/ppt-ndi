@@ -565,11 +565,7 @@ $(document).ready(function() {
 					modePostFix = "";
 					$("#slides_grp").html(mode1options);
 				}
-				if ($(this).is(":checked")) {
-					modeUseBg = false;
-				} else {
-					modeUseBg = true;
-				}
+				modeUseBg != modeUseBg;
 				selectSlide(currentSlide.toString());
 			}
 		} else {
