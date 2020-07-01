@@ -9,6 +9,7 @@ $(document).ready(function() {
 		"width": "100%",
 		"height": "100%"
 	});
+
 	$("#monitorDisp").css({
 		"position": "fixed",
 		"top": "0",
@@ -18,6 +19,13 @@ $(document).ready(function() {
 		"background-color": "transparent",
 		"background-repeat": "no-repeat",
 		"background-size": "100% 100%"
+	});
+
+	$("html").keydown(function(e) {
+		if(e.keyCode === 27) {
+			let currentWindow = remote.getCurrentWindow();
+			currentWindow.hide();
+		}
 	});
 
 	ipc.on('monitor', (event, data) => {

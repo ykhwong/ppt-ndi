@@ -416,6 +416,7 @@ app.on('ready', function() {
 				case "turnOn":
 					monitorWin.show();
 					monitorWin.setFullScreen(true);
+					monitorWin.setResizable(false);
 					break;
 				case "turnOff":
 					monitorWin.hide();
