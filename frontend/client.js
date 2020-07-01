@@ -570,6 +570,7 @@ $(document).ready(function() {
 				} else {
 					modeUseBg = true;
 				}
+				selectSlide(currentSlide.toString());
 			}
 		} else {
 			$(this).prop("checked", !$(this).prop("checked"));
