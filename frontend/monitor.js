@@ -29,21 +29,62 @@ $(document).ready(function() {
 	});
 
 	ipc.on('monitor', (event, data) => {
-		switch (data.func) {
-			case "update":
-				var dFile = data.file.replace(/\\/g, "/");
-				$("#html, #monitorDisp").css("background-color", isTransSet ? "transparent" : "black");
+
+		function updateMon() {
+			var mode = data.mode;
+			var workerinit = data.workerinit;
+			var usebg = data.modeusebg;
+			var dFile = data.file.replace(/\\/g, "/");
+			var dFile2 = dFile;
+			if (/\/mode2\/Slide\d+\.png/i.test(dFile2)) {
+				dFile2 = dFile2.replace(/\/mode2(\/Slide\d+\.png)/i, "$1");
+			} else {
+				dFile2 = dFile2.replace(/(\/Slide\d+\.png)/i, "/mode2/$1");
+			}
+
+			$("#html, #monitorDisp").css("background-color", isTransSet ? "transparent" : "black");
+			if (!workerinit || /Slide0\.png$/i.test(dFile)) {
 				$("#monitorDisp").css({
 					"background-image": 'url(file:///' + dFile + ')'
 				});
+			} else {
+				if (isTransSet) {
+					if (usebg) {
+						$("#monitorDisp").css({
+							"background-image": 'url(file:///' + dFile + ')'
+						});
+					} else {
+						$("#monitorDisp").css({
+							"background-image": 'url(file:///' + dFile2 + ')'
+						});
+					}
+				} else {
+					if (usebg) {
+						$("#monitorDisp").css({
+							"background-image": 'url(file:///' + dFile2 + ')'
+						});
+					} else {
+						$("#monitorDisp").css({
+							"background-image": 'url(file:///' + dFile + ')'
+						});
+					}
+				}
+			}
+		}
+
+		switch (data.func) {
+			case "update":
+				updateMon();
 				break;
 			case "transparentOn":
 				$("#html, #monitorDisp").css("background-color", "transparent");
 				isTransSet = true;
+				updateMon();
 				break;
 			case "transparentOff":
 				$("#html, #monitorDisp").css("background-color", "black");
 				isTransSet = false;
+				updateMon();
 				break;
 			case "monitorBlack":
 				$("#html, #monitorDisp").css("background-color", "black");

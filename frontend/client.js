@@ -226,6 +226,7 @@ $(document).ready(function() {
 	let preTmpDir = "";
 	let pptPath = "";
 	let modePostFix = "";
+	let modeUseBg = "";
 	let mode1options = "";
 	let mode2options = "";
 	let pptTimestamp = 0;
@@ -361,6 +362,9 @@ $(document).ready(function() {
 		initImgPicker();
 		ipc.send("monitor", {
 			file: curSli,
+			workerinit: loadBackgroundInit,
+			mode: modePostFix,
+			modeuusebg: modeUseBg,
 			func: "update"
 		});
 	}
@@ -561,6 +565,11 @@ $(document).ready(function() {
 					modePostFix = "";
 					$("#slides_grp").html(mode1options);
 				}
+				if ($(this).is(":checked")) {
+					modeUseBg = false;
+				} else {
+					modeUseBg = true;
+				}
 			}
 		} else {
 			$(this).prop("checked", !$(this).prop("checked"));
@@ -627,8 +636,10 @@ $(document).ready(function() {
 			vbsDir = tmpDir2 + '/wb.vbs';
 			if ($("#with_background").is(":checked")) {
 				newVbsContent = vbsNoBg;
+				modeUseBg = false;
 			} else {
 				newVbsContent = vbsBg;
+				modeUseBg = true;
 			}
 
 			try {
@@ -1365,12 +1376,20 @@ $(document).ready(function() {
 
 	function enableMonitorTransparent() {
 		ipc.send("monitor", {
+			file: tmpDir + "/Slide" + currentSlide.toString() + '.png',
+			workerinit: loadBackgroundInit,
+			mode: modePostFix,
+			modeuusebg: modeUseBg,
 			func: "transparentOn"
 		});
 	}
 
 	function disableMonitorTransparent() {
 		ipc.send("monitor", {
+			file: tmpDir + "/Slide" + currentSlide.toString() + '.png',
+			workerinit: loadBackgroundInit,
+			mode: modePostFix,
+			modeuusebg: modeUseBg,
 			func: "transparentOff"
 		});
 	}
