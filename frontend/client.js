@@ -624,6 +624,7 @@ $(document).ready(function() {
 		let file = pptPath;
 		loadBackgroundInit = false;
 		modePostFix = "";
+		$("#with_bg_slider").css("filter", "sepia(1)");
 		if (re.exec(file)) {
 			let tmpDir2 = tmpDir + "/mode2";
 			let newVbsContent;
@@ -647,6 +648,7 @@ $(document).ready(function() {
 				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 			} catch(e) {
 				loadBackgroundInit = false;
+				$("#with_bg_slider").css("filter", "sepia(0)");
 				return;
 			}
 
@@ -660,6 +662,7 @@ $(document).ready(function() {
 			res = spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, tmpDir2, resX, resY, '' ] );
 			res.stderr.on('data', (data) => {
 				loadBackgroundInit = false;
+				$("#with_bg_slider").css("filter", "sepia(0)");
 				return;
 			});
 			res.on('close', (code) => {
@@ -698,6 +701,7 @@ $(document).ready(function() {
 				mode2options = options;
 
 				loadBackgroundInit = true;
+				$("#with_bg_slider").css("filter", "sepia(0)");
 			});
 		}
 	}
