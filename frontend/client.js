@@ -364,7 +364,7 @@ $(document).ready(function() {
 			file: curSli,
 			workerinit: loadBackgroundInit,
 			mode: modePostFix,
-			modeuusebg: modeUseBg,
+			modeusebg: modeUseBg,
 			func: "update"
 		});
 	}
@@ -1384,7 +1384,7 @@ $(document).ready(function() {
 			file: tmpDir + "/Slide" + currentSlide.toString() + '.png',
 			workerinit: loadBackgroundInit,
 			mode: modePostFix,
-			modeuusebg: modeUseBg,
+			modeusebg: modeUseBg,
 			func: "transparentOn"
 		});
 	}
@@ -1394,7 +1394,7 @@ $(document).ready(function() {
 			file: tmpDir + "/Slide" + currentSlide.toString() + '.png',
 			workerinit: loadBackgroundInit,
 			mode: modePostFix,
-			modeuusebg: modeUseBg,
+			modeusebg: modeUseBg,
 			func: "transparentOff"
 		});
 	}
