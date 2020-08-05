@@ -12,6 +12,7 @@ app.on('ready', function() {
 	let mainWindow2 = null;
 	let mainWindow3 = null;
 	let monitorWin = null;
+	let rendererWin = null;
 	let startAsTray = false;
 	let isMainWinShown = false;
 	let isMainWin2shown = false;
@@ -45,6 +46,11 @@ app.on('ready', function() {
 			"width" : 0,
 			"height" : 0,
 			"dest" : "monitor.html"
+		},
+		"renderer": {
+			"width" : 1024,
+			"height" : 768,
+			"dest" : "renderer.html"
 		}
 	}
 
@@ -91,6 +97,7 @@ app.on('ready', function() {
 				destroyWin(mainWindow2);
 				destroyWin(mainWindow3);
 				destroyWin(monitorWin);
+				destroyWin(rendererWin);
 				if (process.platform != 'darwin') {
 					app.quit();
 				}
@@ -145,6 +152,8 @@ app.on('ready', function() {
 		sendLoop();
 		refreshTray();
 		monitorWin = createWin(winData.monitor.width, winData.monitor.height, false, winData.monitor.dest, false, true);
+		//rendererWin = createWin(winData.renderer.width, winData.renderer.height, false, winData.renderer.dest, true, false);
+		rendererWin = createWin(winData.renderer.width, winData.renderer.height, false, winData.renderer.dest, false, true);
 		monitorWin.setAlwaysOnTop(true);
 		monitorWin.on('close', function (event) {
 			event.preventDefault();
@@ -322,6 +331,7 @@ app.on('ready', function() {
 					destroyWin(mainWindow2);
 					destroyWin(mainWindow3);
 					destroyWin(monitorWin);
+					destroyWin(rendererWin);
 					if (process.platform != 'darwin') {
 						app.quit();
 					}

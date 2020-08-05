@@ -5,9 +5,12 @@
 	"dependencies": {
 		"ffi-napi": "^3.0.1",
 		"fs-extra": "^8.1.0",
+		"html-to-image": "^0.1.1",
+		"iconv-lite": "^0.6.2",
 		"iohook": "git+https://github.com/wilix-team/iohook.git",
 		"merge-images": "^2.0.0",
 		"pngjs": "^3.4.0",
+		"pptx-compose": "^1.0.0",
 		"tree-kill": "^1.2.2"
 	},
 	"devDependencies": {},
