@@ -13,6 +13,7 @@ $(document).ready(function() {
 		resX : 0,
 		resY : 0
 	};
+	let customSize = resSize;
 	let isLoaded = false;
 	let hasError = false;
 	let outPath = "";
@@ -76,6 +77,7 @@ $(document).ready(function() {
 					grpSpPr[num] = json; json = [];
 				}
 			}
+
 			if (!xmlFound) {
 				notifyError("2");
 				return;
@@ -101,11 +103,19 @@ $(document).ready(function() {
 
 	function drawSlide(selectedNo, slideCnt) {
 		$("#renderer").html("");
-		$("#renderer").css({
-			"position": "fixed",
-			"width": resSize.resX,
-			"height": resSize.resY
-		});
+		if (customSize.resX !== 0 || customSize.resY !== 0) {
+			$("#renderer").css({
+				"position": "fixed",
+				"width": customSize.resX,
+				"height": customSize.resY
+			});
+		} else {
+			$("#renderer").css({
+				"position": "fixed",
+				"width": resSize.resX,
+				"height": resSize.resY
+			});
+		}
 		if (isCancelTriggered) {
 			notifyCanceled();
 			return;
@@ -122,69 +132,98 @@ $(document).ready(function() {
 			let elementOffY = (element["p:spPr"][0]["a:xfrm"][0]["a:off"][0]["$"]["y"] / baseDiv).toFixed(3);
 			let elementExtCX = (element["p:spPr"][0]["a:xfrm"][0]["a:ext"][0]["$"]["cx"] / baseDiv).toFixed(3);
 			let elementExtCY = (element["p:spPr"][0]["a:xfrm"][0]["a:ext"][0]["$"]["cy"] / baseDiv).toFixed(3);
+			if (customSize.resX !== 0 || customSize.resY !== 0) {
+				// resSizeX : eX = customX : ?
+				elementOffX = elementOffX * customSize.resX / resSize.resX;
+				elementOffY = elementOffY * customSize.resY / resSize.resY;
+				elementExtCX = elementExtCX * customSize.resX / resSize.resX;
+				elementExtCY = elementExtCX * customSize.resY / resSize.resY;
+			}
+
 			if (elementType === "rect") {
 				let txBody = element["p:txBody"];
+				let xText = "";
 				if (txBody !== null) {
-					let xText = "";
-					let xFont = "";
-					let xFontLatin = "";
-					let xFontEa = "";
-					let xFontAlgn = "left";
-					let xFontSize = "";
+					for (let i2=0; i2<txBody[0]["a:p"].length; i2++) {
+						let xFont = "";
+						let xFontLatin = "";
+						let xFontEa = "";
+						let xFontAlgn = "left";
+						let xFontSize = "";
+						let fontFamily = '';
+						let xTextA = '';
 
-					try { xText = txBody[0]["a:p"][0]["a:r"][0]["a:t"][0]; } catch(e) {}
-					try { xFont = txBody[0]["a:p"][0]["a:r"][0]["a:rPr"][0]; } catch(e) {}
-					try { xFontLatin = xFont["a:latin"][0]["$"]["typeface"]; } catch(e) {}
-					try { xFontEa = xFont["a:ea"][0]["$"]["typeface"]; } catch(e) {}
-					try { xFontAlgn = txBody[0]["a:p"][0]["a:pPr"][0]["$"]["algn"]; } catch(e) {}
-					try { xFontSize = xFont["$"]["sz"] / 100; } catch(e) {}
-
-					let fontFamily = '';
-					if (/\S/.test(xFontLatin)) {
-						fontFamily = "'" + xFontLatin + "'";
-					}
-					if (/\S/.test(xFontAlgn)) {
-						if (xFontAlgn === 'ctr') {
-							xFontAlgn = "center";
-						} else if (xFontAlgn === 'r') {
-							xFontAlgn = "right";
-						} else if (xFontAlgn === 'just') {
-							xFontAlgn = "justify";
-						} else {
-							xFontAlgn = "left";
+						try { xTextA = txBody[0]["a:p"][i2]["a:r"][0]["a:t"][0]; } catch(e) {}
+						try { xFont = txBody[0]["a:p"][i2]["a:r"][0]["a:rPr"][0]; } catch(e) {}
+						try { xFontLatin = xFont["a:latin"][0]["$"]["typeface"]; } catch(e) {}
+						try { xFontEa = xFont["a:ea"][0]["$"]["typeface"]; } catch(e) {}
+						try { xFontAlgn = txBody[0]["a:p"][i2]["a:pPr"][0]["$"]["algn"]; } catch(e) {}
+						try {
+							xFontSize = xFont["$"]["sz"] / 100;
+							if (customSize.resX !== 0 || customSize.resY !== 0) {
+								xFontSize = xFontSize * customSize.resX / resSize.resX;
+							}
+						} catch(e) {}
+	
+						if (/\S/.test(xFontLatin)) {
+							fontFamily = "'" + xFontLatin + "'";
 						}
-					}
-					if (/\S/.test(xFontEa)) {
-						if (/\S/.test(fontFamily)) {
-							fontFamily += ",";
+						if (/\S/.test(xFontAlgn)) {
+							if (xFontAlgn === 'ctr') {
+								xFontAlgn = "center";
+							} else if (xFontAlgn === 'r') {
+								xFontAlgn = "right";
+							} else if (xFontAlgn === 'just') {
+								xFontAlgn = "justify";
+							} else {
+								xFontAlgn = "left";
+							}
 						}
-						fontFamily += "'" + xFontEa + "'";
-					}
-					let rendererConf = 
-						'<div style="color: white; position: fixed; ' +
-						'left: ' + elementOffX + 'px;' +
-						'top: ' + elementOffY + 'px;' + 
+						if (/\S/.test(xFontEa)) {
+							if (/\S/.test(fontFamily)) {
+								fontFamily += ",";
+							}
+							fontFamily += "'" + xFontEa + "'";
+						}
+						xText +=
+						'<div style="' +
 						(/\S/.test(fontFamily)?'font-family: ' + fontFamily + ";" : '') +
 						'text-align: ' + xFontAlgn + ';' +
 						'width: ' + elementExtCX +'px;' + 
 						'height: ' + elementExtCY +'px;' + 
 						'font-size: ' + xFontSize + 'px;' +
+						'display: inline;' +
 						'white-space: nowrap;' +
-						'">' + xText + '</div>';
-					//console.log(rendererConf);
+						'line-height: 80%;' +
+						'"><p>' + xTextA + '</div></p>';
+					}
+
+					let rendererConf = 
+					'<div style="color: white; position: fixed; ' +
+					'left: ' + elementOffX + 'px;' +
+					'top: ' + elementOffY + 'px;' + 
+					'">' + xText + '</div>';
 					if (isCancelTriggered) {
 						notifyCanceled();
 						return;
 					}
 					$("#renderer").append(rendererConf);
-				}
+					}
 			}
 		}
 		if (isCancelTriggered) {
 			notifyCanceled();
 			return;
 		}
-		htmlToImage.toPng(document.getElementById('renderer'))
+		let options = {};
+		if (customSize.resX !== 0 || customSize.resY !== 0) {
+			options = {
+				width: customSize.resX,
+				height: customSize.resY
+			}
+		}
+
+		htmlToImage.toPng(document.getElementById('renderer'), options)
 		.then(function (png) {
 			if (isCancelTriggered) {
 				notifyCanceled();
@@ -263,6 +302,10 @@ $(document).ready(function() {
 		switch (data.func) {
 			case "load":
 				loadPPT(data.options.file, data.options.outDir);
+				customSize = {
+					resX : parseInt(data.options.resX),
+					resY : parseInt(data.options.resY)
+				}
 				break;
 			case "cancel":
 				isCancelTriggered = true;

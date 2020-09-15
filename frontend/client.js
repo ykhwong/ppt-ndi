@@ -728,10 +728,11 @@ $(document).ready(function() {
 		}
 		tmpDir += '/' + now;
 		fs.mkdirSync(tmpDir);
-
 		let opts = {
 			file: file,
-			outDir : tmpDir
+			outDir : tmpDir,
+			resX : customSlideX,
+			resY : customSlideY
 		}
 		$(".cancelBox").show();
 
