@@ -5,6 +5,7 @@ $(document).ready(function() {
 	const baseDiv = 9525;
 	const htmlToImage = require('html-to-image');
 	const fs = require("fs-extra");
+	const ipc = require('electron').ipcRenderer;
 	let sp = { };
 	let nvGrpSpPr = { };
 	let grpSpPr = { };
@@ -13,27 +14,51 @@ $(document).ready(function() {
 		resY : 0
 	};
 	let isLoaded = false;
+	let hasError = false;
+	let outPath = "";
+	let pptFile = "";
+	let isCancelTriggered = false;
 
 	// x, y = location
 	// cx, cy = width, height
 
-	function loadPPT(filename) {
+	function loadPPT(filename, outDir) {
 		cleanUpJSON();
+		pptFile = filename;
+		outPath = outDir;
 		composer.toJSON(filename).then((output) => {
 			output = JSON.parse(iconv.decode(JSON.stringify(output), 'utf-8'));
-			let sldSz = output["ppt/presentation.xml"]["p:presentation"]["p:sldSz"][0]["$"];
 			let slideCnt = 0;
+			let sldSz;
+			let xmlFound = false;
+			try {
+				sldSz = output["ppt/presentation.xml"]["p:presentation"]["p:sldSz"][0]["$"];
+			} catch (e) {
+				notifyError("Unknown p:sldSz");
+				return;
+			}
 			resSize.resX = sldSz.cx / baseDiv;
 			resSize.resY = sldSz.cy / baseDiv;
 
 			for (let key in output) {
 				if (/^ppt\/slides\/slide\d+\.xml$/.test(key)) {
-					let num = parseInt(key.replace(/\.xml$/, "").replace(/^.*(\d+)/, "$1"), 10);
-					let zData = output[key]["p:sld"]["p:cSld"][0]["p:spTree"][0];
-					let zSp = zData["p:sp"];
-					let zNvGrpSpPr = zData["p:nvGrpSpPr"];
-					let zGrpSpPr = zData["p:grpSpPr"];
+					xmlFound = true;
 					let json = new Array;
+					let num;
+					let zData;
+					let zSp;
+					let zNvGrpSpPr;
+					let zGrpSpPr;
+					try {
+						num = parseInt(key.replace(/\.xml$/, "").replace(/^.*(\d+)/, "$1"), 10);
+						zData = output[key]["p:sld"]["p:cSld"][0]["p:spTree"][0];
+						zSp = zData["p:sp"];
+						zNvGrpSpPr = zData["p:nvGrpSpPr"];
+						zGrpSpPr = zData["p:grpSpPr"];
+					} catch (e) {
+						notifyError("1");
+						return;
+					}
 
 					for (let i=0; i<zSp.length; i++) {
 							json.push(zSp[i]);
@@ -51,7 +76,10 @@ $(document).ready(function() {
 					grpSpPr[num] = json; json = [];
 				}
 			}
-			//console.log(output);
+			if (!xmlFound) {
+				notifyError("2");
+				return;
+			}
 
 			slideCnt = Object.keys(sp).length;
 			drawSlide(1, slideCnt);
@@ -63,6 +91,8 @@ $(document).ready(function() {
 		nvGrpSpPr = { };
 		grpSpPr = { };
 		isLoaded = false;
+		hasError = false;
+		outPath = "";
 		resSize = {
 			resX : 0,
 			resY : 0
@@ -76,7 +106,15 @@ $(document).ready(function() {
 			"width": resSize.resX,
 			"height": resSize.resY
 		});
+		if (isCancelTriggered) {
+			notifyCanceled();
+			return;
+		}
 
+		if (sp[selectedNo] === undefined) {
+			notifyError("undefined sp[selectedNo]: " + selectedNo);
+			return;
+		}
 		for (let i=0; i < sp[selectedNo].length; i++) {
 			let element = sp[selectedNo][i];
 			let elementType = element["p:spPr"][0]["a:prstGeom"][0]["$"]["prst"];
@@ -134,26 +172,101 @@ $(document).ready(function() {
 						'white-space: nowrap;' +
 						'">' + xText + '</div>';
 					//console.log(rendererConf);
+					if (isCancelTriggered) {
+						notifyCanceled();
+						return;
+					}
 					$("#renderer").append(rendererConf);
-					htmlToImage.toPng(document.getElementById('renderer'))
-					.then(function (png) {
-						png = png.replace(/^data:image\/png;base64,/, "");
-						//fs.writeFileSync("Slide" + selectedNo + ".png", png, 'base64');
-						if (selectedNo === slideCnt) {
-							isLoaded = true;
-							return;
-						}
-						drawSlide(selectedNo + 1, slideCnt);
-					});
 				}
 			}
 		}
+		if (isCancelTriggered) {
+			notifyCanceled();
+			return;
+		}
+		htmlToImage.toPng(document.getElementById('renderer'))
+		.then(function (png) {
+			if (isCancelTriggered) {
+				notifyCanceled();
+				return;
+			}
+			png = png.replace(/^data:image\/png;base64,/, "");
+			fs.writeFileSync(outPath + "/Slide" + selectedNo + ".png", png, 'base64');
+			console.log(">>" + selectedNo);
+			if (isCancelTriggered) {
+				notifyCanceled();
+				return;
+			}
+			if (selectedNo === slideCnt) {
+				if (isCancelTriggered) {
+					notifyCanceled();
+				} else {
+					notifyLoaded();
+				}
+			} else {
+				if (isCancelTriggered) {
+					notifyCanceled();
+					return;
+				} else {
+					selectedNo++;
+					drawSlide(selectedNo, slideCnt);	
+				}
+			}
+		});
+	}
+
+	function notifyError(msg) {
+		hasError = true;
+		isLoaded = false;
+		isCancelTriggered = false;
+		console.log("renderer : error");
+		ipc.send("renderer", { name: "notifyError", message: msg });
+	}
+
+	function notifyLoaded() {
+		hasError = false;
+		isLoaded = true;
+		isCancelTriggered = false;
+		console.log("renderer : loaded");
+		ipc.send("renderer", {
+			name: "notifyLoaded",
+			outDir: outPath,
+			pptFile: pptFile
+		});
+	}
+
+	function notifyCanceled() {
+		hasError = false;
+		isLoaded = true;
+		if (isCancelTriggered) {
+			console.log("renderer : cancelled");
+			ipc.send("renderer", {
+				name: "notifyCanceled"
+			});
+		}
+		isCancelTriggered = false;
 	}
 
 	function getSlideSize() {
 		return resSize;
 	}
 
-	//loadPPT("d:/sandbox/simple.pptx");
+	function _isLoaded() {
+		return isLoaded;
+	}
 
+	function _hasError() {
+		return hasError;
+	}
+
+	ipc.on('renderer' , function(event, data){
+		switch (data.func) {
+			case "load":
+				loadPPT(data.options.file, data.options.outDir);
+				break;
+			case "cancel":
+				isCancelTriggered = true;
+				break;
+		}
+	});
 });

@@ -411,6 +411,9 @@ html, body {
 	text-align: center;
 }
 
+#renderer {
+}
+
 .cancelBox {
 	position: fixed;
 	display: none;

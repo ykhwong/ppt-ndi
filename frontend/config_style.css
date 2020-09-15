@@ -33,7 +33,7 @@ html, body {
 
 #bktbl2 {
 	position: fixed;
-	top: 120px;
+	top: 140px;
 	width: 400px;
 	height: 20px;
 	left: 10px;
@@ -42,16 +42,19 @@ html, body {
 
 #bktbl3 {
 	position: fixed;
-	top: 300px;
+	top: 340px;
 	width: 200px;
 	height: 20px;
 	left: 10px;
 	color: #79a9f7;
+	white-space: nowrap;
 }
 
-#langList {
+#rendererList, #langList {
 	background-color: black;
 	color: white;
+	margin-left: 7px;
+	width: 160px;
 }
 
 #version {
@@ -88,7 +91,7 @@ html, body {
 
 #saveConfig {
 	position: fixed;
-	top: 345px;
+	top: 415px;
 	left: 15px;
 	width: 50px;
 	height: 20px;

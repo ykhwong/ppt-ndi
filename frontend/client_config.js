@@ -17,8 +17,10 @@ $(document).ready(function() {
 			"black" : "",
 			"white" : ""
 		},
+		"renderer": "Microsoft PowerPoint",
 		"lang": "en"
 	};
+	const rendererList = ["Microsoft PowerPoint", "Internal"];
 	let configData = defaultData;
 	let configPath = "";
 
@@ -50,6 +52,7 @@ $(document).ready(function() {
 			configData.highPerformance = json.highPerformance;
 			configData.hotKeys = json.hotKeys;
 			configData.lang = json.lang;
+			configData.renderer = json.renderer;
 			$("#systray").prop('checked', configData.startAsTray);
 			$("#startWithFirstSlide").prop('checked', configData.startWithTheFirstSlideSelected);
 			$("#highPerformance").prop('checked', configData.highPerformance);
@@ -61,6 +64,7 @@ $(document).ready(function() {
 			if (typeof(configData.lang) === "undefined" || !/\S/.test(configData.lang)) {
 				configData.lang = "en";
 			}
+			$("#rendererList").val(configData.renderer);
 			$("#langList").val("lang_" + configData.lang);
 			setLangRsc();
 		});
@@ -77,6 +81,7 @@ $(document).ready(function() {
 		setLangRscDiv("#white", "ui_config/white", true, configData.lang);
 		setLangRscDiv("#trans", "ui_config/transparent", true, configData.lang);
 		setLangRscDiv("#localization", "ui_config/localization", true, configData.lang);
+		setLangRscDiv("#renderer", "ui_config/renderer", true, configData.lang);
 		setLangRscDiv("#saveConfig", "ui_config/save", true, configData.lang);
 	}
 
@@ -96,6 +101,7 @@ $(document).ready(function() {
 		configData.highPerformance = $("#highPerformance").prop("checked");
 		configData.hotKeys = hotKeys;
 		configData.lang = $("#langList").val().replace(/^lang_/i, "");
+		configData.renderer = $("#rendererList").val();
 		fs.writeFile(configPath, JSON.stringify(configData, null, "\t"), (err) => {
 			if (err) {
 				alertMsg(getLangRsc("ui_config/could-not-save-config", configData.lang));
@@ -168,13 +174,19 @@ $(document).ready(function() {
 	});
 	$("#version").append(version);
 
-
 	$.each(getLangList(), function (i, item) {
 		$("#langList").append($('<option>', { 
 			value: "lang_" + item.langCode,
 			text : item.details
 		}));
 	});
+
+	for (let i=0; i<rendererList.length; i++) {
+		$("#rendererList").append($('<option>', { 
+			value: rendererList[i],
+			text : rendererList[i]
+		}));	
+	}
 
 	init();
 });

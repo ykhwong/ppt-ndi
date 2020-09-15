@@ -154,6 +154,20 @@
 	}
 },
 {
+	"item": "renderer",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Renderer",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "렌더러",
+			"rev" : 0
+		}
+	}
+},
+{
 	"item": "saved",
 	"lang": {
 		"description": "",

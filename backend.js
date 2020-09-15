@@ -39,7 +39,7 @@ app.on('ready', function() {
 		},
 		"config" : {
 			"width" : 320,
-			"height" : 385,
+			"height" : 465,
 			"dest" : "config.html"
 		},
 		"monitor" : {
@@ -152,8 +152,7 @@ app.on('ready', function() {
 		sendLoop();
 		refreshTray();
 		monitorWin = createWin(winData.monitor.width, winData.monitor.height, false, winData.monitor.dest, false, true);
-		//rendererWin = createWin(winData.renderer.width, winData.renderer.height, false, winData.renderer.dest, true, false);
-		rendererWin = createWin(winData.renderer.width, winData.renderer.height, false, winData.renderer.dest, false, true);
+		rendererWin = createWin(winData.renderer.width, winData.renderer.height, false, winData.renderer.dest, debugMode ? true : false, true);
 		monitorWin.setAlwaysOnTop(true);
 		monitorWin.on('close', function (event) {
 			event.preventDefault();
@@ -376,6 +375,23 @@ app.on('ready', function() {
 				default:
 					console.log("Unhandled function - loadIpc(): " + data);
 					destroyWin(mainWindow);
+					break;
+			}
+		});
+
+		ipc.on('renderer', (event, data) => {
+			switch (data.name) {
+				case "notifyError":
+				case "notifyLoaded":
+				case "notifyCanceled":
+					mainWindow2.webContents.send('renderer', data);
+					break;
+			}
+
+			switch (data.func) {
+				case "load":
+				case "cancel":
+					rendererWin.webContents.send('renderer', data);
 					break;
 			}
 		});
