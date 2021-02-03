@@ -99,8 +99,8 @@ function _init() {
 			dl2_done = true;
 		});
 
-		// 60 sec timeout
-		for ( let i = 0; i < 60; i++ ) {
+		// 1800 sec timeout
+		for ( let i = 0; i < 1800; i++ ) {
 			sleep(1000);
 			if (dl1_done && dl2_done) {
 				//console.log("done");
@@ -143,8 +143,8 @@ function _build() {
 			}
 		});
 
-		// 60 sec timeout
-		for ( let i = 0; i < 60; i++ ) {
+		// 1800 sec timeout
+		for ( let i = 0; i < 1800; i++ ) {
 			sleep(1000);
 			if (unzip1_done) {
 				//console.log("done");
