@@ -82,6 +82,22 @@ Please also download and open the sample.pptx file to see some examples of the l
 
 https://github.com/ykhwong/ppt-ndi/raw/master/resources/sample.pptx
 
+### Development
+
+For advanced users who want to build the PPT-NDI, please make sure to install:
+* Git for Windows
+* Visual Studio 2017 15.2 (26418.1 Preview) or higher
+* Node.js 10 or higher
+
+Run the below commands:
+
+```sh
+git clone https://github.com/ykhwong/ppt-ndi.git
+cd ppt-ndi
+npm install --save
+npm run build
+```
+
 ## REQUIREMENT
 * Microsoft PowerPoint
 * Microsoft Windows 7 or higher (x86-64 only)
