@@ -172,7 +172,8 @@ function _build() {
 			let out;
 			let arr;
 			let cmd;
-			data = data.replace(/C:\/Program Files\/NewTek\/NDI 4 SDK/g, "./app");
+			data = data.replace(/C:\/Program Files\/NewTek\/NDI 4 SDK/g, _TMPDIR.replace(/\\/g, "/") + "/app");
+			fs.writeFileSync("./src/PPTNDI/PPTNDI.cpp", data);
 			
 			if ( typeof(PF86) === 'undefined' ) {
 				realPF = PF86;
