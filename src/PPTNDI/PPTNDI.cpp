@@ -1,23 +1,28 @@
 #include <stdlib.h>
 #include <string>
-#include <windows.h>
 
 using namespace std;
 
-#define EXPORT comment(linker, "/EXPORT:" __FUNCTION__ "=" __FUNCDNAME__)
-
 #ifdef _WIN32
+#define EXPORT comment(linker, "/EXPORT:" __FUNCTION__ "=" __FUNCDNAME__)
+#include <windows.h>
 
 #ifdef _WIN64
-#pragma comment(lib, "C:/Program Files/NewTek/NDI 4 SDK/Lib/x64/Processing.NDI.Lib.x64.lib")
+	#pragma comment(lib, "C:/Program Files/NewTek/NDI 4 SDK/Lib/x64/Processing.NDI.Lib.x64.lib")
 #else // _WIN64
-#pragma comment(lib, "C:/Program Files/NewTek/NDI 4 SDK/Lib/x86/Processing.NDI.Lib.x86.lib")
+	#pragma comment(lib, "C:/Program Files/NewTek/NDI 4 SDK/Lib/x86/Processing.NDI.Lib.x86.lib")
 #endif // _WIN64
-
-#endif
 
 #include "C:/Program Files/NewTek/NDI 4 SDK/Examples/C++/NDIlib_Send_PNG/picopng.hpp"
 #include <C:/Program Files/NewTek/NDI 4 SDK/Include/Processing.NDI.Lib.h>
+#elif __APPLE__
+#include <stdio.h>
+#include <stdlib.h>
+#include <dlfcn.h>
+
+#include "/Library/NDI SDK for macOS/examples/C++/NDIlib_Send_PNG/picopng.hpp"
+#include </Library/NDI SDK for macOS/include/Processing.NDI.Lib.h>
+#endif
 
 bool initSucceeded = false;
 NDIlib_send_create_t NDI_send_create_desc;
@@ -25,6 +30,9 @@ NDIlib_send_instance_t pNDI_send;
 const int maxInstance = 5;
 const char *ndiName = "PPTNDI";
 
+#if __APPLE__
+extern "C"
+#endif
 int init(void) {
 	#pragma EXPORT
 	if (!NDIlib_initialize()) {
@@ -38,9 +46,14 @@ int init(void) {
 	if (!pNDI_send) {
 		for (int i = 2; i <= maxInstance; i++) {
 			char buffer[15];
-			sprintf_s(buffer, "%s (%d)", ndiName, i);
+			#ifdef _WIN32
+				sprintf_s(buffer, "%s (%d)", ndiName, i);
+			#elif __APPLE__
+				snprintf(buffer, 15, "%s (%d)", ndiName, i);
+			#endif
 			NDI_send_create_desc.p_ndi_name = buffer;
 			pNDI_send = NDIlib_send_create(&NDI_send_create_desc);
+
 			if (!pNDI_send) {
 				if (i == maxInstance) {
 					return 1;
@@ -55,6 +68,9 @@ int init(void) {
 	return 0;
 }
 
+#if __APPLE__
+extern "C"
+#endif
 int destroy(void) {
 	#pragma EXPORT
 	if (!initSucceeded) {
@@ -65,6 +81,9 @@ int destroy(void) {
 	return 0;
 }
 
+#if __APPLE__
+extern "C"
+#endif
 int send(const char *path, bool trans) {
 	#pragma EXPORT
 	NDIlib_video_frame_v2_t NDI_video_frame;

@@ -20,7 +20,7 @@ $(document).ready(function() {
 		const { remote } = require('electron');
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
 		if (!fs.existsSync(configPath)) {
-			const appDataPath = process.env.APPDATA + "/PPT-NDI";
+			const appDataPath = (process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
 			configPath = appDataPath + "/" + configFile;
 		}
 		if (fs.existsSync(configPath)) {
@@ -46,4 +46,8 @@ $(document).ready(function() {
 	});
 	
 	reflectConfig();
+
+	if (process.platform === 'darwin') {
+		ipc.send('remote', { name: "select2" }); // only classic mode supported
+	}
 });
