@@ -9,6 +9,9 @@ $(document).ready(function() {
 	let sp = { };
 	let nvGrpSpPr = { };
 	let grpSpPr = { };
+	let pic = { }; // e.g. { 1: [{ "p:blipFill": ..., "p:nvPicPr": ..., "p:spPr": ... }] }, for zPic items on slide 1
+	let relationships = { }; // e.g. { 1: { rId1: "../media/image1.png" } }, for an image on slide 1
+	let imageDict = { }; // e.g. { "image1.png": { type: "Buffer", data: [...] } }, strips out the ppt/media/ prefix
 	let resSize = {
 		resX : 0,
 		resY : 0
@@ -50,31 +53,74 @@ $(document).ready(function() {
 					let zSp;
 					let zNvGrpSpPr;
 					let zGrpSpPr;
+					let zPic;
 					try {
-						num = parseInt(key.replace(/\.xml$/, "").replace(/^.*(\d+)/, "$1"), 10);
-						zData = output[key]["p:sld"]["p:cSld"][0]["p:spTree"][0];
-						zSp = zData["p:sp"];
-						zNvGrpSpPr = zData["p:nvGrpSpPr"];
-						zGrpSpPr = zData["p:grpSpPr"];
+						num = parseInt(key.replace(/\.xml$/, "").replace(/^.*?(\d+)/, "$1"), 10);
+						zData = output[key]["p:sld"]["p:cSld"][0]["p:spTree"][0]; // slide, common slide data, shape tree
+						zSp = zData["p:sp"]; // shape (content)
+						zNvGrpSpPr = zData["p:nvGrpSpPr"]; // non-visual properties for a group shape (e.g. whether it can be moved, resized, rotated)
+						zGrpSpPr = zData["p:grpSpPr"]; // properties for a group shape (e.g. size, location)
+						zPic = zData["p:pic"]; // pictures
 					} catch (e) {
 						notifyError("1");
 						return;
 					}
 
-					for (let i=0; i<zSp.length; i++) {
+					if (zSp) {
+						for (let i=0; i<zSp.length; i++) {
 							json.push(zSp[i]);
+						}
 					}
 					sp[num] = json; json = [];
 
-					for (let i=0; i<zNvGrpSpPr.length; i++) {
+					if (zNvGrpSpPr) {
+						for (let i=0; i<zNvGrpSpPr.length; i++) {
 							json.push(zNvGrpSpPr[i]);
+						}
 					}
 					nvGrpSpPr[num] = json; json = [];
 
-					for (let i=0; i<zGrpSpPr.length; i++) {
+					if (zGrpSpPr) {
+						for (let i=0; i<zGrpSpPr.length; i++) {
 							json.push(zGrpSpPr[i]);
+						}
 					}
 					grpSpPr[num] = json; json = [];
+
+					if (zPic) {
+						for (let i=0; i<zPic.length; i++) {
+							json.push(zPic[i]);
+						}
+					}
+					pic[num] = json; json = [];
+				}
+
+				// add objects containing Buffer for media to dict
+				if (/^ppt\/media\/.*$/.test(key)) {
+					try {
+						let fileName = key.replace("ppt/media/", "");
+						imageDict[fileName] = output[key];
+					} catch (e) {
+						notifyError("1");
+						return;
+					}
+				}
+
+				// store the image id <-> file name relationship to display images
+				if (/^ppt\/slides\/_rels\/slide\d+\.xml.rels$/.test(key)) {
+					let json = new Array;
+					try {
+						num = parseInt(key.replace(/\.xml.rels$/, "").replace(/^.*?(\d+)/, "$1"), 10);
+						for (let i=0; i<output[key].Relationships.Relationship.length; i++) {
+							let relationship = output[key].Relationships.Relationship[i]["$"];
+							json[relationship.Id] = relationship.Target;
+						}
+					} catch (e) {
+						notifyError("1");
+						return;
+					}
+
+					relationships[num] = json; json = [];
 				}
 			}
 
@@ -92,6 +138,9 @@ $(document).ready(function() {
 		sp = { };
 		nvGrpSpPr = { };
 		grpSpPr = { };
+		pic = { };
+		relationships = { };
+		imageDict = { };
 		isLoaded = false;
 		hasError = false;
 		outPath = "";
@@ -125,6 +174,10 @@ $(document).ready(function() {
 			notifyError("undefined sp[selectedNo]: " + selectedNo);
 			return;
 		}
+
+		let blobs = []; // maintain a list to revoke after the slide is captured
+		
+		// create HTML elements for text
 		for (let i=0; i < sp[selectedNo].length; i++) {
 			let element = sp[selectedNo][i];
 			let elementType = element["p:spPr"][0]["a:prstGeom"][0]["$"]["prst"];
@@ -211,7 +264,73 @@ $(document).ready(function() {
 					}
 			}
 		}
+
+		// create HTML elements for images
+		for (let i=0; i < pic[selectedNo].length; i++) {
+			const element = pic[selectedNo][i];
+			const elementType = element["p:spPr"][0]["a:prstGeom"][0]["$"]["prst"];
+			let elementOffX = (element["p:spPr"][0]["a:xfrm"][0]["a:off"][0]["$"]["x"] / baseDiv).toFixed(3);
+			let elementOffY = (element["p:spPr"][0]["a:xfrm"][0]["a:off"][0]["$"]["y"] / baseDiv).toFixed(3);
+			let elementExtCX = (element["p:spPr"][0]["a:xfrm"][0]["a:ext"][0]["$"]["cx"] / baseDiv).toFixed(3);
+			let elementExtCY = (element["p:spPr"][0]["a:xfrm"][0]["a:ext"][0]["$"]["cy"] / baseDiv).toFixed(3);
+			if (customSize.resX !== 0 || customSize.resY !== 0) {
+				elementOffX = elementOffX * customSize.resX / resSize.resX;
+				elementOffY = elementOffY * customSize.resY / resSize.resY;
+				elementExtCX = elementExtCX * customSize.resX / resSize.resX;
+				elementExtCY = elementExtCX * customSize.resY / resSize.resY;
+			}
+
+			if (elementType === "rect") {
+				const blipFill = element["p:blipFill"];
+				if (!blipFill || blipFill.length === 0) continue;
+				const blip = blipFill[0]["a:blip"];
+				if (!blip || blip.length === 0) continue;
+				const embed = blip[0]["$"]["r:embed"];
+
+				let xText = "";
+				if (embed !== null) {
+					const imgFilePath = relationships[selectedNo][embed]; // e.g. "../media/image1.jpg"
+					const imgFileName = /[^/]*$/.exec(imgFilePath)[0];
+					const mimeType = getMimeType(imgFileName);
+					if (!mimeType) {
+						continue;; // give up on unsupported file types
+					}
+					const buffer = imageDict[imgFileName].data;
+
+					const img = new Uint8Array(buffer.length);
+					for (let i = 0; i < buffer.length; ++i) {
+						img[i] = buffer[i];
+					}
+					const imgUrl = URL.createObjectURL(new Blob([img], { type: mimeType }));
+					blobs.push(imgUrl);
+
+					xText +=
+					'<img src="' + imgUrl + '" style="' +
+					'width: ' + elementExtCX +'px;' + 
+					'height: ' + elementExtCY +'px;' + 
+					'display: inline;' +
+					'white-space: nowrap;' +
+					'"/>';
+				}
+
+				let rendererConf = 
+				'<div style="color: white; position: fixed; ' +
+				'left: ' + elementOffX + 'px;' +
+				'top: ' + elementOffY + 'px;' + 
+				'">' + xText + '</div>';
+				if (isCancelTriggered) {
+					notifyCanceled();
+					return;
+				}
+				$("#renderer").append(rendererConf);
+			}
+		}
+		
 		if (isCancelTriggered) {
+			for (let i = 0; i < blobs.length; i += 1) {
+				URL.revokeObjectURL(blobs[i]);
+			}
+			blobs = [];
 			notifyCanceled();
 			return;
 		}
@@ -225,6 +344,11 @@ $(document).ready(function() {
 
 		htmlToImage.toPng(document.getElementById('renderer'), options)
 		.then(function (png) {
+			for (let i = 0; i < blobs.length; i += 1) {
+				URL.revokeObjectURL(blobs[i]);
+			}
+			blobs = [];
+
 			if (isCancelTriggered) {
 				notifyCanceled();
 				return;
@@ -252,6 +376,16 @@ $(document).ready(function() {
 				}
 			}
 		});
+	}
+
+	function getMimeType(fileName) {
+		if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+			return "image/jpeg";
+		} else if (fileName.endsWith(".png")) {
+			return "image/png";
+		} else {
+			return undefined;
+		}
 	}
 
 	function notifyError(msg) {

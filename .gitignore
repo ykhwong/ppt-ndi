@@ -5,3 +5,4 @@
 *.dll
 /node_modules
 /bin
+/tmp
