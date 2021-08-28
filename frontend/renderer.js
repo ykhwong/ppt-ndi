@@ -271,70 +271,71 @@ $(document).ready(function() {
 							'margin-bottom: ' + bodyPrBIns + 'px;' +
 							'">';
 
-						for (let i3=0; i3<txBody[0]["a:p"][i2]["a:r"].length; i3++) { // iterate through text runs
-							let xFont = "";
-							let xFontLatin = "";
-							let xFontEa = "";
-							let xFontAlgn = "left";
-							let xFontSize = "";
-							let fontFamily = '';
-							let xTextA = '';
-							let xFontClr = '';
-							let xBaseline = 0; // if < 0, subscript, if > 0, superscript
+						if (txBody[0]["a:p"][i2]["a:r"]) {
+							for (let i3=0; i3<txBody[0]["a:p"][i2]["a:r"].length; i3++) { // iterate through text runs
+								let xFont = "";
+								let xFontLatin = "";
+								let xFontEa = "";
+								let xFontAlgn = "left";
+								let xFontSize = "";
+								let fontFamily = '';
+								let xTextA = '';
+								let xFontClr = '';
+								let xBaseline = 0; // if < 0, subscript, if > 0, superscript
 
-							try { xTextA = txBody[0]["a:p"][i2]["a:r"][i3]["a:t"][0]; } catch(e) {}
-							try { xFont = txBody[0]["a:p"][i2]["a:r"][i3]["a:rPr"][0]; } catch(e) {}
+								try { xTextA = txBody[0]["a:p"][i2]["a:r"][i3]["a:t"][0]; } catch(e) {}
+								try { xFont = txBody[0]["a:p"][i2]["a:r"][i3]["a:rPr"][0]; } catch(e) {}
 
-							try { xFontLatin = xFont["a:latin"][0]["$"]["typeface"]; } catch(e) {}
-							try { xFontEa = xFont["a:ea"][0]["$"]["typeface"]; } catch(e) {}
-							try { xFontAlgn = txBody[0]["a:p"][i2]["a:pPr"][0]["$"]["algn"]; } catch(e) {}
-							try {
-								xFontSize = xFont["$"]["sz"] / 100;
-								if (customSize.resX !== 0 || customSize.resY !== 0) {
-									xFontSize = xFontSize * customSize.resX / resSize.resX;
-								}
-							} catch(e) {}
-							try { xFontClr = getRgbColor(xFont["a:solidFill"][0]); } catch(e) { }
-							try {
-								if (xFont["$"]["baseline"]) {
-									xBaseline = xFont["$"]["baseline"];
-								}
-							} catch(e) { }
+								try { xFontLatin = xFont["a:latin"][0]["$"]["typeface"]; } catch(e) {}
+								try { xFontEa = xFont["a:ea"][0]["$"]["typeface"]; } catch(e) {}
+								try { xFontAlgn = txBody[0]["a:p"][i2]["a:pPr"][0]["$"]["algn"]; } catch(e) {}
+								try {
+									xFontSize = xFont["$"]["sz"] / 100;
+									if (customSize.resX !== 0 || customSize.resY !== 0) {
+										xFontSize = xFontSize * customSize.resX / resSize.resX;
+									}
+								} catch(e) {}
+								try { xFontClr = getRgbColor(xFont["a:solidFill"][0]); } catch(e) { }
+								try {
+									if (xFont["$"]["baseline"]) {
+										xBaseline = xFont["$"]["baseline"];
+									}
+								} catch(e) { }
 
-							if (/\S/.test(xFontLatin)) {
-								fontFamily = "'" + xFontLatin + "'";
-							}
-							if (/\S/.test(xFontAlgn)) {
-								if (xFontAlgn === 'ctr') {
-									xFontAlgn = "center";
-								} else if (xFontAlgn === 'r') {
-									xFontAlgn = "right";
-								} else if (xFontAlgn === 'just') {
-									xFontAlgn = "justify";
-								} else {
-									xFontAlgn = "left";
+								if (/\S/.test(xFontLatin)) {
+									fontFamily = "'" + xFontLatin + "'";
 								}
-							}
-							if (/\S/.test(xFontEa)) {
-								if (/\S/.test(fontFamily)) {
-									fontFamily += ",";
+								if (/\S/.test(xFontAlgn)) {
+									if (xFontAlgn === 'ctr') {
+										xFontAlgn = "center";
+									} else if (xFontAlgn === 'r') {
+										xFontAlgn = "right";
+									} else if (xFontAlgn === 'just') {
+										xFontAlgn = "justify";
+									} else {
+										xFontAlgn = "left";
+									}
 								}
-								fontFamily += "'" + xFontEa + "'";
+								if (/\S/.test(xFontEa)) {
+									if (/\S/.test(fontFamily)) {
+										fontFamily += ",";
+									}
+									fontFamily += "'" + xFontEa + "'";
+								}
+								xText +=
+								'<span style="' +
+								(/\S/.test(fontFamily)?'font-family: ' + fontFamily + ";" : '') +
+								'text-align: ' + xFontAlgn + ';' +
+								(/\S/.test(xFontClr) ? 'color: ' + '#' + xFontClr + ";" : '') +
+								'font-size: ' + xFontSize + 'px;' +
+								'display: inline;' +
+								'">' +
+								(xBaseline > 0 ? '<sup>' : xBaseline < 0 ? '<sub>' : '') +
+								xTextA +
+								(xBaseline > 0 ? '</sup>' : xBaseline < 0 ? '</sub>' : '') +
+								'</span>';
 							}
-							xText +=
-							'<span style="' +
-							(/\S/.test(fontFamily)?'font-family: ' + fontFamily + ";" : '') +
-							'text-align: ' + xFontAlgn + ';' +
-							(/\S/.test(xFontClr) ? 'color: ' + '#' + xFontClr + ";" : '') +
-							'font-size: ' + xFontSize + 'px;' +
-							'display: inline;' +
-							'">' +
-							(xBaseline > 0 ? '<sup>' : xBaseline < 0 ? '<sub>' : '') +
-							xTextA +
-							(xBaseline > 0 ? '</sup>' : xBaseline < 0 ? '</sub>' : '') +
-							'</span>';
 						}
-
 						xText += '</div>';
 					}
 
