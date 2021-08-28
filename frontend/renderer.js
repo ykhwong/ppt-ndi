@@ -12,6 +12,8 @@ $(document).ready(function() {
 	let pic = { }; // e.g. { 1: [{ "p:blipFill": ..., "p:nvPicPr": ..., "p:spPr": ... }] }, for zPic items on slide 1
 	let relationships = { }; // e.g. { 1: { rId1: "../media/image1.png" } }, for an image on slide 1
 	let imageDict = { }; // e.g. { "image1.png": { type: "Buffer", data: [...] } }, strips out the ppt/media/ prefix
+	let clrMap = { }; // from ppt/slideMasters/slideMaster1.xml, maps to the key of themeColors
+	let themeColors = { }; // the dict from ppt/theme/theme1.xml["a:theme"]["a:themeElements"][0]["a:clrScheme"]
 	let resSize = {
 		resX : 0,
 		resY : 0
@@ -96,7 +98,7 @@ $(document).ready(function() {
 				}
 
 				// add objects containing Buffer for media to dict
-				if (/^ppt\/media\/.*$/.test(key)) {
+				else if (/^ppt\/media\/.*$/.test(key)) {
 					try {
 						let fileName = key.replace("ppt/media/", "");
 						imageDict[fileName] = output[key];
@@ -107,7 +109,7 @@ $(document).ready(function() {
 				}
 
 				// store the image id <-> file name relationship to display images
-				if (/^ppt\/slides\/_rels\/slide\d+\.xml.rels$/.test(key)) {
+				else if (/^ppt\/slides\/_rels\/slide\d+\.xml.rels$/.test(key)) {
 					let json = new Array;
 					try {
 						num = parseInt(key.replace(/\.xml.rels$/, "").replace(/^.*?(\d+)/, "$1"), 10);
@@ -121,6 +123,26 @@ $(document).ready(function() {
 					}
 
 					relationships[num] = json; json = [];
+				}
+
+				// there may be a collision if there are multiple themes, but better than nothing
+				else if (/^ppt\/theme\/theme\d+\.xml$/.test(key)) {
+					try {
+						themeColors = output[key]["a:theme"]["a:themeElements"][0]["a:clrScheme"][0];
+					} catch (e) {
+						console.error(e);
+						// suppress error since themes are not critical
+					}
+				}
+
+				// there may be a collision if there are multiple slide masters, but better than nothing
+				else if (/^ppt\/slideMasters\/slideMaster\d+\.xml$/.test(key)) {
+					try {
+						clrMap = output[key]["p:sldMaster"]["p:clrMap"][0]["$"];
+					} catch (e) {
+						console.error(e);
+						// suppress error since slide masters are not critical
+					}
 				}
 			}
 
@@ -141,6 +163,8 @@ $(document).ready(function() {
 		pic = { };
 		relationships = { };
 		imageDict = { };
+		clrMap = { };
+		themeColors = { };
 		isLoaded = false;
 		hasError = false;
 		outPath = "";
@@ -165,10 +189,6 @@ $(document).ready(function() {
 				"height": resSize.resY
 			});
 		}
-		if (isCancelTriggered) {
-			notifyCanceled();
-			return;
-		}
 
 		if (sp[selectedNo] === undefined) {
 			notifyError("undefined sp[selectedNo]: " + selectedNo);
@@ -179,87 +199,156 @@ $(document).ready(function() {
 		
 		// create HTML elements for text
 		for (let i=0; i < sp[selectedNo].length; i++) {
+			if (isCancelTriggered) {
+				for (let i = 0; i < blobs.length; i += 1) {
+					URL.revokeObjectURL(blobs[i]);
+				}
+				blobs = [];
+				notifyCanceled();
+				return;
+			}
+
 			let element = sp[selectedNo][i];
 			let elementType = element["p:spPr"][0]["a:prstGeom"][0]["$"]["prst"];
 			let elementOffX = (element["p:spPr"][0]["a:xfrm"][0]["a:off"][0]["$"]["x"] / baseDiv).toFixed(3);
 			let elementOffY = (element["p:spPr"][0]["a:xfrm"][0]["a:off"][0]["$"]["y"] / baseDiv).toFixed(3);
 			let elementExtCX = (element["p:spPr"][0]["a:xfrm"][0]["a:ext"][0]["$"]["cx"] / baseDiv).toFixed(3);
 			let elementExtCY = (element["p:spPr"][0]["a:xfrm"][0]["a:ext"][0]["$"]["cy"] / baseDiv).toFixed(3);
+			let elementClr = '';
+			try { elementClr = getRgbColor(element["p:spPr"][0]["a:solidFill"][0]) } catch (e) { }
+
 			if (customSize.resX !== 0 || customSize.resY !== 0) {
 				// resSizeX : eX = customX : ?
 				elementOffX = elementOffX * customSize.resX / resSize.resX;
 				elementOffY = elementOffY * customSize.resY / resSize.resY;
 				elementExtCX = elementExtCX * customSize.resX / resSize.resX;
-				elementExtCY = elementExtCX * customSize.resY / resSize.resY;
+				elementExtCY = elementExtCY * customSize.resY / resSize.resY;
 			}
 
 			if (elementType === "rect") {
 				let txBody = element["p:txBody"];
 				let xText = "";
 				if (txBody !== null) {
-					for (let i2=0; i2<txBody[0]["a:p"].length; i2++) {
-						let xFont = "";
-						let xFontLatin = "";
-						let xFontEa = "";
-						let xFontAlgn = "left";
-						let xFontSize = "";
-						let fontFamily = '';
-						let xTextA = '';
+					let bodyPrLIns = 0;
+					let bodyPrTIns = 0;
+					let bodyPrRIns = 0;
+					let bodyPrBIns = 0;
+					try { // get margins
+						const bodyPr = txBody[0]["a:bodyPr"][0]["$"];
+						if (bodyPr['lIns']) {
+							bodyPrLIns = (bodyPr['lIns'] / baseDiv).toFixed(3);
+						}
+						if (bodyPr['tIns']) {
+							bodyPrTIns = (bodyPr['tIns'] / baseDiv).toFixed(3);
+						}
+						if (bodyPr['rIns']) {
+							bodyPrRIns = (bodyPr['rIns'] / baseDiv).toFixed(3);
+						}
+						if (bodyPr['bIns']) {
+							bodyPrBIns = (bodyPr['bIns'] / baseDiv).toFixed(3);
+						}
 
-						try { xTextA = txBody[0]["a:p"][i2]["a:r"][0]["a:t"][0]; } catch(e) {}
-						try { xFont = txBody[0]["a:p"][i2]["a:r"][0]["a:rPr"][0]; } catch(e) {}
-						try { xFontLatin = xFont["a:latin"][0]["$"]["typeface"]; } catch(e) {}
-						try { xFontEa = xFont["a:ea"][0]["$"]["typeface"]; } catch(e) {}
-						try { xFontAlgn = txBody[0]["a:p"][i2]["a:pPr"][0]["$"]["algn"]; } catch(e) {}
-						try {
-							xFontSize = xFont["$"]["sz"] / 100;
-							if (customSize.resX !== 0 || customSize.resY !== 0) {
-								xFontSize = xFontSize * customSize.resX / resSize.resX;
-							}
-						} catch(e) {}
-	
-						if (/\S/.test(xFontLatin)) {
-							fontFamily = "'" + xFontLatin + "'";
+						if (customSize.resX !== 0 || customSize.resY !== 0) {
+							bodyPrLIns = bodyPrLIns * customSize.resX / resSize.resX;
+							bodyPrTIns = bodyPrTIns * customSize.resY / resSize.resY;
+							bodyPrRIns = bodyPrRIns * customSize.resX / resSize.resX;
+							bodyPrBIns = bodyPrBIns * customSize.resY / resSize.resY;
 						}
-						if (/\S/.test(xFontAlgn)) {
-							if (xFontAlgn === 'ctr') {
-								xFontAlgn = "center";
-							} else if (xFontAlgn === 'r') {
-								xFontAlgn = "right";
-							} else if (xFontAlgn === 'just') {
-								xFontAlgn = "justify";
-							} else {
-								xFontAlgn = "left";
-							}
-						}
-						if (/\S/.test(xFontEa)) {
-							if (/\S/.test(fontFamily)) {
-								fontFamily += ",";
-							}
-							fontFamily += "'" + xFontEa + "'";
-						}
+						elementExtCX = elementExtCX - bodyPrLIns - bodyPrRIns;
+						elementExtCY = elementExtCY - bodyPrTIns - bodyPrBIns;
+					} catch (e) {
+					}
+
+					for (let i2=0; i2<txBody[0]["a:p"].length; i2++) { // iterate through text paragraphs
+
 						xText +=
-						'<div style="' +
-						(/\S/.test(fontFamily)?'font-family: ' + fontFamily + ";" : '') +
-						'text-align: ' + xFontAlgn + ';' +
-						'width: ' + elementExtCX +'px;' + 
-						'height: ' + elementExtCY +'px;' + 
-						'font-size: ' + xFontSize + 'px;' +
-						'display: inline;' +
-						'white-space: nowrap;' +
-						'line-height: 80%;' +
-						'"><p>' + xTextA + '</div></p>';
+							'<div style="' + // the <p> container doesn't handle child elements well so we use <div>
+							'width: ' + elementExtCX +'px;' +
+							'height: ' + elementExtCY +'px;' +
+							'margin-left: ' + bodyPrLIns + 'px;' +
+							'margin-top: ' + bodyPrTIns + 'px;' +
+							'margin-right: ' + bodyPrRIns + 'px;' +
+							'margin-bottom: ' + bodyPrBIns + 'px;' +
+							'">';
+
+						for (let i3=0; i3<txBody[0]["a:p"][i2]["a:r"].length; i3++) { // iterate through text runs
+							let xFont = "";
+							let xFontLatin = "";
+							let xFontEa = "";
+							let xFontAlgn = "left";
+							let xFontSize = "";
+							let fontFamily = '';
+							let xTextA = '';
+							let xFontClr = '';
+							let xBaseline = 0; // if < 0, subscript, if > 0, superscript
+
+							try { xTextA = txBody[0]["a:p"][i2]["a:r"][i3]["a:t"][0]; } catch(e) {}
+							try { xFont = txBody[0]["a:p"][i2]["a:r"][i3]["a:rPr"][0]; } catch(e) {}
+
+							try { xFontLatin = xFont["a:latin"][0]["$"]["typeface"]; } catch(e) {}
+							try { xFontEa = xFont["a:ea"][0]["$"]["typeface"]; } catch(e) {}
+							try { xFontAlgn = txBody[0]["a:p"][i2]["a:pPr"][0]["$"]["algn"]; } catch(e) {}
+							try {
+								xFontSize = xFont["$"]["sz"] / 100;
+								if (customSize.resX !== 0 || customSize.resY !== 0) {
+									xFontSize = xFontSize * customSize.resX / resSize.resX;
+								}
+							} catch(e) {}
+							try { xFontClr = getRgbColor(xFont["a:solidFill"][0]); } catch(e) { }
+							try {
+								if (xFont["$"]["baseline"]) {
+									xBaseline = xFont["$"]["baseline"];
+								}
+							} catch(e) { }
+
+							if (/\S/.test(xFontLatin)) {
+								fontFamily = "'" + xFontLatin + "'";
+							}
+							if (/\S/.test(xFontAlgn)) {
+								if (xFontAlgn === 'ctr') {
+									xFontAlgn = "center";
+								} else if (xFontAlgn === 'r') {
+									xFontAlgn = "right";
+								} else if (xFontAlgn === 'just') {
+									xFontAlgn = "justify";
+								} else {
+									xFontAlgn = "left";
+								}
+							}
+							if (/\S/.test(xFontEa)) {
+								if (/\S/.test(fontFamily)) {
+									fontFamily += ",";
+								}
+								fontFamily += "'" + xFontEa + "'";
+							}
+							xText +=
+							'<span style="' +
+							(/\S/.test(fontFamily)?'font-family: ' + fontFamily + ";" : '') +
+							'text-align: ' + xFontAlgn + ';' +
+							(/\S/.test(xFontClr) ? 'color: ' + '#' + xFontClr + ";" : '') +
+							'font-size: ' + xFontSize + 'px;' +
+							'display: inline;' +
+							'">' +
+							(xBaseline > 0 ? '<sup>' : xBaseline < 0 ? '<sub>' : '') +
+							xTextA +
+							(xBaseline > 0 ? '</sup>' : xBaseline < 0 ? '</sub>' : '') +
+							'</span>';
+						}
+
+						xText += '</div>';
 					}
 
 					let rendererConf = 
 					'<div style="color: white; position: fixed; ' +
 					'left: ' + elementOffX + 'px;' +
 					'top: ' + elementOffY + 'px;' + 
+					(/\S/.test(elementClr)?'background-color: #' + elementClr + ";" : '') +
 					'">' + xText + '</div>';
 					if (isCancelTriggered) {
 						notifyCanceled();
 						return;
 					}
+					console.log(rendererConf);
 					$("#renderer").append(rendererConf);
 					}
 			}
@@ -325,15 +414,6 @@ $(document).ready(function() {
 				$("#renderer").append(rendererConf);
 			}
 		}
-		
-		if (isCancelTriggered) {
-			for (let i = 0; i < blobs.length; i += 1) {
-				URL.revokeObjectURL(blobs[i]);
-			}
-			blobs = [];
-			notifyCanceled();
-			return;
-		}
 		let options = {};
 		if (customSize.resX !== 0 || customSize.resY !== 0) {
 			options = {
@@ -376,6 +456,30 @@ $(document).ready(function() {
 				}
 			}
 		});
+	}
+
+	// pass in the [0] of a:solidFill, and get a RGB value back
+	function getRgbColor(aSolidFill) {
+		try {
+			if (aSolidFill["a:srgbClr"]) {
+				return aSolidFill["a:srgbClr"][0]["$"]["val"];
+			} else if (aSolidFill["a:schemeClr"]) {
+				const schemeClr = aSolidFill["a:schemeClr"][0]["$"]["val"];
+				const mappedClr = clrMap[schemeClr];
+				const clr = themeColors['a:' + mappedClr];
+				if (clr && clr[0]) {
+					if (clr[0]["a:sysClr"]) {
+						return clr[0]["a:sysClr"][0]["$"]["lastClr"];
+					} else if (clr[0]["a:srgbClr"]) {
+						return clr[0]["a:srgbClr"][0]["$"]["val"];
+					}
+				}
+			}
+		} catch (e) {
+			console.error(e);
+		}
+		
+		return '';
 	}
 
 	function getMimeType(fileName) {
