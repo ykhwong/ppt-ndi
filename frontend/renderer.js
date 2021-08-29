@@ -415,7 +415,7 @@ $(document).ready(function() {
 				$("#renderer").append(rendererConf);
 			}
 		}
-		let options = {};
+		let options = { pixelRatio: 1 };
 		if (customSize.resX !== 0 || customSize.resY !== 0) {
 			options = {
 				width: customSize.resX,
