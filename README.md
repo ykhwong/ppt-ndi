@@ -99,11 +99,7 @@ npm install --save
 npm run build
 ```
 
-## REQUIREMENT
-* Microsoft PowerPoint
-* Microsoft Windows 7 or higher (x86-64 only)
-
-## EXPERIMENTAL macOS SUPPORT
+#### Experimental macOS Support
 
 For advanced users who want to build the PPT-NDI for macOS, please make sure to install:
 * Git
@@ -113,6 +109,10 @@ For advanced users who want to build the PPT-NDI for macOS, please make sure to 
 * NDI SDK v5
 
 The macOS build only supports classic mode, and uses the experimental internal renderer which is limited to simple text and images, though doesn't have a dependency on Microsoft PowerPoint.
+
+## REQUIREMENT
+* Microsoft PowerPoint
+* Microsoft Windows 7 or higher (x86-64 only)
 
 ## SEE ALSO
 * https://www.newtek.com/ndi/
