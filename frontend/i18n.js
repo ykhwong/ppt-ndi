@@ -1,11 +1,11 @@
 $(document).ready(function() {
-	const i18nDir = [ "./frontend/i18n", "./locales" ];
 	const fs = require("fs-extra");
+	const path = require('path');
 
-	function getPath(namespace) {
-		let tmpPath = i18nDir[0] + "/" + namespace + ".json";
+	const getPath = (namespace) => {
+		let tmpPath = path.join(__dirname, 'i18n', namespace + ".json");
 		if (!fs.existsSync(tmpPath)) {
-			tmpPath = i18nDir[1] + "/" + namespace + ".json";
+			tmpPath = path.join(__dirname, '..', 'locales', namespace + ".json");
 		}
 		return tmpPath;
 	}
@@ -29,6 +29,9 @@ $(document).ready(function() {
 					break;
 				}
 			}
+		}
+		if (!result) {
+			return title;
 		}
 		return result;
 	}

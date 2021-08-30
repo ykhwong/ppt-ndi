@@ -195,6 +195,8 @@ function main() {
 main();
 `;
 
+const appDataPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
+
 $(document).ready(function() {
 	const { remote } = require('electron');
 	const ipc = require('electron').ipcRenderer;
@@ -248,9 +250,21 @@ $(document).ready(function() {
 	});
 	reflectConfig();
 	ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
-	if ( ffi === -1 ) {
-		alertMsg(getLangRsc("ui_classic/dll-init-failed", configData.lang));
-		if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
+	if ( ffi === -1 ) {		
+		let librariesFound = false;
+		if (process.platform === 'win32') {
+			alertMsg(getLangRsc("ui_classic/dll-init-failed", configData.lang));
+			if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
+				librariesFound = true;
+			}
+		} else if (process.platform === 'darwin') {
+			alertMsg(getLangRsc("ui_classic/dylib-init-failed", configData.lang));
+			if (fs.existsSync("PPTNDI.dylib")) {
+				librariesFound = true;
+			}
+		}
+
+		if (librariesFound) {
 			const execRuntime = require('child_process').execSync;
 			execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
 				callback(stdout); 
@@ -722,7 +736,11 @@ $(document).ready(function() {
 		let now = new Date().getTime();
 		isCancelTriggered = false;
 		preTmpDir = tmpDir;
-		tmpDir = process.env.TEMP + '/ppt_ndi';
+		if (process.platform === 'darwin') {
+			tmpDir = process.env.TMPDIR + '/ppt_ndi';
+		} else { // win32
+			tmpDir = process.env.TEMP + '/ppt_ndi';
+		}
 		if (!fs.existsSync(tmpDir)) {
 			fs.mkdirSync(tmpDir);
 		}
@@ -1510,7 +1528,6 @@ $(document).ready(function() {
 		const { remote } = require('electron');
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
 		if (!fs.existsSync(configPath)) {
-			const appDataPath = process.env.APPDATA + "/PPT-NDI";
 			configPath = appDataPath + "/" + configFile;
 		}
 		if (fs.existsSync(configPath)) {
@@ -1541,7 +1558,6 @@ $(document).ready(function() {
 			"monitorAlpha": $("#monitor_trans").is(":checked")
 		};
 		if (!fs.existsSync(configPath)) {
-			const appDataPath = process.env.APPDATA + "/PPT-NDI";
 			configPath = appDataPath + "/" + configFile;
 		}
 		

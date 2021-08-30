@@ -2,9 +2,15 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const configFile = 'config.js';
-	const appDataPath = process.env.APPDATA + "/PPT-NDI";
+	const appDataPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
 	const version = "v" + require('electron').remote.app.getVersion();
 	const keyCombi = "Ctrl-Shift-";
+	let rendererList;
+	if (process.platform === 'darwin') {
+		rendererList = ["Internal"];
+	} else { // win32
+		rendererList = ["Microsoft PowerPoint", "Internal"];
+	}
 	const defaultData = {
 		"version" : version,
 		"startAsTray" : false,
@@ -17,10 +23,9 @@ $(document).ready(function() {
 			"black" : "",
 			"white" : ""
 		},
-		"renderer": "Microsoft PowerPoint",
+		"renderer": rendererList[0],
 		"lang": "en"
 	};
-	const rendererList = ["Microsoft PowerPoint", "Internal"];
 	let configData = defaultData;
 	let configPath = "";
 
@@ -47,25 +52,28 @@ $(document).ready(function() {
 
 	function loadConfig() {
 		$.getJSON(configPath, function(json) {
-			configData.startAsTray = json.startAsTray;
-			configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
-			configData.highPerformance = json.highPerformance;
-			configData.hotKeys = json.hotKeys;
-			configData.lang = json.lang;
-			configData.renderer = json.renderer;
-			$("#systray").prop('checked', configData.startAsTray);
-			$("#startWithFirstSlide").prop('checked', configData.startWithTheFirstSlideSelected);
-			$("#highPerformance").prop('checked', configData.highPerformance);
-			$("#prevTxtBox").val(getHotKey(configData.hotKeys.prev));
-			$("#nextTxtBox").val(getHotKey(configData.hotKeys.next));
-			$("#transTxtBox").val(getHotKey(configData.hotKeys.transparent));
-			$("#blackTxtBox").val(getHotKey(configData.hotKeys.black));
-			$("#whiteTxtBox").val(getHotKey(configData.hotKeys.white));
-			if (typeof(configData.lang) === "undefined" || !/\S/.test(configData.lang)) {
-				configData.lang = "en";
+			if (json) {
+				configData.startAsTray = json.startAsTray;
+				configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
+				configData.highPerformance = json.highPerformance;
+				configData.hotKeys = json.hotKeys;
+				configData.lang = json.lang;
+				configData.renderer = json.renderer;
+				$("#systray").prop('checked', configData.startAsTray);
+				$("#startWithFirstSlide").prop('checked', configData.startWithTheFirstSlideSelected);
+				$("#highPerformance").prop('checked', configData.highPerformance);
+				$("#prevTxtBox").val(getHotKey(configData.hotKeys.prev));
+				$("#nextTxtBox").val(getHotKey(configData.hotKeys.next));
+				$("#transTxtBox").val(getHotKey(configData.hotKeys.transparent));
+				$("#blackTxtBox").val(getHotKey(configData.hotKeys.black));
+				$("#whiteTxtBox").val(getHotKey(configData.hotKeys.white));
+				if (typeof(configData.lang) === "undefined" || !/\S/.test(configData.lang)) {
+					configData.lang = "en";
+				}
+				$("#rendererList").val(configData.renderer);
+				$("#langList").val("lang_" + configData.lang);
 			}
-			$("#rendererList").val(configData.renderer);
-			$("#langList").val("lang_" + configData.lang);
+
 			setLangRsc();
 		});
 	}
@@ -85,24 +93,33 @@ $(document).ready(function() {
 		setLangRscDiv("#saveConfig", "ui_config/save", true, configData.lang);
 	}
 
-	function setConfig(showInfo) {
+	function setConfig(showInfo, useDefaultData = false) {
 		// Save the config file
 
-		let hotKeys = {
-			"prev" : filterHotKey($("#prevTxtBox")),
-			"next" : filterHotKey($("#nextTxtBox")),
-			"transparent" : filterHotKey($("#transTxtBox")),
-			"black" : filterHotKey($("#blackTxtBox")),
-			"white" : filterHotKey($("#whiteTxtBox"))
-		};
+		if (!useDefaultData) {
 
-		configData.startAsTray = $("#systray").prop("checked");
-		configData.startWithTheFirstSlideSelected = $("#startWithFirstSlide").prop("checked");
-		configData.highPerformance = $("#highPerformance").prop("checked");
-		configData.hotKeys = hotKeys;
-		configData.lang = $("#langList").val().replace(/^lang_/i, "");
-		configData.renderer = $("#rendererList").val();
-		fs.writeFile(configPath, JSON.stringify(configData, null, "\t"), (err) => {
+			let hotKeys = {
+				"prev" : filterHotKey($("#prevTxtBox")),
+				"next" : filterHotKey($("#nextTxtBox")),
+				"transparent" : filterHotKey($("#transTxtBox")),
+				"black" : filterHotKey($("#blackTxtBox")),
+				"white" : filterHotKey($("#whiteTxtBox"))
+			};
+
+			configData.startAsTray = $("#systray").prop("checked");
+			configData.startWithTheFirstSlideSelected = $("#startWithFirstSlide").prop("checked");
+			configData.highPerformance = $("#highPerformance").prop("checked");
+			configData.hotKeys = hotKeys;
+			configData.lang = $("#langList").val().replace(/^lang_/i, "");
+			configData.renderer = $("#rendererList").val();
+		}
+		
+		if (!fs.existsSync(appDataPath)) {
+			fs.mkdirSync(appDataPath, {
+				recursive: false // ~/Library/Preferences should already exist
+			});
+		}
+		fs.writeFile(configPath, JSON.stringify(configData, null, "\t"), { flag: 'w' }, (err) => {
 			if (err) {
 				alertMsg(getLangRsc("ui_config/could-not-save-config", configData.lang));
 			} else {
@@ -131,7 +148,7 @@ $(document).ready(function() {
 				loadConfig();
 				setConfig(false);
 			} else {
-				setConfig(false);
+				setConfig(false, true);
 			}
 		}
 	}

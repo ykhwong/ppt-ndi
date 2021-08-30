@@ -136,7 +136,7 @@ app.on('ready', function() {
 
 		configPath = configFile;
 		if (!fs.existsSync(configPath)) {
-			const appDataPath = process.env.APPDATA + "/PPT-NDI";
+			const appDataPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
 			configPath = appDataPath + "/" + configFile;
 		}
 		if (fs.existsSync(configPath)) {
@@ -246,7 +246,7 @@ app.on('ready', function() {
 		if (debugMode) {
 			retData.webContents.openDevTools();
 		}
-		retData.loadURL(frontendDir + winFile);
+		retData.loadURL('file://' + frontendDir + winFile);
 		if (!showWin) {
 			retData.hide();
 		} else {
@@ -574,12 +574,23 @@ app.on('ready', function() {
 								RTLD_NOW | RTLD_GLOBAL
 							);
 							*/
-							remoteVar.lib = remoteLib.ffi.Library(
-								app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
-								'init': [ 'int', [] ],
-								'destroy': [ 'int', [] ],
-								'send': [ 'int', [ "string", "bool" ] ]
-							});
+							if (process.platform === 'win32') {
+								remoteVar.lib = remoteLib.ffi.Library(
+									app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
+									'init': [ 'int', [] ],
+									'destroy': [ 'int', [] ],
+									'send': [ 'int', [ "string", "bool" ] ]
+								});
+							} else if (process.platform === 'darwin') {
+								remoteVar.lib = remoteLib.ffi.Library(
+									app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dylib', {
+									'init': [ 'int', [] ],
+									'destroy': [ 'int', [] ],
+									'send': [ 'int', [ "string", "bool" ] ]
+								});
+							} else {
+								console.error('Unsupported platform ' + process.platform);
+							}
 							ret = remoteVar.lib;
 						} catch(e) {
 							console.log("remoteLib failed: " + e);
@@ -637,8 +648,8 @@ app.on('ready', function() {
 });
 
 app.on('window-all-closed', (e) => {
-	if (process.platform != 'darwin') {
+	//if (process.platform != 'darwin') {
 		loopPaused = true;
 		app.quit();
-	}
+	//}
 });

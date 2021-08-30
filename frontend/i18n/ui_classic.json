@@ -252,6 +252,20 @@
 	}
 },
 {
+	"item": "dylib-init-failed",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Dylib init failed.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "Dylib 초기화를 실패했습니다.",
+			"rev" : 0
+		}
+	}
+},
+{
 	"item": "failed-to-create-listening-svr",
 	"lang": {
 		"description": "",
