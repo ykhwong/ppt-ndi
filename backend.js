@@ -234,7 +234,8 @@ app.on('ready', function() {
 			webPreferences: {
 				webSecurity: false,
 				nodeIntegration: true,
-				enableRemoteModule: true
+				enableRemoteModule: true,
+				contextIsolation: false
 			},
 			transparent : isTransparent,
 			backgroundColor: isTransparent?'#00051336':'#060621'

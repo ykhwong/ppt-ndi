@@ -208,8 +208,9 @@ $(document).ready(function() {
 				return;
 			}
 
+			let elementType = '';
 			let element = sp[selectedNo][i];
-			let elementType = element["p:spPr"][0]["a:prstGeom"][0]["$"]["prst"];
+			try { elementType = element["p:spPr"][0]["a:prstGeom"][0]["$"]["prst"]; } catch (e) { continue; }
 			let elementOffX = (element["p:spPr"][0]["a:xfrm"][0]["a:off"][0]["$"]["x"] / baseDiv).toFixed(3);
 			let elementOffY = (element["p:spPr"][0]["a:xfrm"][0]["a:off"][0]["$"]["y"] / baseDiv).toFixed(3);
 			let elementExtCX = (element["p:spPr"][0]["a:xfrm"][0]["a:ext"][0]["$"]["cx"] / baseDiv).toFixed(3);

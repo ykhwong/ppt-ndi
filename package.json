@@ -8,7 +8,7 @@
 		"fs-extra": "^8.1.0",
 		"html-to-image": "^0.1.1",
 		"iconv-lite": "^0.6.2",
-		"iohook": "^0.7.2",
+		"iohook": "^0.9.3",
 		"merge-images": "^2.0.0",
 		"pngjs": "^3.4.0",
 		"pptx-compose": "^1.0.0",
@@ -16,7 +16,7 @@
 	},
 	"devDependencies": {
 		"decompress-zip": "^0.3.3",
-		"electron": "^11.3.0",
+		"electron": "^12.0.18",
 		"electron-packager": "^15.2.0",
 		"rimraf": "^3.0.2",
 		"system-sleep": "^1.3.7",
@@ -33,7 +33,7 @@
 	],
 	"iohook": {
 		"targets": [
-			"electron-85"
+			"electron-87"
 		],
 		"platforms": [
 			"win32",
