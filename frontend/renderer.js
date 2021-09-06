@@ -352,7 +352,6 @@ $(document).ready(function() {
 						notifyCanceled();
 						return;
 					}
-					console.log(rendererConf);
 					$("#renderer").append(rendererConf);
 					}
 			}
@@ -421,6 +420,7 @@ $(document).ready(function() {
 		let options = { pixelRatio: 1 };
 		if (customSize.resX !== 0 || customSize.resY !== 0) {
 			options = {
+				...options,
 				width: customSize.resX,
 				height: customSize.resY
 			}
