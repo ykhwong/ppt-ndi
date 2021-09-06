@@ -259,18 +259,20 @@ $(document).ready(function() {
 						elementExtCY = elementExtCY - bodyPrTIns - bodyPrBIns;
 					} catch (e) {
 					}
+	
+					xText +=
+					'<div style="' + // the <p> container doesn't handle child elements well so we use <div>
+					'width: ' + elementExtCX +'px;' + // we inherit the width of the parent container
+					'margin-left: ' + bodyPrLIns + 'px;' +
+					'margin-top: ' + bodyPrTIns + 'px;' +
+					'margin-right: ' + bodyPrRIns + 'px;' +
+					'margin-bottom: ' + bodyPrBIns + 'px;' +
+					'">';
 
 					for (let i2=0; i2<txBody[0]["a:p"].length; i2++) { // iterate through text paragraphs
-
-						xText +=
-							'<div style="' + // the <p> container doesn't handle child elements well so we use <div>
-							'width: ' + elementExtCX +'px;' +
-							'height: ' + elementExtCY +'px;' +
-							'margin-left: ' + bodyPrLIns + 'px;' +
-							'margin-top: ' + bodyPrTIns + 'px;' +
-							'margin-right: ' + bodyPrRIns + 'px;' +
-							'margin-bottom: ' + bodyPrBIns + 'px;' +
-							'">';
+						if (i2 > 0) {
+							xText += "<br />"; // a text box with many lines appears as separate text paragraphs
+						}
 
 						if (txBody[0]["a:p"][i2]["a:r"]) {
 							for (let i3=0; i3<txBody[0]["a:p"][i2]["a:r"].length; i3++) { // iterate through text runs
@@ -337,8 +339,8 @@ $(document).ready(function() {
 								'</span>';
 							}
 						}
-						xText += '</div>';
 					}
+					xText += '</div>';
 
 					let rendererConf = 
 					'<div style="color: white; position: fixed; ' +
