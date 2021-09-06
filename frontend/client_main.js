@@ -46,8 +46,4 @@ $(document).ready(function() {
 	});
 	
 	reflectConfig();
-
-	if (process.platform === 'darwin') {
-		ipc.send('remote', { name: "select2" }); // only classic mode supported
-	}
 });

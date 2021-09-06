@@ -136,7 +136,7 @@ app.on('ready', function() {
 
 		configPath = configFile;
 		if (!fs.existsSync(configPath)) {
-			const appDataPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
+			const appDataPath = (process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
 			configPath = appDataPath + "/" + configFile;
 		}
 		if (fs.existsSync(configPath)) {
@@ -146,7 +146,13 @@ app.on('ready', function() {
 		}
 		ret = loadArg();
 		if (!ret) {
-			loadMainWin(!startAsTray);
+			if (process.platform === 'win32') {
+				loadMainWin(!startAsTray);
+			} else {
+				mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, !startAsTray, false);
+				addMainWin2handler(!startAsTray);
+				registerFocusInfo(mainWindow2);
+			}
 		}
 		loadIpc();
 		sendLoop();
