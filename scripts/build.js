@@ -203,7 +203,15 @@ function _buildWin32() {
 			console.error("Visual Studio 15.2 (26418.1 Preview) or higher must be installed");
 			_exit(1);
 		}
-		out = execSync('"' + vswhere.replace(/\//g, "\\") + '"' + " -latest -property installationPath");
+		vswhere = vswhere.replace(/\//g, "\\")
+		out = execSync('"' + vswhere + '"' + " -latest -property installationPath");
+		if ( ! /\S/.test( out ) ) {
+			out = execSync('"' + vswhere + '"' + " -prerelease -property installationPath");
+		}
+		if ( ! /\S/.test( out ) ) {
+			console.error("Could not locate the Visual Studio");
+			_exit(1);
+		}
 		out = path.join(out.toString().replace(/\r|\n/g, ""), "MSBuild", "Current", "Bin", "amd64", "MSBuild.exe");
 		
 		console.log("Building PPTNDI...");
