@@ -285,8 +285,8 @@ function _buildMac() {
 		// final output to ./src/PPTNDI.dylib
 	} catch(e) {
 		console.error(e.stack);
-		console.error(e.stderr.toString());
-		console.error(e.stdout.toString());
+		if (e.stderr) console.error(e.stderr.toString());
+		if (e.stdout) console.error(e.stdout.toString());
 		_exit(1);
 	}
 		
@@ -329,8 +329,8 @@ function _pack() {
 			"build", "Release", "uiohook.dll"), "ppt-ndi-win32-x64/uiohook.dll" );
 		} catch(e) {
 			console.error(e.stack);
-			console.error(e.stderr.toString());
-			console.error(e.stdout.toString());
+			if (e.stderr) console.error(e.stderr.toString());
+			if (e.stdout) console.error(e.stdout.toString());
 			_exit(1);
 		}
 		console.log(out.toString());
@@ -350,8 +350,8 @@ function _pack() {
 			out = execSync("node dev/node_modules/electron-packager/bin/electron-packager.js ./deploy ppt-ndi --electron-version=" + ver + " " + opt);
 		} catch(e) {
 			console.error(e.stack);
-			console.error(e.stderr.toString());
-			console.error(e.stdout.toString());
+			if (e.stderr) console.error(e.stderr.toString());
+			if (e.stdout) console.error(e.stdout.toString());
 			_exit(1);
 		}
 		console.log(out.toString());
