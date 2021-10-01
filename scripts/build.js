@@ -190,6 +190,10 @@ function _buildWin32() {
 		let out;
 		let arr;
 		let cmd;
+		let latestMscVersion;
+		let platformToolset;
+		let searchDir;
+		let searchDirs;
 		data = data.replace(/C:\/Program Files\/NewTek\/NDI 4 SDK/g, _TMPDIR.replace(/\\/g, "/") + "/app");
 		fs.writeFileSync("./src/PPTNDI/PPTNDI.cpp", data);
 		
@@ -212,10 +216,26 @@ function _buildWin32() {
 			console.error("Could not locate the Visual Studio");
 			_exit(1);
 		}
-		out = path.join(out.toString().replace(/\r|\n/g, ""), "MSBuild", "Current", "Bin", "amd64", "MSBuild.exe");
-		
+		out = out.toString().replace(/\r|\n/g, "");
+
+		searchDir = path.join(out, "MSBuild", "Microsoft", "VC");
+		searchDirs = getDirs(searchDir.replace(/\//g, "\\"));
+		latestMscVersion = searchDirs[searchDirs.length -1];
+		if ( !/\S/.test(latestMscVersion) ) {
+			console.error("Could not locate the latest MSC version");
+			_exit(1);
+		}
+		searchDir = path.join(out, "MSBuild", "Microsoft", "VC", latestMscVersion, "Platforms", "x64", "PlatformToolsets");
+		searchDirs = getDirs(searchDir.replace(/\//g, "\\"));
+		platformToolset = searchDirs[searchDirs.length -1];
+		if ( !/\S/.test(platformToolset) ) {
+			console.error("Could not locate the latest toolset");
+			_exit(1);
+		}
+
 		console.log("Building PPTNDI...");
-		cmd = '"' + out + '"' + " ./src/PPTNDI.sln /property:Configuration=Release;Platform=x64 /clp:NoSummary;NoItemAndPropertyList;ErrorsOnly /verbosity:quiet /nologo";
+		out = path.join(out, "MSBuild", "Current", "Bin", "amd64", "MSBuild.exe");
+		cmd = '"' + out + '"' + " ./src/PPTNDI.sln /property:Configuration=Release;Platform=x64 /clp:NoSummary;NoItemAndPropertyList;ErrorsOnly /verbosity:quiet /nologo /p:PlatformToolset=" + platformToolset;
 		console.log(cmd);
 		out = execSync(cmd);
 		console.log(out.toString());
@@ -223,8 +243,8 @@ function _buildWin32() {
 		// final output to ./src/x64/Release/PPTNDI.dll
 	} catch(e) {
 		console.error(e.stack);
-		console.error(e.stderr.toString());
-		console.error(e.stdout.toString());
+		if (e.stderr) console.error(e.stderr.toString());
+		if (e.stdout) console.error(e.stdout.toString());
 		_exit(1);
 	}
 		
@@ -336,6 +356,12 @@ function _pack() {
 		}
 		console.log(out.toString());
 	}
+}
+
+function getDirs(path) {
+  return fs.readdirSync(path).filter(function (file) {
+    return fs.statSync(path+'/'+file).isDirectory();
+  });
 }
 
 function _exit(code) {
