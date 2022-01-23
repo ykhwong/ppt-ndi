@@ -623,7 +623,7 @@ $(document).ready(function() {
 	}
 
 	function registerGlobalShortcut() {
-		ipc.send("require", { lib: "electron-globalShortcut", func: "client", args: null });
+		ipc.send("require", { lib: "electron-globalShortcut", func: "control", args: null });
 	}
 
 	function procTransition(file, data) {
