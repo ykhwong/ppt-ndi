@@ -41,8 +41,8 @@ function main() {
 	ap = objPPT.Presentations.Open(WScript.arguments(0), false, false, false);
 	proc(ap);
 
-	for (var i=0; i< objPPT.Presentations.length; i++) {
-		var opres = objPPT.Presentations[i];
+	for (var i=0; i< objPPT.Presentations.Count; i++) {
+		var opres = objPPT.Presentations.Item(i + 1);
 		TestFile = opres.FullName;
 		break;
 	}
@@ -180,8 +180,8 @@ function main() {
 	ap = objPPT.Presentations.Open(WScript.arguments(0), false, false, false);
 	proc(ap);
 
-	for (var i=0; i< objPPT.Presentations.length; i++) {
-		var opres = objPPT.Presentations[i];
+	for (var i=0; i< objPPT.Presentations.Count; i++) {
+		var opres = objPPT.Presentations.Item(i + 1);
 		TestFile = opres.FullName;
 		break;
 	}
@@ -191,6 +191,34 @@ function main() {
 	}
 	objPPT = null;
 	WScript.Echo("PPTNDI: Loaded");
+}
+main();
+`;
+
+const vbsQuickEdit = `
+var objPPT;
+var file;
+var slideNo;
+var ap;
+objPPT = new ActiveXObject("PowerPoint.Application");
+file = WScript.arguments(0);
+slideNo = parseInt(WScript.arguments(1));
+
+function main() {
+	for ( var i = 0; i < objPPT.Presentations.Count; i++) {
+		var opres = objPPT.Presentations.Item(i + 1).FullName;
+		if ( opres === file ) {
+			ap = objPPT.Presentations.Item(i + 1);
+			break;
+		}
+	}
+
+	objPPT.DisplayAlerts = false;
+	if ( ! ap ) {
+		ap = objPPT.Presentations.Open(file, false);
+	}
+	ap.Windows(1).Activate();
+	ap.Slides(slideNo).Select();
 }
 main();
 `;
@@ -1840,6 +1868,38 @@ $(document).ready(function() {
 
 	$(".resText").hide();
 	$("#listResList").show();
+
+	$(window).mousedown(function(event) {
+		if ( event.which === 3 ) {
+			if ( /image_picker_image/.test($(event.target).attr('class')) ) {
+				let lSlideNo = $(event.target).attr('src').replace(/.*Slide(\d+)\.png\s*$/i, "$1");
+
+				if ( /^\d+$/.test(lSlideNo) ) {
+					const { Menu, MenuItem } = require('electron').remote;
+					const menu = new Menu();
+					menu.append(new MenuItem ({
+						label: 'Quick Edit',
+							click() {
+								let vbsDir;
+								let file = pptPath;
+								let tmpDir2 = tmpDir + "/mode2";
+								vbsDir = tmpDir2 + '/vbQuickEdit.vbs';
+
+								try {
+									fs.writeFileSync(vbsDir, vbsQuickEdit, 'utf-8');
+								} catch(e) {
+									return;
+								}
+								const spawn = require( 'child_process' ).spawn;
+								spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, lSlideNo, '' ] );
+							}
+						}));
+					menu.popup();
+				}
+			}
+		}
+	});
+
 	initImgPicker();
 	startCurrentTime();
 	registerIoHook();
