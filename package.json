@@ -8,7 +8,6 @@
 		"fs-extra": "^10.0.0",
 		"html-to-image": "^1.9.0",
 		"iconv-lite": "^0.6.3",
-		"iohook": "^0.9.3",
 		"merge-images": "^2.0.0",
 		"pngjs": "^6.0.0",
 		"pptx-compose": "^1.0.0",
@@ -31,17 +30,5 @@
 		"ndi",
 		"powerpoint",
 		"ppt"
-	],
-	"iohook": {
-		"targets": [
-			"electron-87"
-		],
-		"platforms": [
-			"win32",
-			"darwin"
-		],
-		"arches": [
-			"x64"
-		]
-	}
+	]
 }
