@@ -1,4 +1,4 @@
-const { app, Menu, Tray, screen } = require('electron');
+const { app, Menu, Tray, screen, globalShortcut } = require('electron');
 const multipleInstance = !app.requestSingleInstanceLock();
 const frontendDir = __dirname + '/frontend/';
 const debugMode = false;
@@ -472,6 +472,27 @@ app.on('ready', function() {
 			}
 		});
 
+		function globalShortcut_proc() {
+			let mainKey = 'Ctrl+Shift+';
+			if (typeof remoteVar.configData === 'undefined') return;
+
+			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.prev, () => {
+				mainWindow2.webContents.send('remote', { msg: 'gotoPrev' });
+			});
+			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.next, () => {
+				mainWindow2.webContents.send('remote', { msg: 'gotoNext' });
+			});
+			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.transparent, () => {
+				mainWindow2.webContents.send('remote', { msg: 'update_trn' });
+			});
+			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.black, () => {
+				mainWindow2.webContents.send('remote', { msg: 'update_black' });
+			});
+			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.white, () => {
+				mainWindow2.webContents.send('remote', { msg: 'update_white' });
+			});
+		}
+		
 		function iohook_proc(data) {
 			let ret = -1;
 			if (multipleInstance) {
@@ -482,34 +503,6 @@ app.on('ready', function() {
 				ret = remoteLib.ioHook;
 			} else if (data.func === "start") {
 				ret = remoteLib.ioHook.start();
-			} else if (data.on === "keyup") {
-				remoteLib.ioHook.on('keyup', event => {
-					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null) return;
-					if (event.shiftKey && event.ctrlKey) {
-						let chr = String.fromCharCode( event.rawcode );
-						if (chr === "" || typeof remoteVar.configData === 'undefined') return;
-						switch (chr) {
-							case remoteVar.configData.hotKeys.prev:
-								mainWindow2.webContents.send('remote', { msg: 'gotoPrev' });
-								break;
-							case remoteVar.configData.hotKeys.next:
-								mainWindow2.webContents.send('remote', { msg: 'gotoNext' });
-								break;
-							case remoteVar.configData.hotKeys.transparent:
-								mainWindow2.webContents.send('remote', { msg: 'update_trn' });
-								break;
-							case remoteVar.configData.hotKeys.black:
-								mainWindow2.webContents.send('remote', { msg: 'update_black' });
-								break;
-							case remoteVar.configData.hotKeys.white:
-								mainWindow2.webContents.send('remote', { msg: 'update_white' });
-								break;
-							default:
-								break;
-						}
-					}
-				});
-				ret = 1;
 			} else if (data.on === "keydown") {
 				remoteLib.ioHook.on('keydown', event => {
 					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
@@ -574,13 +567,6 @@ app.on('ready', function() {
 					if (data.func === null && data.args === null) {
 						remoteLib.ffi = require("ffi-napi");
 						try {
-							/*
-							let { RTLD_NOW, RTLD_GLOBAL } = remoteLib.ffi.DynamicLibrary.FLAGS;
-							remoteLib.ffi.DynamicLibrary(
-								app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/Processing.NDI.Lib.x64.dll',
-								RTLD_NOW | RTLD_GLOBAL
-							);
-							*/
 							if (process.platform === 'win32') {
 								remoteVar.lib = remoteLib.ffi.Library(
 									app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + '/PPTNDI.dll', {
@@ -623,14 +609,9 @@ app.on('ready', function() {
 					break;
 				case "iohook":
 					if (data.func === "client") {
-						iohook_proc({ on: null, args: null });
-						iohook_proc({ on: "keyup", args: null });
-						iohook_proc({ on: "mouseup", args: null });
-						iohook_proc({ on: "mousedrag", args: null });
-						ret = iohook_proc({ func: "start", args: null });
+						// replaced by electron-globalShortcut
 					} else if (data.func === "control") {
 						iohook_proc({ on: null, args: null });
-						iohook_proc({ on: "keyup", args: null });
 						iohook_proc({ on: "keydown", args: null });
 						iohook_proc({ on: "mouseup", args: null });
 						iohook_proc({ on: "mousewheel", args: null });
@@ -638,6 +619,9 @@ app.on('ready', function() {
 					} else {
 						ret = ioHook_proc(data);
 					}
+					break;
+				case "electron-globalShortcut":
+					ret = globalShortcut_proc();
 					break;
 				default:
 					break;
@@ -655,8 +639,6 @@ app.on('ready', function() {
 });
 
 app.on('window-all-closed', (e) => {
-	//if (process.platform != 'darwin') {
-		loopPaused = true;
-		app.quit();
-	//}
+	loopPaused = true;
+	app.quit();
 });
