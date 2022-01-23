@@ -390,7 +390,7 @@ $(document).ready(function() {
 	}
 
 	function stopSlideTransition() {
-		for (var pp=2; pp<=9; pp++) {
+		for (let pp=2; pp<=9; pp++) {
 			clearTimeout(slideTranTimers[pp]);
 		}
 		mustStop = true;
@@ -428,9 +428,9 @@ $(document).ready(function() {
 			filterType: -1
 		});
 
-		for (var y = 0; y < png.height; y++) {
-			for (var x = 0; x < png.width; x++) {
-				var idx = (png.width * y + x) << 2;
+		for (let y = 0; y < png.height; y++) {
+			for (let x = 0; x < png.width; x++) {
+				let idx = (png.width * y + x) << 2;
 				png.data[idx  ] = colorInfo.r;
 				png.data[idx+1] = colorInfo.g;
 				png.data[idx+2] = colorInfo.b;
@@ -525,7 +525,7 @@ $(document).ready(function() {
 			}
 
 			function getMeta(url, callback) {
-				var img = new Image();
+				let img = new Image();
 				img.src = url;
 				img.onload = function() { callback(this.width, this.height); }
 			}
@@ -627,7 +627,7 @@ $(document).ready(function() {
 		preFile = tmpDir + "/SlidePre.png";
 
 		try {
-			for (var i=2; i<=transLvl; i++) {
+			for (let i=2; i<=transLvl; i++) {
 				fs.unlinkSync(tmpDir + "/t" + i.toString() + ".png");
 			}
 		} catch(e) {
@@ -688,7 +688,7 @@ $(document).ready(function() {
 					try {
 						fs.writeFileSync(tmpDir + "/t" + i.toString() + ".png", b64data, 'base64');
 						if (i === 8) {
-							for (var i2=2; i2<=transLvl; i2++) {
+							for (let i2=2; i2<=transLvl; i2++) {
 								sendSlides(i2);
 							}
 						}
