@@ -325,8 +325,6 @@ function _pack() {
 			fs.copySync( path.join(".", "app", "Bin", "x64", "Processing.NDI.Lib.x64.dll"), "ppt-ndi-win32-x64/Processing.NDI.Lib.x64.dll" );
 			rimraf.sync( "ppt-ndi-win32-x64/locales" );
 			fs.copySync( path.join( _TMPDIR, "deploy", "frontend", "i18n" ), "ppt-ndi-win32-x64/locales" );
-			fs.copySync( path.join( _TMPDIR, "deploy", "node_modules", "iohook", "builds", "electron-v" + abi + "-win32-x64",
-			"build", "Release", "uiohook.dll"), "ppt-ndi-win32-x64/uiohook.dll" );
 		} catch(e) {
 			console.error(e.stack);
 			if (e.stderr) console.error(e.stderr.toString());
@@ -344,8 +342,6 @@ function _pack() {
 			fs.copySync( path.join(".", "src", "PPTNDI.dylib"), "deploy/PPTNDI.dylib" );
 			rimraf.sync( "deploy/locales" );
 			fs.copySync( path.join( _TMPDIR, "deploy", "frontend", "i18n" ), "deploy/locales" );
-			fs.copySync( path.join( _TMPDIR, "deploy", "node_modules", "iohook", "builds", "electron-v" + abi + "-darwin-x64",
-			"build", "Release", "uiohook.dylib"), "deploy/uiohook.dylib" );
 			
 			out = execSync("node dev/node_modules/electron-packager/bin/electron-packager.js ./deploy ppt-ndi --electron-version=" + ver + " " + opt);
 		} catch(e) {
