@@ -376,9 +376,6 @@ app.on('ready', function() {
 				case "passConfigData":
 					remoteVar.configData = data.details;
 					break;
-				case "passIgnoreIoHookVal":
-					remoteVar.ignoreIoHook = data.details;
-					break;
 				default:
 					console.log("Unhandled function - loadIpc(): " + data);
 					destroyWin(mainWindow);
@@ -492,55 +489,6 @@ app.on('ready', function() {
 				mainWindow2.webContents.send('remote', { msg: 'update_white' });
 			});
 		}
-		
-		function iohook_proc(data) {
-			let ret = -1;
-			if (multipleInstance) {
-				return ret;
-			}
-			if (data.on === null && data.args === null) {
-				remoteLib.ioHook = require('iohook');
-				ret = remoteLib.ioHook;
-			} else if (data.func === "start") {
-				ret = remoteLib.ioHook.start();
-			} else if (data.on === "keydown") {
-				remoteLib.ioHook.on('keydown', event => {
-					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
-					if (((event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && event.keycode === 63) ||
-					!(event.altKey || event.shiftKey || event.ctrlKey || event.metaKey) && (
-					event.keycode === 63 || event.keycode === 3655 || event.keycode === 3663 ||
-					event.keycode === 28 || event.keycode === 57 || event.keycode === 48 || event.keycode === 17 ||
-					event.keycode === 49 || event.keycode === 25 || event.keycode === 60999 || event.keycode === 61007 ||
-					event.keycode === 61003 || event.keycode === 61000 || event.keycode === 61005 || event.keycode === 61008
-					)) {
-						mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
-					}
-				});
-				ret = 1;
-			} else if (data.on === "mouseup") {
-				remoteLib.ioHook.on('mouseup', event => {
-					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
-					loopPaused=false;
-					mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
-				});
-				ret = 1;
-			} else if (data.on === "mousewheel") {
-				remoteLib.ioHook.on('mousewheel', event => {
-					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
-					mainWindow2.webContents.send('remote', { msg: 'stdin_write_newline' });
-				});
-				ret = 1;
-			} else if (data.on === "mousedrag") {
-				remoteLib.ioHook.on('mousedrag', event => {
-					if (typeof mainWindow2 === 'undefined' || mainWindow2 === null || remoteVar.ignoreIoHook) return;
-					if (loopPaused === false) {
-						loopPaused=true;
-					}
-				});
-				ret = 1;
-			}
-			return ret;
-		}
 
 		ipc.on('status', (event, data) => {
 			let ret = null;
@@ -605,19 +553,6 @@ app.on('ready', function() {
 							lastImageArgs = data.args;
 							ret = remoteVar.lib.send( ...data.args );
 						}
-					}
-					break;
-				case "iohook":
-					if (data.func === "client") {
-						// replaced by electron-globalShortcut
-					} else if (data.func === "control") {
-						iohook_proc({ on: null, args: null });
-						iohook_proc({ on: "keydown", args: null });
-						iohook_proc({ on: "mouseup", args: null });
-						iohook_proc({ on: "mousewheel", args: null });
-						ret = iohook_proc({ func: "start", args: null });
-					} else {
-						ret = ioHook_proc(data);
 					}
 					break;
 				case "electron-globalShortcut":
