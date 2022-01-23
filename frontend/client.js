@@ -352,7 +352,7 @@ $(document).ready(function() {
 	}
 
 	function stopSlideTransition() {
-		for (var pp=2; pp<=9; pp++) {
+		for (let pp=2; pp<=9; pp++) {
 			clearTimeout(slideTranTimers[pp]);
 		}
 		mustStop = true;
@@ -364,7 +364,7 @@ $(document).ready(function() {
 		let png;
 		let buffer;
 		function getMeta(url, callback) {
-			var img = new Image();
+			let img = new Image();
 			img.src = url;
 			img.onload = function() { callback(this.width, this.height); }
 		}
@@ -375,9 +375,9 @@ $(document).ready(function() {
 				filterType: -1
 			});
 
-			for (var y = 0; y < png.height; y++) {
-				for (var x = 0; x < png.width; x++) {
-					var idx = (png.width * y + x) << 2;
+			for (let y = 0; y < png.height; y++) {
+				for (let x = 0; x < png.width; x++) {
+					let idx = (png.width * y + x) << 2;
 					png.data[idx  ] = redVal;
 					png.data[idx+1] = greenVal;
 					png.data[idx+2] = blueVal;
@@ -459,7 +459,7 @@ $(document).ready(function() {
 			const prevSli = rpc + prevSlide.toString() + '.png';
 			const transLvl=9;
 			try {
-				for (var i=2; i<=transLvl; i++) {
+				for (let i=2; i<=transLvl; i++) {
 					fs.unlinkSync(tmpDir + modePostFix + "/t" + i.toString() + ".png");
 				}
 			} catch(e) {
@@ -526,7 +526,7 @@ $(document).ready(function() {
 						try {
 							fs.writeFileSync(tmpDir + modePostFix + "/t" + i.toString() + ".png", b64data, 'base64');
 							if (i === 8) {
-								for (var i2=2; i2<=transLvl; i2++) {
+								for (let i2=2; i2<=transLvl; i2++) {
 									sendSlides(i2);
 								}
 							}
@@ -720,8 +720,8 @@ $(document).ready(function() {
 				return;
 			});
 			res.on('close', (code) => {
-				var fileArr = [];
-				var options;
+				let fileArr = [];
+				let options;
 				for (let i=1; i<=maxSlideNum; i++) {
 					fileArr.push(i.toString());
 				}
