@@ -211,9 +211,9 @@ Main
 /* vbsCheckSlide: Checks the status of current slide in real time */
 const vbsCheckSlide =`
 Dim objPPT
-Dim preSlideIdx
+'Dim preSlideIdx
 Dim curPos
-preSlideIdx = 0
+'preSlideIdx = 0
 
 sub Main()
 	Wscript.Echo "Status: 0"
@@ -227,16 +227,16 @@ sub Main()
 			If Err.Number = 0 Then
 				Err.Clear
 				curPos = ap.SlideShowWindow.View.CurrentShowPosition
-				If preSlideIdx = curPos Then
-				Else
+				'If preSlideIdx = curPos Then
+				'Else
 					Wscript.Echo "Status: " & curPos
-					preSlideIdx = curPos
-				End If
+					'preSlideIdx = curPos
+				'End If
 			Else
 				Wscript.Echo "Status: OFF"
 			End If
 		Else
-			preSlideIdx = 0
+			'preSlideIdx = 0
 			Wscript.Echo "Status: 0"
 		End If
 		Wscript.Sleep(500)
@@ -298,7 +298,7 @@ $(document).ready(function() {
 	let customSlideX = 0;
 	let customSlideY = 0;
 	let lastSignalTime = 0;
-	let lastSlideStat = "0";
+	let inTransition = false;
 	let configData = {};
 	let pin = true;
 	let mustStop = false;
@@ -595,9 +595,7 @@ $(document).ready(function() {
 				break;
 			case "tran":
 				setTimeout(function() {
-					ignoreIoHook(true);
 					sendColorNDI("tran");
-					ignoreIoHook(false);
 				}, 500);
 				break;
 			case "black":
@@ -614,20 +612,13 @@ $(document).ready(function() {
 		}
 	}
 
-	function ignoreIoHook(val) {
-		ipc.sendSync("remote", { name: "passIgnoreIoHookVal", details: val });
-	}
-
-	function registerIoHook() {
-		ipc.send("require", { lib: "iohook", func: "control", args: null });
-	}
-
 	function registerGlobalShortcut() {
 		ipc.send("require", { lib: "electron-globalShortcut", func: "control", args: null });
 	}
 
 	function procTransition(file, data) {
 		const transLvl=9;
+		inTransition = true;
 		preFile = tmpDir + "/SlidePre.png";
 
 		try {
@@ -640,10 +631,12 @@ $(document).ready(function() {
 		function sendSlides(i) {
 			console.log(i);
 			if (mustStop) {
+				inTransition = false;
 				return;
 			}
 			function setLast() {
 				if (mustStop) {
+					inTransition = false;
 					return;
 				}
 				slideTranTimers[10] = setTimeout(function() {
@@ -659,6 +652,7 @@ $(document).ready(function() {
 							console.log("file could not be generated: "+ preFile);
 						}
 					}
+					inTransition = false;
 				}, 10 * parseFloat(duration) * 50);
 			}
 
@@ -681,7 +675,7 @@ $(document).ready(function() {
 			stopSlideTransition();
 			mustStop = false;
 
-			for (let i=2; i<=transLvl; i++) {
+			for (let i=2; i <= transLvl; i++) {
 				let now = new Date().getTime();
 				mergeImages([
 					{ src: preFile + "?" + now, opacity: 1 - (0.1 * i) },
@@ -784,6 +778,7 @@ $(document).ready(function() {
 		}
 
 		res3.stdout.on('data', function(data) {
+			console.log(data.toString());
 			let curSlideStat = data.toString().replace(/^Status: /, "");
 			if (/^\s*OFF\s*$/.test(curSlideStat)) {
 				// Ready
@@ -796,16 +791,8 @@ $(document).ready(function() {
 				// updateStat("-", "");
 			} else {
 				// ON
+				res.stdin.write("\n");
 			}
-
-			if (/^\s*0\s*$/.test(lastSlideStat)) {
-				if (!/^\s*0\s*$/.test(curSlideStat)) {
-					if (slideIdx != curSlideStat) {
-						res.stdin.write("\n");
-					}
-				}
-			}
-			lastSlideStat = curSlideStat;
 		});
 
 		// Enable Always On Top by default
@@ -816,7 +803,6 @@ $(document).ready(function() {
 		// Enable Slide Checkerboard by default
 		$("#slidePreview").css('background-image', "url('trans_slide.png')");
 
-		registerIoHook();
 		registerGlobalShortcut();
 
 		$("#resWidth").val("0");
