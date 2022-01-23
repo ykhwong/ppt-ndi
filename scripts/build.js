@@ -8,8 +8,8 @@ const rimraf = require("rimraf");
 
 const _url = {
 	"ndi_sdk": {
-		"win32": "https://downloads.ndi.tv/SDK/NDI_SDK/NDI%204%20SDK.exe",
-		"linux": "https://downloads.ndi.tv/SDK/NDI_SDK_Linux/InstallNDISDK_v4_Linux.tar.gz",
+		"win32": "https://downloads.ndi.tv/SDK/NDI_SDK/NDI%205%20SDK.exe",
+		"linux": "https://downloads.ndi.tv/SDK/NDI_SDK_Linux/Install_NDI_SDK_v5_Linux.tar.gz",
 		"mac": "https://downloads.ndi.tv/SDK/NDI_SDK_Mac/Install_NDI_SDK_v5_macOS.pkg"
 	},
 	"innoextract": {
