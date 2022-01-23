@@ -622,6 +622,10 @@ $(document).ready(function() {
 		ipc.send("require", { lib: "iohook", func: "control", args: null });
 	}
 
+	function registerGlobalShortcut() {
+		ipc.send("require", { lib: "electron-globalShortcut", func: "client", args: null });
+	}
+
 	function procTransition(file, data) {
 		const transLvl=9;
 		preFile = tmpDir + "/SlidePre.png";
@@ -813,6 +817,7 @@ $(document).ready(function() {
 		$("#slidePreview").css('background-image', "url('trans_slide.png')");
 
 		registerIoHook();
+		registerGlobalShortcut();
 
 		$("#resWidth").val("0");
 		$("#resHeight").val("0");
