@@ -6,27 +6,8 @@ $(document).ready(function() {
 	const version = "v" + require('electron').remote.app.getVersion();
 	const keyCombi = "Ctrl-Shift-";
 	let rendererList;
-	if (process.platform === 'darwin') {
-		rendererList = ["Internal"];
-	} else { // win32
-		rendererList = ["Microsoft PowerPoint", "Internal"];
-	}
-	const defaultData = {
-		"version" : version,
-		"startAsTray" : false,
-		"startWithTheFirstSlideSelected": false,
-		"highPerformance": false,
-		"hotKeys" : {
-			"prev" : "",
-			"next" : "",
-			"transparent" : "",
-			"black" : "",
-			"white" : ""
-		},
-		"renderer": rendererList[0],
-		"lang": "en"
-	};
-	let configData = defaultData;
+	let defaultData;
+	let configData;
 	let configPath = "";
 
 	function alertMsg(myMsg) {
@@ -53,12 +34,12 @@ $(document).ready(function() {
 	function loadConfig() {
 		$.getJSON(configPath, function(json) {
 			if (json) {
-				configData.startAsTray = json.startAsTray;
-				configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
-				configData.highPerformance = json.highPerformance;
-				configData.hotKeys = json.hotKeys;
-				configData.lang = json.lang;
-				configData.renderer = json.renderer;
+				configData.startAsTray = json.startAsTray || defaultData.startAsTray;
+				configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected || defaultData.startWithTheFirstSlideSelected;
+				configData.highPerformance = json.highPerformance || defaultData.highPerformance;
+				configData.hotKeys = json.hotKeys || defaultData.hotKeys;
+				configData.lang = json.lang || defaultData.lang;
+				configData.renderer = json.renderer || defaultData.renderer;
 				$("#systray").prop('checked', configData.startAsTray);
 				$("#startWithFirstSlide").prop('checked', configData.startWithTheFirstSlideSelected);
 				$("#highPerformance").prop('checked', configData.highPerformance);
@@ -67,9 +48,6 @@ $(document).ready(function() {
 				$("#transTxtBox").val(getHotKey(configData.hotKeys.transparent));
 				$("#blackTxtBox").val(getHotKey(configData.hotKeys.black));
 				$("#whiteTxtBox").val(getHotKey(configData.hotKeys.white));
-				if (typeof(configData.lang) === "undefined" || !/\S/.test(configData.lang)) {
-					configData.lang = "en";
-				}
 				$("#rendererList").val(configData.renderer);
 				$("#langList").val("lang_" + configData.lang);
 			}
@@ -113,7 +91,7 @@ $(document).ready(function() {
 			configData.lang = $("#langList").val().replace(/^lang_/i, "");
 			configData.renderer = $("#rendererList").val();
 		}
-		
+
 		if (!fs.existsSync(appDataPath)) {
 			fs.mkdirSync(appDataPath, {
 				recursive: false // ~/Library/Preferences should already exist
@@ -139,7 +117,46 @@ $(document).ready(function() {
 		$.ajaxSetup({
 			async: false
 		});
+
+		if ( process.platform === 'darwin' ) {
+			rendererList = ["Internal"];
+		} else { // win32
+			rendererList = ["Microsoft PowerPoint", "Internal"];
+		}
+
+		$.each(getLangList(), function (i, item) {
+			$("#langList").append($('<option>', {
+				value: "lang_" + item.langCode,
+				text : item.details
+			}));
+		});
+
+		for ( let i = 0; i < rendererList.length; i++ ) {
+			$("#rendererList").append($('<option>', { 
+				value: rendererList[i],
+				text : rendererList[i]
+			}));
+		}
+
+		defaultData = {
+			"version" : version,
+			"startAsTray" : false,
+			"startWithTheFirstSlideSelected": false,
+			"highPerformance": false,
+			"hotKeys" : {
+				"prev" : "",
+				"next" : "",
+				"transparent" : "",
+				"black" : "",
+				"white" : ""
+			},
+			"renderer": rendererList[0],
+			"lang": "en"
+		};
+		configData = defaultData;
+
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
+
 		if (fs.existsSync(configPath)) {
 			loadConfig();
 		} else {
@@ -190,20 +207,6 @@ $(document).ready(function() {
 		}
 	});
 	$("#version").append(version);
-
-	$.each(getLangList(), function (i, item) {
-		$("#langList").append($('<option>', { 
-			value: "lang_" + item.langCode,
-			text : item.details
-		}));
-	});
-
-	for (let i=0; i<rendererList.length; i++) {
-		$("#rendererList").append($('<option>', { 
-			value: rendererList[i],
-			text : rendererList[i]
-		}));	
-	}
 
 	init();
 });
