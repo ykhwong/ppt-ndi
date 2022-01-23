@@ -223,7 +223,7 @@ function main() {
 main();
 `;
 
-const appDataPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
+const appDataPath = (process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
 
 $(document).ready(function() {
 	const { remote } = require('electron');
@@ -1870,6 +1870,9 @@ $(document).ready(function() {
 	$("#listResList").show();
 
 	$(window).mousedown(function(event) {
+		if ( process.platform === 'darwin' ) {
+			return;
+		}
 		if ( event.which === 3 ) {
 			if ( /image_picker_image/.test($(event.target).attr('class')) ) {
 				let lSlideNo = $(event.target).attr('src').replace(/.*Slide(\d+)\.png\s*$/i, "$1");
