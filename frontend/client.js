@@ -1546,8 +1546,8 @@ $(document).ready(function() {
 		ipc.send('remote', { name: "exit" });
 	}
 
-	function registerIoHook() {
-		ipc.send("require", { lib: "iohook", func: "client", args: null });
+	function registerGlobalShortcut() {
+		ipc.send("require", { lib: "electron-globalShortcut", func: "client", args: null });
 	}
 
 	function reflectConfig() {
@@ -1902,6 +1902,6 @@ $(document).ready(function() {
 
 	initImgPicker();
 	startCurrentTime();
-	registerIoHook();
+	registerGlobalShortcut();
 	reflectCache(false);
 });
