@@ -470,24 +470,35 @@ app.on('ready', function() {
 		});
 
 		function globalShortcut_proc() {
-			let mainKey = 'Ctrl+Shift+';
+			const mainKey = 'Ctrl+Shift+';
 			if (typeof remoteVar.configData === 'undefined') return;
+			globalShortcut.unregisterAll();
 
-			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.prev, () => {
-				mainWindow2.webContents.send('remote', { msg: 'gotoPrev' });
-			});
-			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.next, () => {
-				mainWindow2.webContents.send('remote', { msg: 'gotoNext' });
-			});
-			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.transparent, () => {
-				mainWindow2.webContents.send('remote', { msg: 'update_trn' });
-			});
-			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.black, () => {
-				mainWindow2.webContents.send('remote', { msg: 'update_black' });
-			});
-			globalShortcut.register(mainKey + remoteVar.configData.hotKeys.white, () => {
-				mainWindow2.webContents.send('remote', { msg: 'update_white' });
-			});
+			if ( remoteVar.configData.hotKeys.prev ) {
+				globalShortcut.register(mainKey + remoteVar.configData.hotKeys.prev, () => {
+					mainWindow2.webContents.send('remote', { msg: 'gotoPrev' });
+				});
+			}
+			if ( remoteVar.configData.hotKeys.next ) {
+				globalShortcut.register(mainKey + remoteVar.configData.hotKeys.next, () => {
+					mainWindow2.webContents.send('remote', { msg: 'gotoNext' });
+				});
+			}
+			if ( remoteVar.configData.hotKeys.transparent ) {
+				globalShortcut.register(mainKey + remoteVar.configData.hotKeys.transparent, () => {
+					mainWindow2.webContents.send('remote', { msg: 'update_trn' });
+				});
+			}
+			if ( remoteVar.configData.hotKeys.black ) {
+				globalShortcut.register(mainKey + remoteVar.configData.hotKeys.black, () => {
+					mainWindow2.webContents.send('remote', { msg: 'update_black' });
+				});
+			}
+			if ( remoteVar.configData.hotKeys.white ) {
+				globalShortcut.register(mainKey + remoteVar.configData.hotKeys.white, () => {
+					mainWindow2.webContents.send('remote', { msg: 'update_white' });
+				});
+			}
 		}
 
 		ipc.on('status', (event, data) => {
