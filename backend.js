@@ -372,6 +372,7 @@ app.on('ready', function() {
 					if (mainWindow2 !== null && !mainWindow2.isDestroyed()) {
 						mainWindow2.webContents.send('remote', { msg: 'reload' });
 					}
+					globalShortcut_proc();
 					break;
 				case "passConfigData":
 					remoteVar.configData = data.details;
