@@ -114,6 +114,12 @@ The macOS build only supports classic mode, and uses the experimental internal r
 * Microsoft PowerPoint
 * Microsoft Windows 7 or higher (x86-64 only)
 
+When using non-internal renderer on Windows, PPT NDI depends on Visual Basic for Applications (VBA), a component of Microsoft Office. In a default installation of Office, you'll get the VBA installed automatically. People doing a custom installation of Microsoft Office may sometimes change options to exclude VBA. In that way, the PPT NDI has no access to the PowerPoint components.
+
+1. In Control Panel > Programs and Features, locate Microsoft Office. Right-click it, and select Change.
+2. On the next panel, select Add or Remove Features.
+3. Under Office Shared Features, set Visual Basic for Applications to Run from My Computer. Click Continue.
+
 ## SEE ALSO
 * https://www.newtek.com/ndi/
 * https://www.newtek.com/ndi/tools/
