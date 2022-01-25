@@ -1,13 +1,12 @@
-PPT NDI v1.0.4
+PPT NDI v1.0.5
 
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
 
-Release Note (Jul 2 2020):
+Release Note (-):
 
-ADD: Automatically cache the user selections
-FIX: Include Background switch does not require to reload the slides
-FIX: Set the monitor always on top
-FIX: i18n update issue
+ADD: Internal renderer (experimental)
+ADD: Support for NDI 5
+ADD: Quick Edit (Classic mode)
 FIX: Minor bugs
 
 Please also download and open the sample.pptx file to see some examples of the lower thirds:
