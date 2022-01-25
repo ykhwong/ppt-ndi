@@ -845,7 +845,7 @@ $(document).ready(function() {
 		if (fs.existsSync(configPath)) {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
-				configData.highPerformance = json.highPerformance;
+				//configData.highPerformance = json.highPerformance;
 				configData.lang = json.lang;
 				setLangRsc();
 				ipc.send('remote', { name: "passConfigData", details: configData });

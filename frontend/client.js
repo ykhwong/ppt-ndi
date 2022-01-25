@@ -1417,7 +1417,7 @@ $(document).ready(function() {
 			$.getJSON(configPath, function(json) {
 				configData.hotKeys = json.hotKeys;
 				configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected;
-				configData.highPerformance = json.highPerformance;
+				configData.highPerformance = false;
 				configData.renderer = json.renderer;
 				configData.lang = json.lang;
 				setLangRsc();

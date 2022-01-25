@@ -36,13 +36,13 @@ $(document).ready(function() {
 			if (json) {
 				configData.startAsTray = json.startAsTray || defaultData.startAsTray;
 				configData.startWithTheFirstSlideSelected = json.startWithTheFirstSlideSelected || defaultData.startWithTheFirstSlideSelected;
-				configData.highPerformance = json.highPerformance || defaultData.highPerformance;
+				configData.highPerformance = false;
 				configData.hotKeys = json.hotKeys || defaultData.hotKeys;
 				configData.lang = json.lang || defaultData.lang;
 				configData.renderer = json.renderer || defaultData.renderer;
 				$("#systray").prop('checked', configData.startAsTray);
 				$("#startWithFirstSlide").prop('checked', configData.startWithTheFirstSlideSelected);
-				$("#highPerformance").prop('checked', configData.highPerformance);
+				//$("#highPerformance").prop('checked', configData.highPerformance);
 				$("#prevTxtBox").val(getHotKey(configData.hotKeys.prev));
 				$("#nextTxtBox").val(getHotKey(configData.hotKeys.next));
 				$("#transTxtBox").val(getHotKey(configData.hotKeys.transparent));
@@ -59,7 +59,7 @@ $(document).ready(function() {
 	function setLangRsc() {
 		setLangRscDiv("#minimize-systray", "ui_config/minimize-systray", true, configData.lang);
 		setLangRscDiv("#start-with-first-slide-selected", "ui_config/start-with-first-slide-selected", true, configData.lang);
-		setLangRscDiv("#enable-high-performance-mode", "ui_config/enable-high-performance-mode", true, configData.lang);
+		//setLangRscDiv("#enable-high-performance-mode", "ui_config/enable-high-performance-mode", true, configData.lang);
 		setLangRscDiv("#hotkeys", "ui_config/hotkeys", true, configData.lang);
 		setLangRscDiv("#prev", "ui_config/prev", true, configData.lang);
 		setLangRscDiv("#next", "ui_config/next", true, configData.lang);
@@ -86,7 +86,7 @@ $(document).ready(function() {
 
 			configData.startAsTray = $("#systray").prop("checked");
 			configData.startWithTheFirstSlideSelected = $("#startWithFirstSlide").prop("checked");
-			configData.highPerformance = $("#highPerformance").prop("checked");
+			configData.highPerformance = false;
 			configData.hotKeys = hotKeys;
 			configData.lang = $("#langList").val().replace(/^lang_/i, "");
 			configData.renderer = $("#rendererList").val();
