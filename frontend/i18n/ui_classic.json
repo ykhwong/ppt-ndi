@@ -56,15 +56,29 @@
 	}
 },
 {
+	"item": "hide-checkerboard",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Hide Checkerboard",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "체커보드 숨기기",
+			"rev" : 0
+		}
+	}
+},
+{
 	"item": "enable-slide-transition-effect",
 	"lang": {
 		"description": "",
 		"en": {
-			"msg" : "Enable Slide Transition Effect",
+			"msg" : "Slide Transition Effect",
 			"rev" : 0
 		},
 		"ko": {
-			"msg" : "슬라이드 전환 효과 사용",
+			"msg" : "슬라이드 전환 효과",
 			"rev" : 0
 		}
 	}
@@ -485,6 +499,34 @@
 		},
 		"ko": {
 			"msg" : "이 파일은 수정되었습니다. 다시 로드하시겠습니까?",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "quick-edit",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Quick Edit",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "빠른 편집",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "monitor",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Monitor",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "모니터",
 			"rev" : 0
 		}
 	}

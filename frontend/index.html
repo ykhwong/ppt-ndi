@@ -33,7 +33,7 @@
 		<table id="bktbl" border="0">
 		  <tbody>
 			<tr style="display: none;">
-			  <td id="show-checkerboard" width="180px"></td><!--Show Checkerboard-->
+			  <td id="show-checkerboard" width="50px"></td><!--Show Checkerboard-->
 			  <td>
 				<label class="switch">
 				<input type="checkbox" id="trans_checker" class="checkbox" name="trans_checker" value="trans_checker" checked>
@@ -42,7 +42,10 @@
 			</td>
 			</tr>
 			<tr>
-			  <td id="enable-slide-transition-effect" width="180px"></td><!--Enable Slide Transition Effect-->
+				<td style="font-weight: bold;">NDI</td>
+			</tr>
+			<tr>
+			  <td id="enable-slide-transition-effect" width="50px"></td><!--Enable Slide Transition Effect-->
 			  <td>
 				<label class="switch">
 				<input type="checkbox" id="use_slide_transition" class="checkbox" name="use_slide_transition" value="use_slide_transition" checked>
@@ -51,7 +54,7 @@
 			</td>
 			</tr>
 			<tr>
-			  <td id="include-background" width="180px"></td><!--Include Background-->
+			  <td id="include-background" width="50px"></td><!--Include Background-->
 			  <td width="35px">
 				<label class="switch">
 				<input type="checkbox" id="with_background" class="checkbox" name="with_background" value="with_background">
@@ -63,6 +66,9 @@
 		</table>
 		<table id="bktbl2" border="0">
 			<tbody>
+				<tr>
+					<td style="font-weight: bold;">PowerPoint</td>
+				</tr>
 				<tr>
 					<td id="resolution" width="120px"></td><!--Resolution-->
 					<td width="300px">
@@ -109,11 +115,8 @@
 			</tbody>
 		</table>
 	</div>
-	<div id="slideInfo">
-		<div id="slide_cnt" class="slideInfo">SLIDE 0 / 0</div>
-		<div id="current_time" class="slideInfo">00:00 AM</div>
-	</div>
 	<div id="monitorControl">
+		<div id="monitorText" style="font-weight: bold;"></div><!--Monitor-->
 		<div id="monitorControlText"></div><!--SlideShow Monitor-->
 		<select id="monitorList">
 		</select>
@@ -151,6 +154,10 @@
 						<button type="button" class="button" id="empty">&nbsp;</button>
 						<button type="button" class="button" id="smaller">&nbsp;</button>
 						<button type="button" class="button" id="bigger">&nbsp;</button>
+					</div>
+					<div id="slideInfo">
+						<div id="slide_cnt" class="slideInfo">SLIDE 0 / 0</div>
+						<div id="current_time" class="slideInfo">00:00 AM</div>
 					</div>
 			  </td>
 			</tr>

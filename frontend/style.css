@@ -69,7 +69,7 @@ html, body {
 #bktbl2 {
 	position: fixed;
 	top: 50px;
-	left: 420px;
+	left: 390px;
 	width: 250px;
 	color: #79a9f7;
 }
@@ -158,16 +158,19 @@ html, body {
 }
 
 #slideInfo {
-	position: fixed;
-	top: 47px;
-	right: 20px;
 	color: #79a9f7;
+	position: fixed;
+	top: 1px;
+	min-width: 50px;
+	right: 250px;
+	text-align: center;
+	-webkit-app-region: drag;
+	padding: 2px;
 }
 
 .slideInfo {
-	font-size: 20px;
+	font-size: 12px;
 }
-
 
 #buttons {
 	height: 35px;
@@ -216,10 +219,10 @@ html, body {
 
 #ppt_filename {
 	position: fixed;
-	top: 5px;
-	left: 0px;
+	top: 10px;
+	left: 152px;
 	width: 100%;
-	text-align: center;
+	text-align: left;
 	color: #79a9f7;
 	-webkit-app-region: drag;
 }
@@ -239,32 +242,39 @@ html, body {
 
 #monitorControl {
 	position: fixed;
-	top: 78px;
-	right: 22px;
+	top: 50px;
+	right: 30px;
 	width: 270px;
 	height: 40px;
 	color: #79a9f7;
+	font-weight: normal;
 }
 
-#monitorControlText {
+#monitorText {
 	position: absolute;
 	top: 0px;
 	left: 0px;
 }
 
-#monitorAlphaText {
+#monitorControlText {
 	position: absolute;
 	top: 20px;
-	left: -30px;
+	left: 0px;
+}
+
+#monitorAlphaText {
+	position: absolute;
+	top: 40px;
+	left: 0px;
 	display: inline-block;
 }
 
 #setMonitor {
 	position: absolute;
-	top: 23px;
-	left: 125px;
+	top: 43px;
+	left: 169px;
 	background-color: #0066ff;
-	width: 145px;
+	width: 100px;
 	text-align: center;
 	display: inline-block;
 	cursor:pointer;
@@ -272,17 +282,17 @@ html, body {
 
 #monitor_trans_switch {
 	position: relative;
-	top: 20px;
-	left: 80px;
+	top: 40px;
+	left: 120px;
 }
 
 #monitorList {
 	position: absolute;
-	top: 0px;
-	left: 125px;
+	top: 20px;
+	left: 169px;
 	background-color: black;
 	color: white;
-	width: 145px;
+	width: 100px;
 	display: inline-block;
 	height: 22px;
 }

@@ -333,6 +333,7 @@ $(document).ready(function() {
 		setLangRscDiv("#monitorControlText", "ui_classic/monitorControlText", false, configData.lang);
 		setLangRscDiv("#monitorAlphaText", "ui_classic/monitorAlphaText", false, configData.lang);
 		setLangRscDiv("#setMonitor", "ui_classic/setMonitor", false, configData.lang);
+		setLangRscDiv("#monitorText", "ui_classic/monitor", false, configData.lang);
 		/*
 		$("#currentSlideText").attr("data-img-label", getLangRsc("ui_classic/currentSlideText", configData.lang));
 		$("#nextSlideText").attr("data-img-label", getLangRsc("ui_classic/nextSlideText", configData.lang));
@@ -1006,142 +1007,6 @@ $(document).ready(function() {
 		});
 		res.on('close', (code) => {
 			loadPPTX_PostProcess(file);
-/*
-			let newMaxSlideNum = 0;
-			let stats;
-			let path = require("path");
-			if (tmpDir === "") {
-				return;
-			}
-			fs.readdirSync(tmpDir).forEach(file2 => {
-				re = new RegExp("^Slide(\\d+)\\.png\$", "i");
-				if (re.exec(file2)) {
-					let rpc = file2.replace(re, "\$1");
-					fileArr.push(rpc);
-					newMaxSlideNum++;
-				}
-			});
-			if (isCancelTriggered) return;
-			if (fileArr === undefined || fileArr.length == 0) {
-				maxSlideNum = 0;
-				cleanupForTemp(false);
-				tmpDir = preTmpDir;
-				alertMsg(getLangRsc("ui_classic/ppt-not-loaded", configData.lang));
-				$("#fullblack, .cancelBox").hide();
-				return;
-			}
-			hiddenSlides = [];
-			if (fs.existsSync(tmpDir + "/hidden.dat")) {
-				const hs = fs.readFileSync(tmpDir + "/hidden.dat", { encoding: 'utf8' });
-				hiddenSlides = hs.split("\n");
-			}
-
-			advanceSlides = {};
-			if (fs.existsSync(tmpDir + "/advance.dat")) {
-				const as = fs.readFileSync(tmpDir + "/advance.dat", { encoding: 'utf8' });
-				const tmpAdvanceSlides = as.split(/\r\n|\n/);
-				for (let i=0; i < tmpAdvanceSlides.length; i++) {
-					let sNum = tmpAdvanceSlides[i].split("\t")[0];
-					let sSec = tmpAdvanceSlides[i].split("\t")[1];
-					advanceSlides[sNum] = sSec;
-				}
-			}
-
-			if (isCancelTriggered) return;
-			hiddenSlides = hiddenSlides.filter(n => n);
-			for (i = 0, len = hiddenSlides.length; i < len; i++) { 
-				hiddenSlides[i] = parseInt(hiddenSlides[i], 10);
-			}
-
-			slideEffects = {};
-			if (fs.existsSync(tmpDir + "/slideEffect.dat")) {
-				const hs = fs.readFileSync(tmpDir + "/slideEffect.dat", { encoding: 'utf8' });
-				const lines = hs.split(/(\r|\n)+/);
-				for (i = 0; i < lines.length; i++) {
-					let ls = lines[i].split(",");
-					let obj = {
-						"effectName" : ls[1],
-						"duration" : ls[2]
-					};
-					slideEffects[ls[0].toString()] = obj;
-				}
-			}
-			if (isCancelTriggered) return;
-			fileArr.sort((a, b) => a - b).forEach(file2 => {
-				let rpc = file2;
-				let isHidden = false;
-				options += '<option data-img-label="' + rpc + '"';
-
-				for (i = 0, len = hiddenSlides.length; i < len; i++) { 
-					let num = hiddenSlides[i];
-					if (/^\d+$/.test(num)) {
-						if (num == parseInt(rpc, 10)) {
-							options += ' data-img-class="hiddenSlide" ';
-							isHidden = true;
-							break;
-						}
-					}
-				}
-				if (!isHidden && ( slideEffects[rpc].effectName !== "0" )) {
-					options += ' data-img-class="transSlide" ';
-				}
-
-				options += ' data-img-src="' + tmpDir + '/Slide' + rpc + '.png" value="' + rpc + '">' + "\n";
-				$("select").find('option[value="Current"]').prop('img-src', tmpDir + "/Slide1.png");
-				if (!fs.existsSync(tmpDir + "/Slide2.png")) {
-					$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide1.png");
-				} else {
-					$("select").find('option[value="Next"]').prop('img-src', tmpDir + "/Slide2.png");
-				}
-			});
-			$("#slides_grp").html(options);
-			mode1options = options;
-			$("#fullblack, .cancelBox").hide();
-			maxSlideNum = newMaxSlideNum;
-			createNullSlide();
-
-			if (configData.startWithTheFirstSlideSelected === true) {
-				if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
-					selectSlide('1');
-				} else {
-					for (i = 1; i <= maxSlideNum; i++) {
-						if (!hiddenSlides.includes(i)) {
-							selectSlide(i.toString());
-							break;
-						}
-					}
-				}
-			} else {
-				let selectedDiv = "ul.thumbnails.image_picker_selector li .thumbnail.selected";
-				let tmpSrc = $("img.image_picker_image:first").attr('src');
-				initImgPicker();
-				$("img.image_picker_image:first").attr('src', tmpSrc);
-				$(selectedDiv).css("background", "rgb(0, 0, 0, 0)");
-				currentSlide = 0;
-				$("img.image_picker_image:eq(1)").attr("src", "null_slide.png");
-				$("#below .thumbnail:first").click(function() {
-					selectSlide('1');
-					$(this).off('click');
-				});
-			}
-			
-			if (isLoaded) {
-				cleanupForTemp(true);
-			}
-			isLoaded = true;
-			pptPath = file;
-			stats = fs.statSync(pptPath);
-			pptTimestamp = stats.mtimeMs;
-			$("#ppt_filename").html(path.basename(pptPath));
-			blkBool = false;
-			whtBool = false;
-			trnBool = false;
-			loadBackgroundWorker();
-			if (!checkVisible(document.querySelector('#below img'))) {
-				$("#rightTop img").css("width", "40%");
-				$(window).trigger('resize');
-			}
-*/
 		});
 	}
 
@@ -1871,7 +1736,7 @@ $(document).ready(function() {
 					const { Menu, MenuItem } = require('electron').remote;
 					const menu = new Menu();
 					menu.append(new MenuItem ({
-						label: 'Quick Edit',
+						label: getLangRsc("ui_classic/quick-edit", configData.lang),
 							click() {
 								let vbsDir;
 								let file = pptPath;
@@ -1889,7 +1754,7 @@ $(document).ready(function() {
 						}));
 					if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
 						menu.append(new MenuItem ({
-							label: ($("#trans_checker").is(":checked")) ? 'Hide Checkerboard' : 'Show Checkerboard',
+							label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui_classic/hide-checkerboard", configData.lang) : getLangRsc("ui_classic/show-checkerboard", configData.lang),
 								click() {
 									$('#trans_checker').trigger("click");
 								}
@@ -1901,7 +1766,7 @@ $(document).ready(function() {
 					const menu = new Menu();
 					if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
 						menu.append(new MenuItem ({
-							label: ($("#trans_checker").is(":checked")) ? 'Hide Checkerboard' : 'Show Checkerboard',
+							label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui_classic/hide-checkerboard", configData.lang) : getLangRsc("ui_classic/show-checkerboard", configData.lang),
 								click() {
 									$('#trans_checker').trigger("click");
 								}
