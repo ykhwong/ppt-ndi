@@ -74,11 +74,11 @@
 	"lang": {
 		"description": "",
 		"en": {
-			"msg" : "Include Background",
+			"msg" : "Background on NDI",
 			"rev" : 0
 		},
 		"ko": {
-			"msg" : "배경 포함",
+			"msg" : "NDI의 배경",
 			"rev" : 0
 		}
 	}
@@ -158,11 +158,11 @@
 	"lang": {
 		"description": "",
 		"en": {
-			"msg" : "Alpha",
+			"msg" : "Alpha on Monitor",
 			"rev" : 0
 		},
 		"ko": {
-			"msg" : "알파",
+			"msg" : "모니터의 알파",
 			"rev" : 0
 		}
 	}
