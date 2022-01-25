@@ -687,7 +687,7 @@ $(document).ready(function() {
 				fs.removeSync(tmpDir2);
 			}
 			if (!fs.existsSync(tmpDir2)) {
-				fs.mkdirSync(tmpDir2);
+				fs.mkdirSync(tmpDir2, { recursive: true });
 			}
 			vbsDir = tmpDir2 + '/wb.vbs';
 			if ($("#with_background").is(":checked")) {
@@ -767,13 +767,13 @@ $(document).ready(function() {
 		if (process.platform === 'darwin') {
 			tmpDir = process.env.TMPDIR + '/ppt_ndi';
 		} else { // win32
-			tmpDir = process.env.TEMP + '/ppt_ndi';
+			tmpDir = process.env.PROGRAMDATA + '/PPT-NDI/temp';
 		}
 		if (!fs.existsSync(tmpDir)) {
-			fs.mkdirSync(tmpDir);
+			fs.mkdirSync(tmpDir, { recursive: true });
 		}
 		tmpDir += '/' + now;
-		fs.mkdirSync(tmpDir);
+		fs.mkdirSync(tmpDir, { recursive: true });
 		let opts = {
 			file: file,
 			outDir : tmpDir,
@@ -965,12 +965,12 @@ $(document).ready(function() {
 		const spawn = require( 'child_process' ).spawn;
 		spawnpid = spawn.pid;
 		preTmpDir = tmpDir;
-		tmpDir = process.env.TEMP + '/ppt_ndi';
+		tmpDir = process.env.PROGRAMDATA + '/PPT-NDI/temp';
 		if (!fs.existsSync(tmpDir)) {
-			fs.mkdirSync(tmpDir);
+			fs.mkdirSync(tmpDir, { recursive: true });
 		}
 		tmpDir += '/' + now;
-		fs.mkdirSync(tmpDir);
+		fs.mkdirSync(tmpDir, { recursive: true });
 		vbsDir = tmpDir + '/wb.vbs';
 
 		if ($("#with_background").is(":checked")) {
