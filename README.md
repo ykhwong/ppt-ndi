@@ -42,7 +42,6 @@ The features of PPT NDI can be tested with NDI Studio Monitor. Any NDI-compatibl
 ![PPT NDI Studio Monitor Integration](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_ndi_vmix_example.png)
 
 * obs-ndi users must set the latency mode to Low in the Properties for NDI Source window.
-* High-end users can enable high performance mode in the PPT-NDI configuration. Enabling the high-performance mode lets the PPT-NDI send frames continuously, which could burden more performance loads. It may help in the case that third-party applications are not able to properly update the NDI image after switching the videos.
 
 ## OTHER NOTES
 
@@ -111,8 +110,11 @@ For advanced users who want to build the PPT-NDI for macOS, please make sure to 
 The macOS build only supports classic mode, and uses the experimental internal renderer which is limited to simple text and images, though doesn't have a dependency on Microsoft PowerPoint.
 
 ## REQUIREMENT
-* Microsoft PowerPoint
-* Microsoft Windows 7 or higher (x86-64 only)
+
+* Microsoft Windows 7+ or macOS El Capitan 10.11+ (see above). Both 64-bit only.
+* For Windows Users: Please have Microsoft PowerPoint installed because the internal renderer is still experimental.
+
+### VBA Note (Windows users)
 
 When using non-internal renderer on Windows, PPT NDI depends on Visual Basic for Applications (VBA), a component of Microsoft Office. In a default installation of Office, you'll get the VBA installed automatically. People doing a custom installation of Microsoft Office may sometimes change options to exclude VBA. In that way, the PPT NDI has no access to the PowerPoint components.
 
