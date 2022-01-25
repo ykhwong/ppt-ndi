@@ -61,7 +61,7 @@ html, body {
 #bktbl {
 	position: fixed;
 	top: 50px;
-	left: 120px;
+	left: 150px;
 	width: 250px;
 	color: #79a9f7;
 }
@@ -131,10 +131,10 @@ html, body {
 
 #edit_pptx {
 	position: fixed;
-	left: 420px;
-	top: 92px;
+	left: 70px;
+	top: 50px;
 	width: 52px;
-	height: 20px;
+	height: 22px;
 	margin-bottom: 20px;
 	background-color: #a6200c;
 	color: white;
@@ -142,20 +142,19 @@ html, body {
 
 #reload {
 	position: fixed;
-	left: 478px;
-	top: 92px;
-	width: 71px;
-	height: 20px;
+	left: 70px;
+	top: 85px;
+	width: 52px;
+	height: 22px;
 	margin-bottom: 20px;
 }
 
 #config {
 	position: fixed;
-	left: 555px;
-	top: 92px;
-	width: 80px;
-	height: 20px;
-	margin-bottom: 20px;
+	right: 120px;
+	top: -1px;
+	width: 20px;
+	height: 17px;
 }
 
 #slideInfo {
@@ -229,7 +228,7 @@ html, body {
 	position: fixed;
 	top: 1px;
 	min-width: 50px;
-	right: 120px;
+	right: 160px;
 	background-color: #79a9f7;
 	color: black;
 	text-align: center;
@@ -256,7 +255,7 @@ html, body {
 #monitorAlphaText {
 	position: absolute;
 	top: 20px;
-	left: 40px;
+	left: -30px;
 	display: inline-block;
 }
 
