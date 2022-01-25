@@ -321,8 +321,8 @@ $(document).ready(function() {
 
 	function setLangRsc() {
 		setLangRscDiv("#edit_pptx", "ui_classic/edit_pptx", false, configData.lang);
-		setLangRscDiv("#reload", "ui_classic/reload", false, configData.lang);
-		setLangRscDiv("#config", "ui_classic/config", false, configData.lang);
+		//setLangRscDiv("#reload", "ui_classic/reload", false, configData.lang);
+		//setLangRscDiv("#config", "ui_classic/config", false, configData.lang);
 		setLangRscDiv("#show-checkerboard", "ui_classic/show-checkerboard", false, configData.lang);
 		setLangRscDiv("#enable-slide-transition-effect", "ui_classic/enable-slide-transition-effect", false, configData.lang);
 		setLangRscDiv("#include-background", "ui_classic/include-background", false, configData.lang);
@@ -339,16 +339,6 @@ $(document).ready(function() {
 		*/
 		setLangRscDiv("#loadingTxt", "ui_classic/loadingTxt", false, configData.lang);
 		setLangRscDiv("#cancel", "ui_classic/cancel", false, configData.lang);
-		
-		switch (configData.lang) {
-			case "ko":
-				$("#config").css("width", "56px");
-				break;
-			case "en":
-			default:
-				$("#config").css("width", "80px");
-				break;
-		}
 	}
 
 	function stopSlideTransition() {
