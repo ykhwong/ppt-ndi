@@ -1887,6 +1887,26 @@ $(document).ready(function() {
 								spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, lSlideNo, '' ] );
 							}
 						}));
+					if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
+						menu.append(new MenuItem ({
+							label: ($("#trans_checker").is(":checked")) ? 'Hide Checkerboard' : 'Show Checkerboard',
+								click() {
+									$('#trans_checker').trigger("click");
+								}
+							}));
+					}
+					menu.popup();
+				} else {
+					const { Menu, MenuItem } = require('electron').remote;
+					const menu = new Menu();
+					if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
+						menu.append(new MenuItem ({
+							label: ($("#trans_checker").is(":checked")) ? 'Hide Checkerboard' : 'Show Checkerboard',
+								click() {
+									$('#trans_checker').trigger("click");
+								}
+							}));
+					}
 					menu.popup();
 				}
 			}
