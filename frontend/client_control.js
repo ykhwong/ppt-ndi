@@ -719,13 +719,13 @@ $(document).ready(function() {
 		if (process.platform === 'darwin') {
 			tmpDir = process.env.TMPDIR + '/ppt_ndi';
 		} else { // win32
-			tmpDir = process.env.TEMP + '/ppt_ndi';
+			tmpDir = process.env.PROGRAMDATA + '/PPT-NDI/temp';
 		}
 		if (!fs.existsSync(tmpDir)) {
-			fs.mkdirSync(tmpDir);
+			fs.mkdirSync(tmpDir, { recursive: true });
 		}
 		tmpDir += '/' + now;
-		fs.mkdirSync(tmpDir);
+		fs.mkdirSync(tmpDir, { recursive: true });
 		vbsDir = tmpDir + '/wb.vbs';
 		vbsDir2 = tmpDir + '/wb2.vbs';
 		vbsDir3 = tmpDir + '/wb3.vbs';
