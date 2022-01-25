@@ -33,7 +33,7 @@ Select Classic Mode to display the dedicated graphical user interface window.
 
 ![PPT NDI Screenshot](https://raw.githubusercontent.com/ykhwong/ppt-ndi/master/resources/ppt_ndi_sshot.png)
 
-Click the Open icon to load a Powerpoint file. Please make sure to disable "Include background" option to enable transparency.
+Click the Open icon to load a Powerpoint file. Please make sure to disable "Background on NDI" option to enable transparency.
 
 ## TESTING AND INTEGRATION
 
