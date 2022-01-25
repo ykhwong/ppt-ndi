@@ -2,7 +2,7 @@ PPT NDI v1.0.5
 
 PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
 
-Release Note (-):
+Release Note (Jan 25 2022):
 
 ADD: Internal renderer (experimental)
 ADD: Support for NDI 5
