@@ -1154,6 +1154,9 @@ $(document).ready(function() {
 	});
 
 	function updateBlkWhtTrn(color) {
+		if (maxSlideNum === 0) {
+			return;
+		}
 		let dirTo = "";
 		switch (color) {
 			case "black":
