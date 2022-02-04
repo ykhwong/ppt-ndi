@@ -312,8 +312,8 @@ $(document).ready(function() {
 	let curStatus = "";
 
 	function alertMsg(myMsg) {
-		const { remote } = require('electron');
-		const {dialog} = require('electron').remote;
+		const remote = require('@electron/remote');
+		const {dialog} = require('@electron/remote');
 		let currentWindow = remote.getCurrentWindow();
 		let options;
 		options = {
@@ -699,7 +699,7 @@ $(document).ready(function() {
 	}
 
 	function init() {
-		const { remote } = require('electron');
+		const remote = require('@electron/remote');
 		let file;
 		let vbsDir;
 		let vbsDir2;
@@ -837,7 +837,7 @@ $(document).ready(function() {
 	function reflectConfig() {
 		const configFile = 'config.js';
 		let configPath = "";
-		const { remote } = require('electron');
+		const remote = require('@electron/remote');
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
 		if (!fs.existsSync(configPath)) {
 			configPath = appDataPath + "/" + configFile;
@@ -858,7 +858,7 @@ $(document).ready(function() {
 	function reflectCache(saveOnly) {
 		const configFile = 'cache_control.js';
 		let configPath = "";
-		const { remote } = require('electron');
+		const remote = require('@electron/remote');
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
 		const cacheData = {
 			"showCheckerboard": $("#trans_checker").is(":checked"),

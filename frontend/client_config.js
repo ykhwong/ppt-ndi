@@ -3,7 +3,7 @@ $(document).ready(function() {
 	const fs = require("fs-extra");
 	const configFile = 'config.js';
 	const appDataPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
-	const version = "v" + require('electron').remote.app.getVersion();
+	const version = "v" + require('@electron/remote').app.getVersion();
 	const keyCombi = "Ctrl-Shift-";
 	let rendererList;
 	let defaultData;
@@ -11,8 +11,8 @@ $(document).ready(function() {
 	let configPath = "";
 
 	function alertMsg(myMsg) {
-		const { remote } = require('electron');
-		const {dialog} = require('electron').remote;
+		const remote = require('@electron/remote');
+		const {dialog} = require('@electron/remote');
 		let currentWindow = remote.getCurrentWindow();
 		let options;
 		options = {
@@ -113,7 +113,7 @@ $(document).ready(function() {
 	}
 
 	function init() {
-		const { remote } = require('electron');
+		const remote = require('@electron/remote');
 		$.ajaxSetup({
 			async: false
 		});

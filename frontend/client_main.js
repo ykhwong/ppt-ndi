@@ -17,7 +17,7 @@ $(document).ready(function() {
 	function reflectConfig() {
 		const configFile = 'config.js';
 		let configPath = "";
-		const { remote } = require('electron');
+		const remote = require('@electron/remote');
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
 		if (!fs.existsSync(configPath)) {
 			const appDataPath = (process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";

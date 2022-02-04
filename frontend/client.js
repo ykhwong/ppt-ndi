@@ -226,7 +226,7 @@ main();
 const appDataPath = (process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + "/PPT-NDI";
 
 $(document).ready(function() {
-	const { remote } = require('electron');
+	const remote = require('@electron/remote');
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const runtimeUrl = "https://aka.ms/vs/16/release/vc_redist.x64.exe";
@@ -309,7 +309,7 @@ $(document).ready(function() {
 	}
 
 	function alertMsg(myMsg) {
-		const {dialog} = require('electron').remote;
+		const {dialog} = require('@electron/remote');
 		let options;
 		options = {
 			type: 'info',
@@ -562,7 +562,7 @@ $(document).ready(function() {
 	});
 
 	function askReloadFile(ele, msg, description) {
-		const {dialog} = require('electron').remote;
+		const {dialog} = require('@electron/remote');
 		let options;
 		let response;
 		let defaultMsg = getLangRsc("ui_classic/do-you-want-to-continue", configData.lang);
@@ -1035,7 +1035,7 @@ $(document).ready(function() {
 	}
 
 	$("#load_pptx").click(function() {
-		const {dialog} = require('electron').remote;
+		const {dialog} = require('@electron/remote');
 		$("#fullblack").show();
 
 		dialog.showOpenDialog(currentWindow,{
@@ -1411,7 +1411,7 @@ $(document).ready(function() {
 	function reflectConfig() {
 		const configFile = 'config.js';
 		let configPath = "";
-		const { remote } = require('electron');
+		const remote = require('@electron/remote');
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
 		if (!fs.existsSync(configPath)) {
 			configPath = appDataPath + "/" + configFile;
@@ -1435,7 +1435,7 @@ $(document).ready(function() {
 	function reflectCache(saveOnly) {
 		const configFile = 'cache_client.js';
 		let configPath = "";
-		const { remote } = require('electron');
+		const remote = require('@electron/remote');
 		configPath = remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, "") + "/" + configFile;
 		const cacheData = {
 			"showCheckerboard": $("#trans_checker").is(":checked"),

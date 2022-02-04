@@ -21,6 +21,8 @@ app.on('ready', function() {
 	let lastImageArgs = null;
 	let loopPaused = false;
 
+	require('@electron/remote/main').initialize();
+
 	const winData = {
 		"home" : {
 			"width" : 600,
@@ -247,6 +249,7 @@ app.on('ready', function() {
 			backgroundColor: isTransparent?'#00051336':'#060621'
 		});
 		
+		require("@electron/remote/main").enable(retData.webContents);
 		if (!maximizable) {
 			retData.setMaximumSize(width, height);
 		}
