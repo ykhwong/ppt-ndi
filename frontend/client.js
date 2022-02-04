@@ -1736,7 +1736,7 @@ $(document).ready(function() {
 				let lSlideNo = $(event.target).attr('src').replace(/.*Slide(\d+)\.png\s*$/i, "$1");
 
 				if ( /^\d+$/.test(lSlideNo) ) {
-					const { Menu, MenuItem } = require('electron').remote;
+					const { Menu, MenuItem } = require('@electron/remote');
 					const menu = new Menu();
 					menu.append(new MenuItem ({
 						label: getLangRsc("ui_classic/quick-edit", configData.lang),
@@ -1765,7 +1765,7 @@ $(document).ready(function() {
 					}
 					menu.popup();
 				} else {
-					const { Menu, MenuItem } = require('electron').remote;
+					const { Menu, MenuItem } = require('@electron/remote');
 					const menu = new Menu();
 					if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
 						menu.append(new MenuItem ({
