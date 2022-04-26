@@ -522,11 +522,11 @@
 	"lang": {
 		"description": "",
 		"en": {
-			"msg" : "Monitor",
+			"msg" : "Overlay Monitor",
 			"rev" : 0
 		},
 		"ko": {
-			"msg" : "모니터",
+			"msg" : "오버레이 모니터",
 			"rev" : 0
 		}
 	}
