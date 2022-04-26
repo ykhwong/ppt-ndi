@@ -405,12 +405,6 @@ $(document).ready(function() {
 		});
 	}
 
-	function checkVisible(elm) {
-		let rect = elm.getBoundingClientRect();
-		let viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
-		return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
-	}
-
 	function updateScreen(noTran) {
 		let curSli, nextSli;
 		let nextNum;
@@ -549,10 +543,6 @@ $(document).ready(function() {
 				gotoNext();
 			}, parseFloat(advanceSlides[currentSlide]) * 1000);
 		}
-		if (!checkVisible(document.querySelector('#below img'))) {
-			$("#rightTop img").css("width", "40%");
-			$(window).trigger('resize');
-		}
 	}
 
 	$("select").change(function() {
@@ -619,15 +609,6 @@ $(document).ready(function() {
 		}
 	});
 
-	function fitHeight() {
-		let autoHeight = belowImgWidth*slideHeight/slideWidth + "px";
-		$("#below img").css({
-			'background' : 'black',
-			'width' : belowImgWidth + "px",
-			'height' : autoHeight
-		});
-	}
-
 	function initImgPicker() {
 		$("#right select").imagepicker({
 			hide_select: true,
@@ -643,7 +624,6 @@ $(document).ready(function() {
 		} else {
 			//$("#right img").css('background-image', "url('trans.png')");
 		}
-		fitHeight();
 		$("img.image_picker_image:first, img.image_picker_image:eq(1)").click(function() {
 			gotoNext();
 		});
@@ -938,10 +918,6 @@ $(document).ready(function() {
 		} else {
 			$("#with_bg_slider, #monitor_trans_switch, #setMonitor").css("filter", "sepia(1)");
 		}
-		if (!checkVisible(document.querySelector('#below img'))) {
-			$("#rightTop img").css("width", "40%");
-			$(window).trigger('resize');
-		}
 	}
 
 	function loadPPTX_Renderer_PPT(file) {
@@ -1230,7 +1206,6 @@ $(document).ready(function() {
 			belowImgWidth = 0;
 		}
 		$("#below img").css("width", belowImgWidth + "px");
-		fitHeight();
 	}
 
 	function makePreviewBigger() {
@@ -1242,7 +1217,6 @@ $(document).ready(function() {
 			belowImgWidth -= 5;
 		}
 		$("#below img").css("width", belowImgWidth + "px");
-		fitHeight();
 	}
 
 	$('#blk').click(function() {
@@ -1378,7 +1352,6 @@ $(document).ready(function() {
 		m = checkTime(m);
 		s = checkTime(s);
 		$('#current_time').html(h + ":" + m + ":" + s);
-		fitHeight();
 		t = setTimeout(startCurrentTime, 500);
 	}
 
@@ -1647,11 +1620,6 @@ $(document).ready(function() {
 			}
 		}
 	}, false);
-
-	$(window).resize(function(){
-		let ss = $(document).height() - $("#top").height() - $("#rest1").height() - $("#rest2 img:first").height() - 50;
-		$("#below").height(ss);
-	});
 
 	$("#resWidth").val("0");
 	$("#resHeight").val("0");
