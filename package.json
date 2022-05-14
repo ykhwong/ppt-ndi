@@ -24,7 +24,7 @@
 		"wget-improved": "^3.2.1"
 	},
 	"scripts": {
-		"test": "echo test && exit",
+		"test": "node ./scripts/test.js",
 		"build": "node ./scripts/build.js"
 	},
 	"keywords": [
