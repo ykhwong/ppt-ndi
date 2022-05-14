@@ -267,45 +267,51 @@ $(document).ready(function() {
 	let slideTranTimers = [];
 	let multipleMonitors;
 	let loadBackgroundInit = false;
+	let glLayout = null;
 
-	try {
-		process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
-	} catch(e) {
-	}
-
-	$.ajaxSetup({
-		async: false
-	});
-	reflectConfig();
-	ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
-	if ( ffi === -1 ) {		
-		let librariesFound = false;
-		if (process.platform === 'win32') {
-			alertMsg(getLangRsc("ui_classic/dll-init-failed", configData.lang));
-			if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
-				librariesFound = true;
-			}
-		} else if (process.platform === 'darwin') {
-			alertMsg(getLangRsc("ui_classic/dylib-init-failed", configData.lang));
-			if (fs.existsSync("PPTNDI.dylib")) {
-				librariesFound = true;
-			}
+	function prepare() {
+		try {
+			process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
+		} catch(e) {
 		}
 
-		if (librariesFound) {
-			const execRuntime = require('child_process').execSync;
-			execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
-				callback(stdout); 
-			});
-		}
-		ipc.send('remote', { name: "exit" });
-	}
+		$.ajaxSetup({
+			async: false
+		});
+		reflectConfig();
+		ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
+		if ( ffi === -1 ) {		
+			let librariesFound = false;
+			if (process.platform === 'win32') {
+				alertMsg(getLangRsc("ui_classic/dll-init-failed", configData.lang));
+				if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
+					librariesFound = true;
+				}
+			} else if (process.platform === 'darwin') {
+				alertMsg(getLangRsc("ui_classic/dylib-init-failed", configData.lang));
+				if (fs.existsSync("PPTNDI.dylib")) {
+					librariesFound = true;
+				}
+			}
 
-	lib = ipc.sendSync("require", { lib: "ffi", func: "init", args: null });
-	if (lib === 1) {
-		alertMsg(getLangRsc("ui_classic/failed-to-create-listening-svr", configData.lang));
-		ipc.send('remote', { name: "exit" });
-		return;
+			if (librariesFound) {
+				const execRuntime = require('child_process').execSync;
+				execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
+					callback(stdout); 
+				});
+			}
+			ipc.send('remote', { name: "exit" });
+		}
+
+		lib = ipc.sendSync("require", { lib: "ffi", func: "init", args: null });
+		if (lib === 1) {
+			alertMsg(getLangRsc("ui_classic/failed-to-create-listening-svr", configData.lang));
+			ipc.send('remote', { name: "exit" });
+			return;
+		}
+
+		$("#resWidth").val("0");
+		$("#resHeight").val("0");
 	}
 
 	function alertMsg(myMsg) {
@@ -545,12 +551,6 @@ $(document).ready(function() {
 		}
 	}
 
-	$("select").change(function() {
-		if (repo == null) {
-			repo = $(this);
-		}
-	});
-
 	function askReloadFile(ele, msg, description) {
 		const {dialog} = require('@electron/remote');
 		let options;
@@ -577,40 +577,458 @@ $(document).ready(function() {
 		}
 	}
 
-	$("#monitor_trans").click(function() {
-		if (!isLoaded) {
-			return;
-		}
-
-		if (!loadBackgroundInit) {
-			$(this).prop("checked", !$(this).prop("checked"));
-		}
-	});
-
-	$("#with_background").click(function() {
-		if (!isLoaded) {
-			return;
-		}
-
-		if (loadBackgroundInit) {
-			if (maxSlideNum > 0) {
-				if (modePostFix == "") {
-					modePostFix = "/mode2";
-					$("#slides_grp").html(mode2options);
-				} else {
-					modePostFix = "";
-					$("#slides_grp").html(mode1options);
-				}
-				modeUseBg != modeUseBg;
-				selectSlide(currentSlide.toString());
+	function registerEvents() {
+		$("#monitor_trans").click(function() {
+			if (!isLoaded) {
+				return;
 			}
-		} else {
-			$(this).prop("checked", !$(this).prop("checked"));
-		}
-	});
+
+			if (!loadBackgroundInit) {
+				$(this).prop("checked", !$(this).prop("checked"));
+			}
+		});
+
+		$("#with_background").click(function() {
+			if (!isLoaded) {
+				return;
+			}
+
+			if (loadBackgroundInit) {
+				if (maxSlideNum > 0) {
+					if (modePostFix == "") {
+						modePostFix = "/mode2";
+						$("#slides_grp").html(mode2options);
+					} else {
+						modePostFix = "";
+						$("#slides_grp").html(mode1options);
+					}
+					modeUseBg != modeUseBg;
+					selectSlide(currentSlide.toString());
+				}
+			} else {
+				$(this).prop("checked", !$(this).prop("checked"));
+			}
+		});
+
+		ipc.on('renderer' , function(event, data){
+			switch (data.name) {
+				case "notifyError":
+					cleanupForTemp(false);
+					tmpDir = preTmpDir;
+					// Error
+					$("#fullblack, .cancelBox").hide();
+					break;
+				case "notifyLoaded":
+					// Done
+					loadPPTX_PostProcess(data.pptFile);
+					$("#fullblack, .cancelBox").hide();
+					break;
+				case "notifyCanceled":
+					// Canceled
+					cleanupForTemp(false);
+					tmpDir = preTmpDir;
+					$("#fullblack, .cancelBox").hide();		
+					break;
+			}
+		});
+		$("#load_pptx").click(function() {
+			const {dialog} = require('@electron/remote');
+			$("#fullblack").show();
+
+			dialog.showOpenDialog(currentWindow,{
+				properties: ['openFile'],
+				filters: [
+					{name: getLangRsc("ui_classic/open-file-ppt-presentation", configData.lang), extensions: ['pptx', 'ppt']},
+					{name: getLangRsc("ui_classic/open-file-all-files", configData.lang), extensions: ['*']}
+				]
+			}).then(result => {
+				loadPPTX(result.filePaths[0], 0, 0);
+			}).catch(err => {
+				$("#fullblack").hide();
+			});
+		});
+
+		$("#reload").click(function() {
+			if (maxSlideNum > 0) {
+				askReloadFile(null, "", "");
+			}
+		});
+
+		$("#edit_pptx").click(function() {
+			if (pptPath !== "") {
+				const { exec } = require('child_process');
+				exec('"' + pptPath + '"', (err, stdout, stderr) => {
+					if (err) {
+						return;
+					}
+				});
+			}
+		});
+
+		$('#prev').click(function() {
+			gotoPrev();
+		});
+
+		$('#next').click(function() {
+			gotoNext();
+		});
+
+		$('#blk').click(function() {
+			updateBlkWhtTrn("black");
+		});
+
+		$('#wht').click(function() {
+			updateBlkWhtTrn("white");
+		});
+
+		$('#trn').click(function() {
+			alert("s");
+			updateBlkWhtTrn("trn");
+		});
+
+		$(document).keydown(function(e) {
+			let realNum = 0;
+			if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+				numTypBuf = "";
+				if (e.ctrlKey) {
+					e.preventDefault();
+					e.stopPropagation();
+				}
+				return;
+			}
+			if ($(":text").is(":focus")) {
+				return;
+			}
+			$("#below").trigger('click');
+			if(e.which >= 48 && e.which <= 57) {
+				// 0 through 9
+				realNum = e.which - 48;
+				numTypBuf += realNum.toString();
+			} else if (e.which >= 96 && e.which <= 105) {
+				// 0 through 9 (keypad)
+				realNum = e.which - 96;
+				numTypBuf += realNum.toString();
+			} else if (e.which === 13) {
+				// Enter
+				if (numTypBuf == "") {
+					gotoNext();
+				} else {
+					realNum = parseInt(numTypBuf, 10);
+					selectSlide(realNum);
+				}
+				numTypBuf = "";
+			} else if (e.which === 32 || e.which === 39 || e.which === 40 || e.which === 78 || e.which === 34) {
+				// Spacebar, right arrow, down, N or page down
+				numTypBuf = "";
+				gotoNext();
+			} else if(e.which === 37 || e.which === 8 || e.which === 38 || e.which === 80 || e.which === 33) {
+				// Left arrow, backspace, up, P or page up
+				numTypBuf = "";
+				gotoPrev();
+			} else if(e.which === 36) {
+				// Home
+				numTypBuf = "";
+				if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
+					selectSlide('1');
+				} else {
+					for (i = 1; i <= maxSlideNum; i++) {
+						if (!hiddenSlides.includes(i)) {
+							selectSlide(i.toString());
+							break;
+						}
+					}
+				}
+			} else if(e.which === 35) {
+				// End
+				numTypBuf = "";
+				if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
+					selectSlide(maxSlideNum.toString());
+				} else {
+					for (i = maxSlideNum; i >= 1; i--) {
+						if (!hiddenSlides.includes(i)) {
+							selectSlide(i.toString());
+							break;
+						}
+					}
+				}
+
+			} else if(e.which === 66) {
+				// B
+				numTypBuf = "";
+				updateBlkWhtTrn("black");
+			} else if(e.which === 84) {
+				// T
+				numTypBuf = "";
+				updateBlkWhtTrn("trn");
+			} else if(e.which === 87) {
+				// W
+				numTypBuf = "";
+				updateBlkWhtTrn("white");
+			} else if(e.which === 189 || e.which === 109) {
+				// -
+				makePreviewSmaller();
+			} else if(e.which === 187 || e.which === 107) {
+				// +
+				makePreviewBigger();
+			}
+		});
+
+		$('#smaller').click(function() {
+			makePreviewSmaller();
+		});
+
+		$('#bigger').click(function() {
+			makePreviewBigger();
+		});
+
+		$('.button, .checkbox').keydown(function(e){
+			if (e.which == 13 || e.which == 32) {
+				// Enter or spacebar
+				e.preventDefault();
+				e.stopPropagation();
+				gotoNext();
+			}
+		});
+
+		ipc.on('remote' , function(event, data){
+			switch (data.msg) {
+				case "exit":
+					cleanupForExit();
+					break;
+				case "reload":
+					reflectConfig();
+					break;
+				case "focused":
+					let stats;
+					let tmpPptTimestamp = 0;
+					if (pptTimestamp === 0) {
+						return;
+					}
+					try {
+						stats = fs.statSync(pptPath);
+						tmpPptTimestamp = stats.mtimeMs;
+						if (pptTimestamp === tmpPptTimestamp) {
+						} else {
+							pptTimestamp = tmpPptTimestamp;
+							askReloadFile("", getLangRsc("ui_classic/ask-reload", configData.lang), "");
+						}
+					} catch(e) {
+					}
+					break;
+				case "blurred":
+					// we don't care here
+					break;
+				case "gotoPrev":
+					gotoPrev();
+					break;
+				case "gotoNext":
+					gotoNext();
+					break;
+				case "update_trn":
+					updateBlkWhtTrn("trn");
+					break;
+				case "update_black":
+					updateBlkWhtTrn("black");
+					break;
+				case "update_white":
+					updateBlkWhtTrn("white");
+					break;
+				default:
+					break;
+			}
+			return;
+		});
+
+		$('#minimize').click(function() {
+			remote.BrowserWindow.getFocusedWindow().minimize();
+		});
+
+		$('#max_restore').click(function() {
+			if(currentWindow.isMaximized()) {
+				remote.BrowserWindow.getFocusedWindow().unmaximize();
+			} else {
+				remote.BrowserWindow.getFocusedWindow().maximize();
+			}
+		});
+
+		$('#cancel').click(function() {
+			isCancelTriggered = true;
+			cancelLoad();
+		});
+
+		$('#trans_checker').click(function() {
+			if ($("#trans_checker").is(":checked")) {
+				$(".right img").css('background-image', "url('trans_slide.png')");
+			} else {
+				$(".right img").css('background-image', "url('null_slide.png')");
+			}
+		});
+
+		currentWindow.on('maximize', function (){
+			$("#max_restore").attr("src", "restore.png");
+		});
+
+		currentWindow.on('unmaximize', function (){
+			$("#max_restore").attr("src", "max.png");
+		});
+		
+		$('#exit').click(function() {
+			cleanupForExit();
+		});
+
+		document.addEventListener('dragover',function(event){
+			event.preventDefault();
+			return false;
+		},false);
+		
+		document.addEventListener('drop',function(event){
+			event.preventDefault();
+			return false;
+		},false);
+
+		window.addEventListener("keydown", function(e) {
+			if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+				if (!$(":text").is(":focus")) {
+					e.preventDefault();
+				}
+			}
+		}, false);
+
+		$("select").change(function() {
+			if (repo == null) {
+				repo = $(this);
+			}
+		});
+
+		$("#resWidth, #resHeight").click(function() {
+			$(this).val("");
+		});
+
+		$("#setRes").click(function() {
+			let resX = $("#resWidth").val();
+			let resY = $("#resHeight").val();
+			if (/^\d+$/.test(resX) && /^\d+$/.test(resY)) {
+				customSlideX = resX;
+				customSlideY = resY;
+				if (maxSlideNum > 0) {
+					// slideWidth : slideHeight = customSlideX : customSlideY
+					if (slideHeight*customSlideX/slideWidth !== parseInt(customSlideY, 10)) {
+						alertMsg(getLangRsc("ui_classic/original-aspect-ratio-not-match", configData.lang));
+					}
+					askReloadFile(null, "", "");
+				}
+			}
+		});
+
+		$("#setMonitor").click(function() {
+			if (!isLoaded) {
+				return;
+			}
+
+			if (!loadBackgroundInit) {
+				$(this).prop("checked", !$(this).prop("checked"));
+				return;
+			}
+
+			let idx = $("#monitorList").prop('selectedIndex');
+			if (idx === 0) {
+				disableMonitor();
+				return;
+			}
+			assignMonitor($("#monitorList").prop('selectedIndex'));
+			$("#monitor_trans").is(":checked") ? enableMonitorTransparent() : disableMonitorTransparent();
+			enableMonitor();
+		});
+
+		$('#monitor_trans').click(function() {
+			if ($("#monitor_trans").is(":checked")) {
+				enableMonitorTransparent();
+			} else {
+				disableMonitorTransparent();
+			}
+		});
+
+		$("#listRes").click(function() {
+			$(".resText").hide();
+			$("#listResList").val("0x0");
+			$("#listResList").show();
+		});
+
+		$("#listResList").change(function() {
+			let resVal = $(this).val();
+			if (resVal === "custom") {
+				$("#listResList").hide();
+				$(".resText").show();
+			} else {
+				$("#resWidth").val(resVal.replace(/x.*/, ""));
+				$("#resHeight").val(resVal.replace(/.*x/, ""));
+			}
+		});
+
+		$("#config").click(function() {
+			ipc.send('remote', { name: "showConfig" });
+		});
+
+		$(".resText").hide();
+		$("#listResList").show();
+
+		$(window).mousedown(function(event) {
+			if ( process.platform === 'darwin' ) {
+				return;
+			}
+			if ( event.which === 3 ) {
+				if ( /image_picker_image/.test($(event.target).attr('class')) ) {
+					let lSlideNo = $(event.target).attr('src').replace(/.*Slide(\d+)\.png\s*$/i, "$1");
+
+					if ( /^\d+$/.test(lSlideNo) ) {
+						const { Menu, MenuItem } = require('@electron/remote');
+						const menu = new Menu();
+						menu.append(new MenuItem ({
+							label: getLangRsc("ui_classic/quick-edit", configData.lang),
+								click() {
+									let vbsDir;
+									let file = pptPath;
+									let tmpDir2 = tmpDir + "/mode2";
+									vbsDir = tmpDir2 + '/vbQuickEdit.vbs';
+
+									try {
+										fs.writeFileSync(vbsDir, vbsQuickEdit, 'utf-8');
+									} catch(e) {
+										return;
+									}
+									const spawn = require( 'child_process' ).spawn;
+									spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, lSlideNo, '' ] );
+								}
+							}));
+						if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
+							menu.append(new MenuItem ({
+								label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui_classic/hide-checkerboard", configData.lang) : getLangRsc("ui_classic/show-checkerboard", configData.lang),
+									click() {
+										$('#trans_checker').trigger("click");
+									}
+								}));
+						}
+						menu.popup();
+					} else {
+						const { Menu, MenuItem } = require('@electron/remote');
+						const menu = new Menu();
+						if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
+							menu.append(new MenuItem ({
+								label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui_classic/hide-checkerboard", configData.lang) : getLangRsc("ui_classic/show-checkerboard", configData.lang),
+									click() {
+										$('#trans_checker').trigger("click");
+									}
+								}));
+						}
+						menu.popup();
+					}
+				}
+			}
+		});
+	}
 
 	function initImgPicker() {
-		$("#right select").imagepicker({
+		$(".right select").imagepicker({
 			hide_select: true,
 			show_label: true,
 			selected:function(select, picker_option, event) {
@@ -620,9 +1038,9 @@ $(document).ready(function() {
 			}
 		});
 		if ($("#trans_checker").is(":checked")) {
-			$("#right img").css('background-image', "url('trans_slide.png')");
+			$(".right img").css('background-image', "url('trans_slide.png')");
 		} else {
-			//$("#right img").css('background-image', "url('trans.png')");
+			//$(".right img").css('background-image', "url('trans.png')");
 		}
 		$("img.image_picker_image:first, img.image_picker_image:eq(1)").click(function() {
 			gotoNext();
@@ -758,28 +1176,6 @@ $(document).ready(function() {
 			options: opts
 		});
 	}
-
-	ipc.on('renderer' , function(event, data){
-		switch (data.name) {
-			case "notifyError":
-				cleanupForTemp(false);
-				tmpDir = preTmpDir;
-				// Error
-				$("#fullblack, .cancelBox").hide();
-				break;
-			case "notifyLoaded":
-				// Done
-				loadPPTX_PostProcess(data.pptFile);
-				$("#fullblack, .cancelBox").hide();
-				break;
-			case "notifyCanceled":
-				// Canceled
-				cleanupForTemp(false);
-				tmpDir = preTmpDir;
-				$("#fullblack, .cancelBox").hide();		
-				break;
-		}
-	});
 
 	function loadPPTX_PostProcess(file) {
 		let fileArr = [];
@@ -1010,40 +1406,6 @@ $(document).ready(function() {
 		}
 	}
 
-	$("#load_pptx").click(function() {
-		const {dialog} = require('@electron/remote');
-		$("#fullblack").show();
-
-		dialog.showOpenDialog(currentWindow,{
-			properties: ['openFile'],
-			filters: [
-				{name: getLangRsc("ui_classic/open-file-ppt-presentation", configData.lang), extensions: ['pptx', 'ppt']},
-				{name: getLangRsc("ui_classic/open-file-all-files", configData.lang), extensions: ['*']}
-			]
-		}).then(result => {
-			loadPPTX(result.filePaths[0], 0, 0);
-		}).catch(err => {
-			$("#fullblack").hide();
-		});
-	});
-
-	$("#reload").click(function() {
-		if (maxSlideNum > 0) {
-			askReloadFile(null, "", "");
-		}
-	});
-
-	$("#edit_pptx").click(function() {
-		if (pptPath !== "") {
-			const { exec } = require('child_process');
-			exec('"' + pptPath + '"', (err, stdout, stderr) => {
-				if (err) {
-					return;
-				}
-			});
-		}
-	});
-
 	function selectSlide(num) {
 		blkBool = false;
 		whtBool = false;
@@ -1120,14 +1482,6 @@ $(document).ready(function() {
 		}
 		selectSlide(curSli.toString());
 	}
-	
-	$('#prev').click(function() {
-		gotoPrev();
-	});
-
-	$('#next').click(function() {
-		gotoNext();
-	});
 
 	function updateBlkWhtTrn(color) {
 		if (maxSlideNum === 0) {
@@ -1218,123 +1572,6 @@ $(document).ready(function() {
 		}
 		$("#below img").css("width", belowImgWidth + "px");
 	}
-
-	$('#blk').click(function() {
-		updateBlkWhtTrn("black");
-	});
-
-	$('#wht').click(function() {
-		updateBlkWhtTrn("white");
-	});
-
-	$('#trn').click(function() {
-		updateBlkWhtTrn("trn");
-	});
-
-	$(document).keydown(function(e) {
-		let realNum = 0;
-		if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
-			numTypBuf = "";
-			if (e.ctrlKey) {
-				e.preventDefault();
-				e.stopPropagation();
-			}
-			return;
-		}
-		if ($(":text").is(":focus")) {
-			return;
-		}
-		$("#below").trigger('click');
-		if(e.which >= 48 && e.which <= 57) {
-			// 0 through 9
-			realNum = e.which - 48;
-			numTypBuf += realNum.toString();
-		} else if (e.which >= 96 && e.which <= 105) {
-			// 0 through 9 (keypad)
-			realNum = e.which - 96;
-			numTypBuf += realNum.toString();
-		} else if (e.which === 13) {
-			// Enter
-			if (numTypBuf == "") {
-				gotoNext();
-			} else {
-				realNum = parseInt(numTypBuf, 10);
-				selectSlide(realNum);
-			}
-			numTypBuf = "";
-		} else if (e.which === 32 || e.which === 39 || e.which === 40 || e.which === 78 || e.which === 34) {
-			// Spacebar, right arrow, down, N or page down
-			numTypBuf = "";
-			gotoNext();
-		} else if(e.which === 37 || e.which === 8 || e.which === 38 || e.which === 80 || e.which === 33) {
-			// Left arrow, backspace, up, P or page up
-			numTypBuf = "";
-			gotoPrev();
-		} else if(e.which === 36) {
-			// Home
-			numTypBuf = "";
-			if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
-				selectSlide('1');
-			} else {
-				for (i = 1; i <= maxSlideNum; i++) {
-					if (!hiddenSlides.includes(i)) {
-						selectSlide(i.toString());
-						break;
-					}
-				}
-			}
-		} else if(e.which === 35) {
-			// End
-			numTypBuf = "";
-			if (hiddenSlides.length === 0 || maxSlideNum === hiddenSlides.length) {
-				selectSlide(maxSlideNum.toString());
-			} else {
-				for (i = maxSlideNum; i >= 1; i--) {
-					if (!hiddenSlides.includes(i)) {
-						selectSlide(i.toString());
-						break;
-					}
-				}
-			}
-
-		} else if(e.which === 66) {
-			// B
-			numTypBuf = "";
-			updateBlkWhtTrn("black");
-		} else if(e.which === 84) {
-			// T
-			numTypBuf = "";
-			updateBlkWhtTrn("trn");
-		} else if(e.which === 87) {
-			// W
-			numTypBuf = "";
-			updateBlkWhtTrn("white");
-		} else if(e.which === 189 || e.which === 109) {
-			// -
-			makePreviewSmaller();
-		} else if(e.which === 187 || e.which === 107) {
-			// +
-			makePreviewBigger();
-		}
-	});
-
-	$('#smaller').click(function() {
-		makePreviewSmaller();
-	});
-
-	$('#bigger').click(function() {
-		makePreviewBigger();
-	});
-
-
-	$('.button, .checkbox').keydown(function(e){
-		if (e.which == 13 || e.which == 32) {
-			// Enter or spacebar
-			e.preventDefault();
-			e.stopPropagation();
-			gotoNext();
-		}
-	});
 
 	function checkTime(i) {
 		if (i < 10) {
@@ -1516,239 +1753,159 @@ $(document).ready(function() {
 		}
 	}
 
-	ipc.on('remote' , function(event, data){
-		switch (data.msg) {
-			case "exit":
-				cleanupForExit();
-				break;
-			case "reload":
-				reflectConfig();
-				break;
-			case "focused":
-				let stats;
-				let tmpPptTimestamp = 0;
-				if (pptTimestamp === 0) {
-					return;
+	function glInit() {
+		let contentPerTab = [/*{
+				type: 'component',
+				componentName: 'area',
+				componentState: { label: 'A' },
+				title: 'Area',
+				width: 15,
+				height: 100,
+				reorderEnabled: false,
+				isClosable: false
+			},*/
+			{
+				type: 'column',
+				content:[
+				{
+					type: 'component',
+					componentName: 'ndiViews',
+					componentState: { label: 'B' },
+					title: 'NDI Views',
+					height: 50,
+					reorderEnabled: false,
+					isClosable: false
+				},
+				{
+					type: 'component',
+					componentName: 'slides',
+					componentState: { label: 'C' },
+					title: 'Slides',
+					reorderEnabled: false,
+					isClosable: false
 				}
-				try {
-					stats = fs.statSync(pptPath);
-					tmpPptTimestamp = stats.mtimeMs;
-					if (pptTimestamp === tmpPptTimestamp) {
-					} else {
-						pptTimestamp = tmpPptTimestamp;
-						askReloadFile("", getLangRsc("ui_classic/ask-reload", configData.lang), "");
-					}
-				} catch(e) {
+				]
+			}];
+
+		let glConfig = {
+			settings: {
+				showPopoutIcon: false,
+				showMaximiseIcon: false,
+				showCloseIcon: false
+			},
+			dimensions: {
+				borderWidth: 5,
+				minItemHeight: 10,
+				minItemWidth: 10,
+				headerHeight: 20,
+				dragProxyWidth: 300,
+				dragProxyHeight: 200
+			},
+			content: [{
+				isClosable: false,
+				type: "stack",
+				title: "area",
+				content: [{
+					id: "tab1",
+					name: "tab1",
+					title: "-",
+					reorderEnabled: false,
+					type: "row",
+					componentName: "test",
+					isClosable: false,
+					content: contentPerTab
+				}/*, {
+					title: "+",
+					type: "row",
+					reorderEnabled: false,
+					componentName: "test2",
+					isClosable: false
+				}*/
+				]
+			}]
+		};
+
+		glLayout = new GoldenLayout( glConfig );
+
+		//glLayout.registerComponent( 'area', function( container, componentState ){
+		//	container.getElement().html( 'html text' );
+		//	container.on('resize', function (tab) {
+		//		if (container.width < 50 ) {
+		//			container.setSize( 100, container.height );
+		//		}
+		//	});
+		//});
+
+		glLayout.registerComponent( 'ndiViews', function( container, componentState ){
+			container.getElement().html( `
+				<table class="right" border="0">
+				  <tbody>
+					<tr id="rightTop">
+					  <td width="50%">
+						<select class="image-picker show-html">
+							<optgroup label="Screen" id="screen_grp">
+							<option id="currentSlideText" data-img-label="CURRENT" data-img-src="null_slide.png" value="Current" disabled>Current</option>
+							</optgroup>
+						</select>
+					  </td>
+					  <td width="40%" style="vertical-align: top;">
+						<select class="image-picker show-html">
+							<optgroup label="Screen" id="screen_grp">
+							<option id="nextSlideText" data-img-label="NEXT" data-img-src="null_slide.png" value="Next" disabled>Next</option>
+							</optgroup>
+						</select>
+							<div id="buttons">
+								<button type="button" class="button" id="prev">&nbsp;&lt;&nbsp;</button>
+								<button type="button" class="button" id="next">&nbsp;&gt;&nbsp;</button>
+								<button type="button" class="button" id="blk">&nbsp;B&nbsp;</button>
+								<button type="button" class="button" id="wht">&nbsp;W&nbsp;</button>
+								<button type="button" class="button" id="trn">&nbsp;T&nbsp;</button>
+								<button type="button" class="button" id="empty">&nbsp;</button>
+								<button type="button" class="button" id="smaller">&nbsp;</button>
+								<button type="button" class="button" id="bigger">&nbsp;</button>
+							</div>
+							<div id="slideInfo">
+								<div id="slide_cnt" class="slideInfo">SLIDE 0 / 0</div>
+								<div id="current_time" class="slideInfo">00:00 AM</div>
+							</div>
+					  </td>
+					</tr>
+				  </tbody>
+				</table>
+		` );
+		});
+
+		glLayout.registerComponent( 'slides', function( container, componentState ){
+			container.getElement().html( `
+				<div class="right" id="below">
+					<select class="image-picker">
+						<optgroup label="Slides" id="slides_grp">
+						</optgroup>
+					</select>
+				</div>
+		`
+			);
+			container.on('resize', function () {
+				if (container.height < 50 ) {
+					container.setSize( container.width, 50 );
 				}
-				break;
-			case "blurred":
-				// we don't care here
-				break;
-			case "gotoPrev":
-				gotoPrev();
-				break;
-			case "gotoNext":
-				gotoNext();
-				break;
-			case "update_trn":
-				updateBlkWhtTrn("trn");
-				break;
-			case "update_black":
-				updateBlkWhtTrn("black");
-				break;
-			case "update_white":
-				updateBlkWhtTrn("white");
-				break;
-			default:
-				break;
-		}
-		return;
-	});
+			});
+		});
 
-	$('#minimize').click(function() {
-		remote.BrowserWindow.getFocusedWindow().minimize();
-	});
+		glLayout.init();
 
-	$('#max_restore').click(function() {
-		if(currentWindow.isMaximized()) {
-			remote.BrowserWindow.getFocusedWindow().unmaximize();
-		} else {
-			remote.BrowserWindow.getFocusedWindow().maximize();
-		}
-	});
-
-	$('#cancel').click(function() {
-		isCancelTriggered = true;
-		cancelLoad();
-	});
-
-	$('#trans_checker').click(function() {
-		if ($("#trans_checker").is(":checked")) {
-			$("#right img").css('background-image', "url('trans_slide.png')");
-		} else {
-			$("#right img").css('background-image', "url('null_slide.png')");
-		}
-		$("#below img").css('background', 'black');
-	});
-
-	currentWindow.on('maximize', function (){
-		$("#max_restore").attr("src", "restore.png");
-    });
-
-	currentWindow.on('unmaximize', function (){
-		$("#max_restore").attr("src", "max.png");
-    });
-	
-	$('#exit').click(function() {
-		cleanupForExit();
-	});
-
-	document.addEventListener('dragover',function(event){
-		event.preventDefault();
-		return false;
-	},false);
-	
-	document.addEventListener('drop',function(event){
-		event.preventDefault();
-		return false;
-	},false);
-
-	window.addEventListener("keydown", function(e) {
-		if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
-			if (!$(":text").is(":focus")) {
-				e.preventDefault();
+		for (let i = 0; i < $(".lm_title").length; i++) {
+			let txtObj = $($(".lm_title")[i]);
+			if ( txtObj.text() === "-" ) {
+				txtObj.attr('id', 'ppt_filename');
+				break;
 			}
 		}
-	}, false);
+	}
 
-	$("#resWidth").val("0");
-	$("#resHeight").val("0");
-	$("#resWidth, #resHeight").click(function() {
-		$(this).val("");
-	});
-
-	$("#setRes").click(function() {
-		let resX = $("#resWidth").val();
-		let resY = $("#resHeight").val();
-		if (/^\d+$/.test(resX) && /^\d+$/.test(resY)) {
-			customSlideX = resX;
-			customSlideY = resY;
-			if (maxSlideNum > 0) {
-				// slideWidth : slideHeight = customSlideX : customSlideY
-				if (slideHeight*customSlideX/slideWidth !== parseInt(customSlideY, 10)) {
-					alertMsg(getLangRsc("ui_classic/original-aspect-ratio-not-match", configData.lang));
-				}
-				askReloadFile(null, "", "");
-			}
-		}
-	});
-
-	$("#setMonitor").click(function() {
-		if (!isLoaded) {
-			return;
-		}
-
-		if (!loadBackgroundInit) {
-			$(this).prop("checked", !$(this).prop("checked"));
-			return;
-		}
-
-		let idx = $("#monitorList").prop('selectedIndex');
-		if (idx === 0) {
-			disableMonitor();
-			return;
-		}
-		assignMonitor($("#monitorList").prop('selectedIndex'));
-		$("#monitor_trans").is(":checked") ? enableMonitorTransparent() : disableMonitorTransparent();
-		enableMonitor();
-	});
-
-	$('#monitor_trans').click(function() {
-		if ($("#monitor_trans").is(":checked")) {
-			enableMonitorTransparent();
-		} else {
-			disableMonitorTransparent();
-		}
-	});
-
-	$("#listRes").click(function() {
-		$(".resText").hide();
-		$("#listResList").val("0x0");
-		$("#listResList").show();
-	});
-
-	$("#listResList").change(function() {
-		let resVal = $(this).val();
-		if (resVal === "custom") {
-			$("#listResList").hide();
-			$(".resText").show();
-		} else {
-			$("#resWidth").val(resVal.replace(/x.*/, ""));
-			$("#resHeight").val(resVal.replace(/.*x/, ""));
-		}
-	});
-
-	$("#config").click(function() {
-		ipc.send('remote', { name: "showConfig" });
-	});
-
-	$(".resText").hide();
-	$("#listResList").show();
-
-	$(window).mousedown(function(event) {
-		if ( process.platform === 'darwin' ) {
-			return;
-		}
-		if ( event.which === 3 ) {
-			if ( /image_picker_image/.test($(event.target).attr('class')) ) {
-				let lSlideNo = $(event.target).attr('src').replace(/.*Slide(\d+)\.png\s*$/i, "$1");
-
-				if ( /^\d+$/.test(lSlideNo) ) {
-					const { Menu, MenuItem } = require('@electron/remote');
-					const menu = new Menu();
-					menu.append(new MenuItem ({
-						label: getLangRsc("ui_classic/quick-edit", configData.lang),
-							click() {
-								let vbsDir;
-								let file = pptPath;
-								let tmpDir2 = tmpDir + "/mode2";
-								vbsDir = tmpDir2 + '/vbQuickEdit.vbs';
-
-								try {
-									fs.writeFileSync(vbsDir, vbsQuickEdit, 'utf-8');
-								} catch(e) {
-									return;
-								}
-								const spawn = require( 'child_process' ).spawn;
-								spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, lSlideNo, '' ] );
-							}
-						}));
-					if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
-						menu.append(new MenuItem ({
-							label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui_classic/hide-checkerboard", configData.lang) : getLangRsc("ui_classic/show-checkerboard", configData.lang),
-								click() {
-									$('#trans_checker').trigger("click");
-								}
-							}));
-					}
-					menu.popup();
-				} else {
-					const { Menu, MenuItem } = require('@electron/remote');
-					const menu = new Menu();
-					if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
-						menu.append(new MenuItem ({
-							label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui_classic/hide-checkerboard", configData.lang) : getLangRsc("ui_classic/show-checkerboard", configData.lang),
-								click() {
-									$('#trans_checker').trigger("click");
-								}
-							}));
-					}
-					menu.popup();
-				}
-			}
-		}
-	});
-
+	prepare();
+	glInit();
+	registerEvents();
 	initImgPicker();
 	startCurrentTime();
 	registerGlobalShortcut();

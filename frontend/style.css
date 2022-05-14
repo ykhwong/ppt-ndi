@@ -191,7 +191,7 @@ html, body {
 	height: 100%;
 }
 
-#right {
+.right {
 	position: absolute;
 	left: 3px;
 	border: none;
@@ -203,7 +203,7 @@ html, body {
 	table-layout: fixed;
 }
 
-#right img {
+.right img {
 	position: relative;
 	background-image: url('null_slide.png');
 	background-repeat: repeat;
@@ -215,16 +215,6 @@ html, body {
 
 #slide_cnt, #progress, #current_time {
 	display:inline;
-}
-
-#ppt_filename {
-	position: fixed;
-	top: 10px;
-	left: 152px;
-	width: 100%;
-	text-align: left;
-	color: #79a9f7;
-	-webkit-app-region: drag;
 }
 
 #slide_res {
@@ -305,7 +295,6 @@ html, body {
 #below {
 	position: relative;
 	height: 100%;
-	left: -4px;
 	bottom: 1px;
 	right: 1px;
 	padding-left: 0px;
