@@ -54,15 +54,24 @@ function _prepare() {
 	}
 
 	try {
-		rimraf.sync( _TMPDIR );
-		if ( fs.existsSync(_TMPDIR) ) {
-			console.error("Failed to remove " + _TMPDIR);
-			_exit(1);
+		let pptNdiExecPath = "";
+		if ( process.platform === "win32" ) {
+			pptNdiExecPath = path.join(_TMPDIR, "ppt-ndi-win32-x64");
+		} else if ( process.platform === "darwin" ) {
+			pptNdiExecPath = path.join(_TMPDIR, "ppt-ndi-darwin-x64");
 		}
-		fs.mkdirSync( _TMPDIR, { recursive: true } );
+		if ( fs.existsSync( _TMPDIR ) ) {
+			rimraf.sync(pptNdiExecPath);
+			if ( fs.existsSync (pptNdiExecPath) ) {
+				console.error("Failed to remove " + pptNdiExecPath);
+				_exit(1);
+			}
+		} else {
+			fs.mkdirSync( _TMPDIR, { recursive: true } );
+		}
 	} catch (e) {
 		console.error(e);
-		console.error("Failed to remove " + _TMPDIR);
+		console.error("Failed to locate " + _TMPDIR);
 		_exit(1);
 	}
 
@@ -83,25 +92,35 @@ function _init() {
 	let dl2;
 	if ( process.platform === "win32" ) {
 		console.log("Downloading NDI SDK...");
-		dl1 = wget.download(_url.ndi_sdk.win32, 'ndi_sdk_win32.exe', {});
-		dl2 = wget.download(_url.innoextract.win32, 'innoextract.zip', {});
+		if ( ! fs.existsSync(path.join(_TMPDIR, 'ndi_sdk_win32.exe')) ) {
+			dl1 = wget.download(_url.ndi_sdk.win32, 'ndi_sdk_win32.exe', {});
+		} else {
+			dl1_done = true;
+		}
+		if ( ! fs.existsSync(path.join(_TMPDIR, 'innoextract.zip')) ) {
+			dl2 = wget.download(_url.innoextract.win32, 'innoextract.zip', {});
+		} else {
+			dl2_done = true;
+		}
 	} else if ( process.platform === "darwin" ) {
 		// we assume NDI SDK v5 has been installed already on macOS
 		return;
 	} else {
 		return;
 	}
-	
-	dl1.on('error', function(err) {
-		console.error(err);
-		_exit(1);
-	});
 
-	dl1.on('end', function(output) {
-		dl1_done = true;
-	});
+	if (!dl1_done) {
+		dl1.on('error', function(err) {
+			console.error(err);
+			_exit(1);
+		});
 
-	if (dl2) {
+		dl1.on('end', function(output) {
+			dl1_done = true;
+		});
+	}
+
+	if (!dl2_done && dl2) {
 		dl2.on('end', function(output) {
 			dl2_done = true;
 		});
@@ -114,11 +133,11 @@ function _init() {
 
 	// 1800 sec timeout
 	for ( let i = 0; i < 1800; i++ ) {
-		sleep(1000);
 		if (dl1_done && dl2_done) {
-			console.log("done");
+			console.log("Done");
 			break;
 		}
+		sleep(1000);
 	}
 	if ( !dl1_done || !dl2_done ) {
 		console.error("Failed to retrieve NDI SDK files");
