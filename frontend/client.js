@@ -205,7 +205,7 @@ file = WScript.arguments(0);
 slideNo = parseInt(WScript.arguments(1));
 
 function main() {
-	for ( var i = 0; i < objPPT.Presentations.Count; i++) {
+	for ( var i = 0; i < objPPT.Presentations.Count; i++ ) {
 		var opres = objPPT.Presentations.Item(i + 1).FullName;
 		if ( opres === file ) {
 			ap = objPPT.Presentations.Item(i + 1);
@@ -213,7 +213,6 @@ function main() {
 		}
 	}
 
-	objPPT.DisplayAlerts = false;
 	if ( ! ap ) {
 		ap = objPPT.Presentations.Open(file, false);
 	}
