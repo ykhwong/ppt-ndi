@@ -294,7 +294,8 @@ html, body {
 
 #below {
 	position: relative;
-	height: 100%;
+	display: block;
+	height: calc(100% - 120px);
 	bottom: 1px;
 	right: 1px;
 	padding-left: 0px;

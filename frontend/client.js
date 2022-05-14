@@ -682,7 +682,6 @@ $(document).ready(function() {
 		});
 
 		$('#trn').click(function() {
-			alert("s");
 			updateBlkWhtTrn("trn");
 		});
 
