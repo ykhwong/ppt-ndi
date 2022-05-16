@@ -228,7 +228,7 @@ $(document).ready(function() {
 	const remote = require('@electron/remote');
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
-	const runtimeUrl = "https://aka.ms/vs/16/release/vc_redist.x64.exe";
+	const runtimeUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe";
 	let ffi;
 	let lib;
 	let maxSlideNum = 0;
@@ -291,9 +291,12 @@ $(document).ready(function() {
 				if (fs.existsSync("PPTNDI.dylib")) {
 					librariesFound = true;
 				}
+			} else {
+				alertMsg(getLangRsc("ui_classic/dll-init-failed", configData.lang));
+				librariesFound = false;
 			}
 
-			if (librariesFound) {
+			if (librariesFound && process.platform === 'win32') {
 				const execRuntime = require('child_process').execSync;
 				execRuntime("start " + runtimeUrl, (error, stdout, stderr) => { 
 					callback(stdout); 
@@ -1147,15 +1150,21 @@ $(document).ready(function() {
 		}
 	}
 
+	function setTmpDir() {
+		if (process.platform === 'darwin') {
+			tmpDir = process.env.TMPDIR + '/ppt_ndi';
+		} else if (process.platform === 'win32') {
+			tmpDir = process.env.PROGRAMDATA + '/PPT-NDI/temp';
+		} else {
+			tmpDir = '/tmp/ppt_ndi';
+		}
+	}
+
 	function loadPPTX_Renderer_Internal(file) {
 		let now = new Date().getTime();
 		isCancelTriggered = false;
 		preTmpDir = tmpDir;
-		if (process.platform === 'darwin') {
-			tmpDir = process.env.TMPDIR + '/ppt_ndi';
-		} else { // win32
-			tmpDir = process.env.PROGRAMDATA + '/PPT-NDI/temp';
-		}
+		setTmpDir();
 		if (!fs.existsSync(tmpDir)) {
 			fs.mkdirSync(tmpDir, { recursive: true });
 		}
@@ -1326,7 +1335,7 @@ $(document).ready(function() {
 		const spawn = require( 'child_process' ).spawn;
 		spawnpid = spawn.pid;
 		preTmpDir = tmpDir;
-		tmpDir = process.env.PROGRAMDATA + '/PPT-NDI/temp';
+		setTmpDir();
 		if (!fs.existsSync(tmpDir)) {
 			fs.mkdirSync(tmpDir, { recursive: true });
 		}
