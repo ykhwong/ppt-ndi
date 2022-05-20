@@ -1,16 +1,16 @@
-const _WORKDIR = process.cwd();
 const path = require('path');
-const _TMPDIR = path.join(_WORKDIR, "/tmp");
 const fs = require("fs-extra");
 const sleep = require('system-sleep');
 const execSync = require("child_process").execSync;
 const rimraf = require("rimraf");
+const _WORKDIR = process.cwd();
+const _TMPDIR = path.join(_WORKDIR, "/tmp");
 
 const _url = {
 	"ndi_sdk": {
 		"win32": "https://downloads.ndi.tv/SDK/NDI_SDK/NDI%205%20SDK.exe",
 		"linux": "https://downloads.ndi.tv/SDK/NDI_SDK_Linux/Install_NDI_SDK_v5_Linux.tar.gz",
-		"mac": "https://downloads.ndi.tv/SDK/NDI_SDK_Mac/Install_NDI_SDK_v5_macOS.pkg"
+		"darwin": "https://downloads.ndi.tv/SDK/NDI_SDK_Mac/Install_NDI_SDK_v5_macOS.pkg"
 	},
 	"innoextract": {
 		"win32": "https://constexpr.org/innoextract/files/innoextract-1.9-windows.zip"
@@ -25,22 +25,35 @@ const _filepath = {
 			"app/Include"
 		],
 		"linux": [],
-		"mac": [
+		"darwin": [
 			"/Library/NDI SDK for macOS/lib/macOS/libndi.dylib"
 		]
 	}
 }
 
 function _prepare() {
-	if ( ! /^(win32|linux|darwin)$/.test(process.platform) ) {
-		console.error("Unknown or unsupported OS type: " + process.platform);
-		_exit(1);
-	} else {
-		// TO-DO: Support linux
-		if ( ! /^(win32|darwin)/.test(process.platform) ) {
-			console.error("Unsupported OS type: " + process.platform);
+	switch (process.platform) {
+		case "win32":
+		case "darwin":
+			break;
+		case "linux":
+			console.error("Unsupported platform: " + process.platform);
 			_exit(1);
-		}
+		default:
+			console.error("Unknown or unsupported platform: " + process.platform);
+			_exit(1);
+	}
+
+	switch (process.arch) {
+		case "x64":
+			break;
+		case "x86":
+		case "arm64":
+			console.error("Unsupported arch type: " + process.arch);
+			_exit(1);
+		default:
+			console.error("Unknown or unsupported arch type: " + process.arch);
+			_exit(1);
 	}
 
 	if ( ! fs.existsSync(path.join(_WORKDIR, "backend", "src")) ) {
@@ -54,12 +67,7 @@ function _prepare() {
 	}
 
 	try {
-		let pptNdiExecPath = "";
-		if ( process.platform === "win32" ) {
-			pptNdiExecPath = path.join(_TMPDIR, "ppt-ndi-win32-x64");
-		} else if ( process.platform === "darwin" ) {
-			pptNdiExecPath = path.join(_TMPDIR, "ppt-ndi-darwin-x64");
-		}
+		let pptNdiExecPath = path.join(_TMPDIR, "ppt-ndi-" + process.platform + "-" + process.arch);
 		if ( fs.existsSync( _TMPDIR ) ) {
 			rimraf.sync(pptNdiExecPath);
 			if ( fs.existsSync (pptNdiExecPath) ) {
@@ -83,30 +91,29 @@ function _prepare() {
 
 function _init() {
 	const wget = require('wget-improved');
-
 	process.chdir(_TMPDIR);
 
 	let dl1_done = false;
 	let dl2_done = false;
 	let dl1;
 	let dl2;
-	if ( process.platform === "win32" ) {
-		console.log("Downloading NDI SDK...");
-		if ( ! fs.existsSync(path.join(_TMPDIR, 'ndi_sdk_win32.exe')) ) {
-			dl1 = wget.download(_url.ndi_sdk.win32, 'ndi_sdk_win32.exe', {});
-		} else {
-			dl1_done = true;
-		}
-		if ( ! fs.existsSync(path.join(_TMPDIR, 'innoextract.zip')) ) {
-			dl2 = wget.download(_url.innoextract.win32, 'innoextract.zip', {});
-		} else {
-			dl2_done = true;
-		}
-	} else if ( process.platform === "darwin" ) {
-		// we assume NDI SDK v5 has been installed already on macOS
-		return;
-	} else {
-		return;
+	switch (process.platform) {
+		case "win32":
+			console.log("Downloading NDI SDK...");
+
+			dl1_done = fs.existsSync(path.join(_TMPDIR, 'ndi_sdk_win32.exe'));
+			dl2_done = fs.existsSync(path.join(_TMPDIR, 'innoextract.zip'));
+			if ( ! dl1_done ) {
+				dl1 = wget.download(_url.ndi_sdk.win32, 'ndi_sdk_win32.exe', {});
+			}
+			if ( ! dl2_done ) {
+				dl2 = wget.download(_url.innoextract.win32, 'innoextract.zip', {});
+			}
+			break;
+		case "darwin":
+			// we assume NDI SDK v5 has been installed already on macOS
+		default:
+			return;
 	}
 
 	if (!dl1_done) {
@@ -149,7 +156,7 @@ function _build() {
 	if ( process.platform === "win32" ) {
 		_buildWin32();
 	} else if ( process.platform === "darwin") {
-		_buildMac();
+		_buildDarwin();
 	}
 }
 
@@ -283,7 +290,7 @@ function _buildWin32() {
 	fs.copySync("./node_modules/electron-packager", "../dev/node_modules/electron-packager");
 }
 
-function _buildMac() {
+function _buildDarwin() {
 
 	// build PPTNDI lib
 	try {
