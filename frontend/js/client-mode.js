@@ -33,8 +33,8 @@ $(document).ready(function() {
 	}
 
 	function setLangRsc() {
-		setLangRscDiv("#select1", "ui_main/select1", true, configData.lang);
-		setLangRscDiv("#select2", "ui_main/select2", true, configData.lang);
+		setLangRscDiv("#select1", "ui-main/select1", true, configData.lang);
+		setLangRscDiv("#select2", "ui-main/select2", true, configData.lang);
 	}
 
 	ipc.on('remote' , function(event, data){

@@ -282,17 +282,17 @@ $(document).ready(function() {
 		if ( ffi === -1 ) {		
 			let librariesFound = false;
 			if (process.platform === 'win32') {
-				alertMsg(getLangRsc("ui_classic/dll-init-failed", configData.lang));
+				alertMsg(getLangRsc("ui-classic/dll-init-failed", configData.lang));
 				if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
 					librariesFound = true;
 				}
 			} else if (process.platform === 'darwin') {
-				alertMsg(getLangRsc("ui_classic/dylib-init-failed", configData.lang));
+				alertMsg(getLangRsc("ui-classic/dylib-init-failed", configData.lang));
 				if (fs.existsSync("PPTNDI.dylib")) {
 					librariesFound = true;
 				}
 			} else {
-				alertMsg(getLangRsc("ui_classic/dll-init-failed", configData.lang));
+				alertMsg(getLangRsc("ui-classic/dll-init-failed", configData.lang));
 				librariesFound = false;
 			}
 
@@ -307,7 +307,7 @@ $(document).ready(function() {
 
 		lib = ipc.sendSync("require", { lib: "ffi", func: "init", args: null });
 		if (lib === 1) {
-			alertMsg(getLangRsc("ui_classic/failed-to-create-listening-svr", configData.lang));
+			alertMsg(getLangRsc("ui-classic/failed-to-create-listening-svr", configData.lang));
 			ipc.send('remote', { name: "exit" });
 			return;
 		}
@@ -328,26 +328,26 @@ $(document).ready(function() {
 	}
 
 	function setLangRsc() {
-		setLangRscDiv("#edit_pptx", "ui_classic/edit_pptx", false, configData.lang);
-		//setLangRscDiv("#reload", "ui_classic/reload", false, configData.lang);
-		//setLangRscDiv("#config", "ui_classic/config", false, configData.lang);
-		setLangRscDiv("#show-checkerboard", "ui_classic/show-checkerboard", false, configData.lang);
-		setLangRscDiv("#enable-slide-transition-effect", "ui_classic/enable-slide-transition-effect", false, configData.lang);
-		setLangRscDiv("#include-background", "ui_classic/include-background", false, configData.lang);
-		setLangRscDiv("#resolution", "ui_classic/resolution", false, configData.lang);
-		setLangRscDiv("#resDefault", "ui_classic/resDefault", false, configData.lang);
-		setLangRscDiv("#resCustom", "ui_classic/resCustom", false, configData.lang);
-		setLangRscDiv("#setRes", "ui_classic/setRes", false, configData.lang);
-		setLangRscDiv("#monitorControlText", "ui_classic/monitorControlText", false, configData.lang);
-		setLangRscDiv("#monitorAlphaText", "ui_classic/monitorAlphaText", false, configData.lang);
-		setLangRscDiv("#setMonitor", "ui_classic/setMonitor", false, configData.lang);
-		setLangRscDiv("#monitorText", "ui_classic/monitor", false, configData.lang);
+		setLangRscDiv("#edit_pptx", "ui-classic/edit_pptx", false, configData.lang);
+		//setLangRscDiv("#reload", "ui-classic/reload", false, configData.lang);
+		//setLangRscDiv("#config", "ui-classic/config", false, configData.lang);
+		setLangRscDiv("#show-checkerboard", "ui-classic/show-checkerboard", false, configData.lang);
+		setLangRscDiv("#enable-slide-transition-effect", "ui-classic/enable-slide-transition-effect", false, configData.lang);
+		setLangRscDiv("#include-background", "ui-classic/include-background", false, configData.lang);
+		setLangRscDiv("#resolution", "ui-classic/resolution", false, configData.lang);
+		setLangRscDiv("#resDefault", "ui-classic/resDefault", false, configData.lang);
+		setLangRscDiv("#resCustom", "ui-classic/resCustom", false, configData.lang);
+		setLangRscDiv("#setRes", "ui-classic/setRes", false, configData.lang);
+		setLangRscDiv("#monitorControlText", "ui-classic/monitorControlText", false, configData.lang);
+		setLangRscDiv("#monitorAlphaText", "ui-classic/monitorAlphaText", false, configData.lang);
+		setLangRscDiv("#setMonitor", "ui-classic/setMonitor", false, configData.lang);
+		setLangRscDiv("#monitorText", "ui-classic/monitor", false, configData.lang);
 		/*
-		$("#currentSlideText").attr("data-img-label", getLangRsc("ui_classic/currentSlideText", configData.lang));
-		$("#nextSlideText").attr("data-img-label", getLangRsc("ui_classic/nextSlideText", configData.lang));
+		$("#currentSlideText").attr("data-img-label", getLangRsc("ui-classic/currentSlideText", configData.lang));
+		$("#nextSlideText").attr("data-img-label", getLangRsc("ui-classic/nextSlideText", configData.lang));
 		*/
-		setLangRscDiv("#loadingTxt", "ui_classic/loadingTxt", false, configData.lang);
-		setLangRscDiv("#cancel", "ui_classic/cancel", false, configData.lang);
+		setLangRscDiv("#loadingTxt", "ui-classic/loadingTxt", false, configData.lang);
+		setLangRscDiv("#cancel", "ui-classic/cancel", false, configData.lang);
 	}
 
 	function stopSlideTransition() {
@@ -557,8 +557,8 @@ $(document).ready(function() {
 		const {dialog} = require('@electron/remote');
 		let options;
 		let response;
-		let defaultMsg = getLangRsc("ui_classic/do-you-want-to-continue", configData.lang);
-		let defaultDetail = getLangRsc("ui_classic/changes-require-reload", configData.lang);
+		let defaultMsg = getLangRsc("ui-classic/do-you-want-to-continue", configData.lang);
+		let defaultDetail = getLangRsc("ui-classic/changes-require-reload", configData.lang);
 		
 		options = {
 			type: 'question',
@@ -640,8 +640,8 @@ $(document).ready(function() {
 			dialog.showOpenDialog(currentWindow,{
 				properties: ['openFile'],
 				filters: [
-					{name: getLangRsc("ui_classic/open-file-ppt-presentation", configData.lang), extensions: ['pptx', 'ppt']},
-					{name: getLangRsc("ui_classic/open-file-all-files", configData.lang), extensions: ['*']}
+					{name: getLangRsc("ui-classic/open-file-ppt-presentation", configData.lang), extensions: ['pptx', 'ppt']},
+					{name: getLangRsc("ui-classic/open-file-all-files", configData.lang), extensions: ['*']}
 				]
 			}).then(result => {
 				loadPPTX(result.filePaths[0], 0, 0);
@@ -811,7 +811,7 @@ $(document).ready(function() {
 						if (pptTimestamp === tmpPptTimestamp) {
 						} else {
 							pptTimestamp = tmpPptTimestamp;
-							askReloadFile("", getLangRsc("ui_classic/ask-reload", configData.lang), "");
+							askReloadFile("", getLangRsc("ui-classic/ask-reload", configData.lang), "");
 						}
 					} catch(e) {
 					}
@@ -914,7 +914,7 @@ $(document).ready(function() {
 				if (maxSlideNum > 0) {
 					// slideWidth : slideHeight = customSlideX : customSlideY
 					if (slideHeight*customSlideX/slideWidth !== parseInt(customSlideY, 10)) {
-						alertMsg(getLangRsc("ui_classic/original-aspect-ratio-not-match", configData.lang));
+						alertMsg(getLangRsc("ui-classic/original-aspect-ratio-not-match", configData.lang));
 					}
 					askReloadFile(null, "", "");
 				}
@@ -985,7 +985,7 @@ $(document).ready(function() {
 						const { Menu, MenuItem } = require('@electron/remote');
 						const menu = new Menu();
 						menu.append(new MenuItem ({
-							label: getLangRsc("ui_classic/quick-edit", configData.lang),
+							label: getLangRsc("ui-classic/quick-edit", configData.lang),
 								click() {
 									let vbsDir;
 									let file = pptPath;
@@ -1003,7 +1003,7 @@ $(document).ready(function() {
 							}));
 						if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
 							menu.append(new MenuItem ({
-								label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui_classic/hide-checkerboard", configData.lang) : getLangRsc("ui_classic/show-checkerboard", configData.lang),
+								label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui-classic/hide-checkerboard", configData.lang) : getLangRsc("ui-classic/show-checkerboard", configData.lang),
 									click() {
 										$('#trans_checker').trigger("click");
 									}
@@ -1015,7 +1015,7 @@ $(document).ready(function() {
 						const menu = new Menu();
 						if ( /CURRENT|NEXT/.test($(event.target).parent().text()) ) {
 							menu.append(new MenuItem ({
-								label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui_classic/hide-checkerboard", configData.lang) : getLangRsc("ui_classic/show-checkerboard", configData.lang),
+								label: ($("#trans_checker").is(":checked")) ? getLangRsc("ui-classic/hide-checkerboard", configData.lang) : getLangRsc("ui-classic/show-checkerboard", configData.lang),
 									click() {
 										$('#trans_checker').trigger("click");
 									}
@@ -1206,7 +1206,7 @@ $(document).ready(function() {
 			maxSlideNum = 0;
 			cleanupForTemp(false);
 			tmpDir = preTmpDir;
-			alertMsg(getLangRsc("ui_classic/ppt-not-loaded", configData.lang));
+			alertMsg(getLangRsc("ui-classic/ppt-not-loaded", configData.lang));
 			$("#fullblack, .cancelBox").hide();
 			return;
 		}
@@ -1354,7 +1354,7 @@ $(document).ready(function() {
 		} catch(e) {
 			cleanupForTemp(false);
 			tmpDir = preTmpDir;
-			alertMsg(getLangRsc("ui_classic/failed-to-access-tempdir", configData.lang));
+			alertMsg(getLangRsc("ui-classic/failed-to-access-tempdir", configData.lang));
 			$("#fullblack, .cancelBox").hide();
 			return;
 		}
@@ -1370,16 +1370,16 @@ $(document).ready(function() {
 		res = spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, tmpDir, resX, resY, '' ] );
 		$(".cancelBox").show();
 		res.stderr.on('data', (data) => {
-			let myMsg = getLangRsc("ui_classic/failed-to-parse-presentation", configData.lang);
+			let myMsg = getLangRsc("ui-classic/failed-to-parse-presentation", configData.lang);
 			maxSlideNum = 0;
 			cleanupForTemp(false);
 			tmpDir = preTmpDir;
 			if (!fs.existsSync(file)) {
-				alertMsg(myMsg + getLangRsc("ui_classic/file-moved-or-deleted", configData.lang));
+				alertMsg(myMsg + getLangRsc("ui-classic/file-moved-or-deleted", configData.lang));
 			} else if (maxSlideNum > 0) {
-				alertMsg(myMsg + getLangRsc("ui_classic/check-the-config", configData.lang));
+				alertMsg(myMsg + getLangRsc("ui-classic/check-the-config", configData.lang));
 			} else {
-				alertMsg(myMsg + getLangRsc("ui_classic/make-sure-ppt-installed", configData.lang));
+				alertMsg(myMsg + getLangRsc("ui-classic/make-sure-ppt-installed", configData.lang));
 			}
 			$("#fullblack, .cancelBox").hide();
 			return;
@@ -1397,7 +1397,7 @@ $(document).ready(function() {
 		}
 		if (!re.exec(file)) {
 			if (/\S/.test(file)) {
-				alertMsg(getLangRsc("ui_classic/only-allowed-filename", configData.lang));
+				alertMsg(getLangRsc("ui-classic/only-allowed-filename", configData.lang));
 			}
 			$("#fullblack, .cancelBox").hide();
 		}
@@ -1749,13 +1749,13 @@ $(document).ready(function() {
 	function updateMonitorList() {
 		$('#monitorList').html($('<option>', {
 			value: "none",
-			text: getLangRsc("ui_classic/slideshow-monitor-none", configData.lang)
+			text: getLangRsc("ui-classic/slideshow-monitor-none", configData.lang)
 		}));
 		for (let i=0; i<getMultipleMonitors().length; i++) {
 			let monNum = i + 1;
 			$('#monitorList').append($('<option>', {
 				value: monNum,
-				text: getLangRsc("ui_classic/slideshow-monitor-monitor", configData.lang) + monNum
+				text: getLangRsc("ui-classic/slideshow-monitor-monitor", configData.lang) + monNum
 			}));
 		}
 	}

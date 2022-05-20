@@ -27,22 +27,22 @@ app.on('ready', function() {
 		"home" : {
 			"width" : 600,
 			"height" : 330,
-			"dest" : "mode.html"
+			"dest" : "client-mode.html"
 		},
 		"control" : {
 			"width" : 277,
 			"height" : 430,
-			"dest" : "control.html"
+			"dest" : "client-slideshow.html"
 		},
 		"classic" : {
 			"width" : 960,
 			"height" : 700,
-			"dest" : "classic.html"
+			"dest" : "client-classic.html"
 		},
 		"config" : {
 			"width" : 320,
 			"height" : 465,
-			"dest" : "config.html"
+			"dest" : "client-config.html"
 		},
 		"monitor" : {
 			"width" : 0,

@@ -325,14 +325,14 @@ $(document).ready(function() {
 	}
 
 	function setLangRsc() {
-		setLangRscDiv("#show-checkerboard", "ui_slideshow/show-checkerboard", true, configData.lang);
-		setLangRscDiv("#enable-slide-transition-effect", "ui_slideshow/enable-slide-transition-effect", true, configData.lang);
-		setLangRscDiv("#include-background", "ui_slideshow/include-background", true, configData.lang);
-		setLangRscDiv("#customRes", "ui_slideshow/customRes", true, configData.lang);
-		setLangRscDiv("#setRes", "ui_slideshow/setRes", false, configData.lang);
-		setLangRscDiv("#config", "ui_slideshow/config", false, configData.lang);
-		setLangRscDiv("#prevTxt", "ui_slideshow/prevTxt", false, configData.lang);
-		setLangRscDiv("#pinTxt", "ui_slideshow/pinTxt", false, configData.lang);
+		setLangRscDiv("#show-checkerboard", "ui-slideshow/show-checkerboard", true, configData.lang);
+		setLangRscDiv("#enable-slide-transition-effect", "ui-slideshow/enable-slide-transition-effect", true, configData.lang);
+		setLangRscDiv("#include-background", "ui-slideshow/include-background", true, configData.lang);
+		setLangRscDiv("#customRes", "ui-slideshow/customRes", true, configData.lang);
+		setLangRscDiv("#setRes", "ui-slideshow/setRes", false, configData.lang);
+		setLangRscDiv("#config", "ui-slideshow/config", false, configData.lang);
+		setLangRscDiv("#prevTxt", "ui-slideshow/prevTxt", false, configData.lang);
+		setLangRscDiv("#pinTxt", "ui-slideshow/pinTxt", false, configData.lang);
 
 		switch (configData.lang) {
 			case "ko":
@@ -361,12 +361,12 @@ $(document).ready(function() {
 
 			let librariesFound = false;
 			if (process.platform === 'win32') {
-				alertMsg(getLangRsc("ui_slideshow/dll-init-failed", configData.lang));
+				alertMsg(getLangRsc("ui-slideshow/dll-init-failed", configData.lang));
 				if (fs.existsSync("PPTNDI.DLL") && fs.existsSync("Processing.NDI.Lib.x64.dll")) {
 					librariesFound = true;
 				}
 			} else if (process.platform === 'darwin') {
-				alertMsg(getLangRsc("ui_slideshow/dylib-init-failed", configData.lang));
+				alertMsg(getLangRsc("ui-slideshow/dylib-init-failed", configData.lang));
 				if (fs.existsSync("PPTNDI.dylib")) {
 					librariesFound = true;
 				}
@@ -383,7 +383,7 @@ $(document).ready(function() {
 
 		lib = ipc.sendSync("require", { lib: "ffi", func: "init", args: null });
 		if (lib === 1) {
-			alertMsg(getLangRsc("ui_slideshow/failed-to-create-listening-svr", configData.lang));
+			alertMsg(getLangRsc("ui-slideshow/failed-to-create-listening-svr", configData.lang));
 			ipc.send('remote', { name: "exit" });
 			return;
 		}
@@ -449,8 +449,8 @@ $(document).ready(function() {
 	}
 
 	function updateStat(cmd, details) {
-		let msg = getLangRsc("ui_slideshow/status", configData.lang);
-		curStatus = getLangRsc("ui_slideshow/status-ready", configData.lang);
+		let msg = getLangRsc("ui-slideshow/status", configData.lang);
+		curStatus = getLangRsc("ui-slideshow/status-ready", configData.lang);
 		msg = msg + cmd;
 		if (/\S/.test(details)) {
 			msg = msg + "<br />" + details;
@@ -479,7 +479,7 @@ $(document).ready(function() {
 			preFile = "";
 		} else if(/^PPTNDI: Done/.test(cmd)) {
 			updateStat(
-				getLangRsc("ui_slideshow/status-end-of-slideshow", configData.lang),
+				getLangRsc("ui-slideshow/status-end-of-slideshow", configData.lang),
 				""
 			);
 			return;
@@ -488,14 +488,14 @@ $(document).ready(function() {
 		//	return;
 		} else if(/^PPTNDI: Ready/.test(cmd)) {
 			updateStat(
-				getLangRsc("ui_slideshow/status-ready", configData.lang),
-				getLangRsc("ui_slideshow/status-ppt-start-slideshow", configData.lang)
+				getLangRsc("ui-slideshow/status-ready", configData.lang),
+				getLangRsc("ui-slideshow/status-ppt-start-slideshow", configData.lang)
 			);
 			return;
 		} else if(/^PPTNDI: NoPPT/.test(cmd)) {
 			updateStat(
-				getLangRsc("ui_slideshow/status-error", configData.lang),
-				getLangRsc("ui_slideshow/status-ppt-not-found", configData.lang)
+				getLangRsc("ui-slideshow/status-error", configData.lang),
+				getLangRsc("ui-slideshow/status-ppt-not-found", configData.lang)
 			);
 			return;
 		} else {
@@ -504,8 +504,8 @@ $(document).ready(function() {
 		}
 
 		updateStat(
-			getLangRsc("ui_slideshow/status-ok", configData.lang),
-			getLangRsc("ui_slideshow/status-request-complete", configData.lang)
+			getLangRsc("ui-slideshow/status-ok", configData.lang),
+			getLangRsc("ui-slideshow/status-request-complete", configData.lang)
 		);
 		if (/^PPTNDI: Sent /.test(cmd)) {
 			let fd;
@@ -600,7 +600,7 @@ $(document).ready(function() {
 				break;
 			case "black":
 			case "white":
-				if (slideWidth === 0 || curStatus === getLangRsc("ui_slideshow/status-ready", configData.lang)) {
+				if (slideWidth === 0 || curStatus === getLangRsc("ui-slideshow/status-ready", configData.lang)) {
 					sendColorNDI(cmd);
 				} else {
 					res2.stdin.write(cmd + "\n");
@@ -735,7 +735,7 @@ $(document).ready(function() {
 		try {
 			fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 		} catch(e) {
-			alertMsg(getLangRsc("ui_slideshow/failed-to-access-tempdir", configData.lang));
+			alertMsg(getLangRsc("ui-slideshow/failed-to-access-tempdir", configData.lang));
 			return;
 		}
 		try {
@@ -745,7 +745,7 @@ $(document).ready(function() {
 		try {
 			fs.writeFileSync(vbsDir3, vbsCheckSlide, 'utf-8');
 		} catch(e) {
-			alertMsg(getLangRsc("ui_slideshow/failed-to-access-tempdir", configData.lang));
+			alertMsg(getLangRsc("ui-slideshow/failed-to-access-tempdir", configData.lang));
 			return;
 		}
 		if (fs.existsSync(vbsDir)) {
@@ -764,7 +764,7 @@ $(document).ready(function() {
 				sendNDI(file, data);
 			});
 		} else {
-			alertMsg(getLangRsc("ui_slideshow/failed-to-parse-presentation", configData.lang));
+			alertMsg(getLangRsc("ui-slideshow/failed-to-parse-presentation", configData.lang));
 			return;
 		}
 		if (fs.existsSync(vbsDir2)) {
@@ -773,7 +773,7 @@ $(document).ready(function() {
 		if (fs.existsSync(vbsDir3)) {
 			res3 = spawn( 'cscript.exe', [ vbsDir3, "//NOLOGO", '' ] );
 		} else {
-			alertMsg(getLangRsc("ui_slideshow/failed-to-parse-presentation", configData.lang));
+			alertMsg(getLangRsc("ui-slideshow/failed-to-parse-presentation", configData.lang));
 			return;
 		}
 
@@ -783,8 +783,8 @@ $(document).ready(function() {
 			if (/^\s*OFF\s*$/.test(curSlideStat)) {
 				// Ready
 				updateStat(
-					getLangRsc("ui_slideshow/status-ready", configData.lang),
-					getLangRsc("ui_slideshow/open-ppt-file", configData.lang)
+					getLangRsc("ui-slideshow/status-ready", configData.lang),
+					getLangRsc("ui-slideshow/open-ppt-file", configData.lang)
 				);
 			} else if (/^\s*0\s*$/.test(curSlideStat)) {
 				// Not found
@@ -821,7 +821,7 @@ $(document).ready(function() {
 		});
 		multipleInstance = ipc.sendSync("status", { item: "multipleInstance" });
 		if (multipleInstance) {
-			alertMsg(getLangRsc("ui_slideshow/no-support-multiple-instances", configData.lang));
+			alertMsg(getLangRsc("ui-slideshow/no-support-multiple-instances", configData.lang));
 			cleanupForExit();
 		}
 		
@@ -959,7 +959,7 @@ $(document).ready(function() {
 			try {
 				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 			} catch(e) {
-				alertMsg(getLangRsc("ui_slideshow/failed-to-access-tempdir", configData.lang));
+				alertMsg(getLangRsc("ui-slideshow/failed-to-access-tempdir", configData.lang));
 				return;
 			}
 		} else {
@@ -967,7 +967,7 @@ $(document).ready(function() {
 			try {
 				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
 			} catch(e) {
-				alertMsg(getLangRsc("ui_slideshow/failed-to-access-tempdir", configData.lang));
+				alertMsg(getLangRsc("ui-slideshow/failed-to-access-tempdir", configData.lang));
 				return;
 			}
 		}
@@ -989,7 +989,7 @@ $(document).ready(function() {
 				sendNDI(file, data);
 			});
 		} else {
-			alertMsg(getLangRsc("ui_slideshow/failed-to-parse-presentation", configData.lang));
+			alertMsg(getLangRsc("ui-slideshow/failed-to-parse-presentation", configData.lang));
 			return;
 		}
 	});

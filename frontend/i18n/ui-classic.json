@@ -1,0 +1,534 @@
+[
+{
+	"item": "edit_pptx",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "EDIT",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "편집",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "reload",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "RELOAD",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "다시 로드",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "config",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "CONFIG",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "구성",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "show-checkerboard",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Show Checkerboard",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "체커보드 표시",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "hide-checkerboard",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Hide Checkerboard",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "체커보드 숨기기",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "enable-slide-transition-effect",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Slide Transition Effect",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "슬라이드 전환 효과",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "include-background",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Background on NDI",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "NDI의 배경",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "resolution",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Resolution",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "해상도",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "resDefault",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Default",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "기본값",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "resCustom",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Custom",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "사용자 지정",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "setRes",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "SET",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "설정",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "monitorControlText",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "SlideShow Monitor",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "슬라이드쇼 모니터",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "monitorAlphaText",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Alpha on Monitor",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "모니터의 알파",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "setMonitor",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "SET",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "설정",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "currentSlideText",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "CURRENT",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "현재",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "nextSlideText",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "NEXT",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "다음",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "loadingTxt",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "LOADING",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "불러오는 중",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "cancel",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Cancel",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "취소",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "dll-init-failed",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "DLL init failed.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "DLL 초기화를 실패했습니다.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "dylib-init-failed",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Dylib init failed.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "Dylib 초기화를 실패했습니다.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "failed-to-create-listening-svr",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Failed to create a listening server!",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "리스닝 서버 생성을 실패했습니다.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "failed-to-access-tempdir",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Failed to access the temporary directory!",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "임시 디렉터리 접근을 실패했습니다.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "failed-to-parse-presentation",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Failed to parse the presentation!\n",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "프레젠테이션의 구문 분석을 실패했습니다!\n",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "file-moved-or-deleted",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "The file might have been moved or deleted.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "파일이 이동되었거나 삭제되었을 수 있습니다.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "check-the-config",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Please check the configuration.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "구성 설정을 확인해 주십시오.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "make-sure-ppt-installed",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Please make sure that Microsoft PowerPoint has been installed on the system.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "Microsoft PowerPoint가 시스템에 설치되어 있는지 확인해 주십시오.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "ppt-not-loaded",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Presentation file could not be loaded.\n\nPlease check whether the presentension has one or more slides.\nAlso, please remove missing fonts if applicable.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "프레젠테이션 파일을 로드하지 못했습니다.\n\n프레젠테이션이 하나 이상의 슬라이드를 보유하고 있는지 확인해 주십시오.\n또, 해당되는 경우 존재하지 않는 글꼴을 제거해 주십시오.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "only-allowed-filename",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Only allowed filename extensions are PPT and PPTX.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "허용되는 유일한 파일 확장자는 PPT와 PPTX입니다.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "open-file-ppt-presentation",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "PowerPoint Presentations",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "PowerPoint 프레젠테이션",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "open-file-all-files",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "All Files",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "모든 파일",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "original-aspect-ratio-not-match",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "The original aspect ratio does not match. The layout can be corrupted due to the different ratios.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "원래의 가로 세로비가 일치하지 않습니다. 다른 비율로 인해 레이아웃이 손상될 수 있습니다.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "do-you-want-to-continue",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Do you want to continue?",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "계속하시겠습니까?",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "changes-require-reload",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Changes require a reload to take effect.",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "변경 효력을 적용하려면 다시 로드해야 합니다.",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "slideshow-monitor-none",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "None",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "없음",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "slideshow-monitor-monitor",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Monitor ",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "모니터 ",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "ask-reload",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "This file has been modified. Do you want to reload it?",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "이 파일은 수정되었습니다. 다시 로드하시겠습니까?",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "quick-edit",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Quick Edit",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "빠른 편집",
+			"rev" : 0
+		}
+	}
+},
+{
+	"item": "monitor",
+	"lang": {
+		"description": "",
+		"en": {
+			"msg" : "Overlay Monitor",
+			"rev" : 0
+		},
+		"ko": {
+			"msg" : "오버레이 모니터",
+			"rev" : 0
+		}
+	}
+}
+]

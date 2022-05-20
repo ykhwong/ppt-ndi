@@ -57,18 +57,18 @@ $(document).ready(function() {
 	}
 
 	function setLangRsc() {
-		setLangRscDiv("#minimize-systray", "ui_config/minimize-systray", true, configData.lang);
-		setLangRscDiv("#start-with-first-slide-selected", "ui_config/start-with-first-slide-selected", true, configData.lang);
-		//setLangRscDiv("#enable-high-performance-mode", "ui_config/enable-high-performance-mode", true, configData.lang);
-		setLangRscDiv("#hotkeys", "ui_config/hotkeys", true, configData.lang);
-		setLangRscDiv("#prev", "ui_config/prev", true, configData.lang);
-		setLangRscDiv("#next", "ui_config/next", true, configData.lang);
-		setLangRscDiv("#black", "ui_config/black", true, configData.lang);
-		setLangRscDiv("#white", "ui_config/white", true, configData.lang);
-		setLangRscDiv("#trans", "ui_config/transparent", true, configData.lang);
-		setLangRscDiv("#localization", "ui_config/localization", true, configData.lang);
-		setLangRscDiv("#renderer", "ui_config/renderer", true, configData.lang);
-		setLangRscDiv("#saveConfig", "ui_config/save", true, configData.lang);
+		setLangRscDiv("#minimize-systray", "ui-config/minimize-systray", true, configData.lang);
+		setLangRscDiv("#start-with-first-slide-selected", "ui-config/start-with-first-slide-selected", true, configData.lang);
+		//setLangRscDiv("#enable-high-performance-mode", "ui-config/enable-high-performance-mode", true, configData.lang);
+		setLangRscDiv("#hotkeys", "ui-config/hotkeys", true, configData.lang);
+		setLangRscDiv("#prev", "ui-config/prev", true, configData.lang);
+		setLangRscDiv("#next", "ui-config/next", true, configData.lang);
+		setLangRscDiv("#black", "ui-config/black", true, configData.lang);
+		setLangRscDiv("#white", "ui-config/white", true, configData.lang);
+		setLangRscDiv("#trans", "ui-config/transparent", true, configData.lang);
+		setLangRscDiv("#localization", "ui-config/localization", true, configData.lang);
+		setLangRscDiv("#renderer", "ui-config/renderer", true, configData.lang);
+		setLangRscDiv("#saveConfig", "ui-config/save", true, configData.lang);
 	}
 
 	function setConfig(showInfo, useDefaultData = false) {
@@ -99,13 +99,13 @@ $(document).ready(function() {
 		}
 		fs.writeFile(configPath, JSON.stringify(configData, null, "\t"), { flag: 'w' }, (err) => {
 			if (err) {
-				alertMsg(getLangRsc("ui_config/could-not-save-config", configData.lang));
+				alertMsg(getLangRsc("ui-config/could-not-save-config", configData.lang));
 			} else {
 				ipc.send('remote', { name: "reflectConfig" });
 				setLangRsc();
 				if (showInfo) {
 					setTimeout(function() {
-						alertMsg(getLangRsc("ui_config/saved", configData.lang));
+						alertMsg(getLangRsc("ui-config/saved", configData.lang));
 					}, 100);
 				}
 			}

@@ -1,0 +1,92 @@
+<html>
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+<script src="./js/external/jquery.min.js"></script>
+<script src="./js/i18n.js"></script>
+<script src="./js/client-config.js"></script>
+<link rel="stylesheet" type="text/css" href="./css/client-config.css">
+<link rel="stylesheet" type="text/css" href="./css/common.css">
+<script>if (window.module) module = window.module;</script>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>-</title>
+</head>
+<body>
+<table id="bktbl1" border="0">
+  <tbody>
+    <tr>
+      <td id="minimize-systray" width=250></td><!--Minimize in the system tray on startup-->
+      <td>
+		<label class="switch">
+		<input type="checkbox" id="systray" name="systray" value="systray">
+		<span class="slider"></span>
+		</label>
+	  </td>
+	</tr>
+    <tr>
+	  <td id="start-with-first-slide-selected" width=250></td><!--Start with the first slide selected-->
+      <td>
+		<label class="switch">
+		<input type="checkbox" id="startWithFirstSlide" name="startWithFirstSlide" value="startWithFirstSlide">
+		<span class="slider"></span>
+		</label>
+	  </td>
+	</tr>
+	<tr>
+	  <td>&nbsp;</td>
+	  <td>&nbsp;</td>
+	</tr>
+  </tbody>
+</table>
+<table id="bktbl2" border="0">
+  <tbody>
+	<tr>
+	  <td id="hotkeys"></td><!--Hotkeys-->
+	  <td>&nbsp;</td>
+	</tr>
+    <tr>
+      <td id="prev" class="alignRight"></td><!--Prev-->
+      <td><input class="txtBox" maxlength=1 id="prevTxtBox" name="prevTxtBox"></textarea></td>
+	</tr>
+	<tr>
+      <td id="next" class="alignRight"></td><!--Next-->
+	  <td><input class="txtBox" maxlength=1 id="nextTxtBox" name="prevTxtBox"></textarea></td>
+	</tr>
+	<tr>
+      <td id="black" class="alignRight"></td><!--Black-->
+	  <td><input class="txtBox" maxlength=1 id="blackTxtBox" name="blackTxtBox"></textarea></td>
+	</tr>
+	<tr>
+      <td id="white" class="alignRight"></td><!--White-->
+	  <td><input class="txtBox" maxlength=1 id="whiteTxtBox" name="whiteTxtBox"></textarea></td>
+	</tr>
+	<tr>
+      <td id="trans" class="alignRight"></td><!--Transparent-->
+	  <td><input class="txtBox" maxlength=1 id="transTxtBox" name="transTxtBox"></textarea></td>
+	</tr>
+  </tbody>
+</table>
+
+<table id="bktbl3" border="0">
+  <tbody>
+	<tr>
+	  <td id="renderer"></td><!--Renderer-->
+	  <td>
+		<select id="rendererList">
+		</select>
+	  </td>
+	</tr>
+	<tr>
+		<td id="localization"></td><!--Localization-->
+	  <td>
+		<select id="langList">
+		</select>
+	  </td>
+	</tr>
+	</tbody>
+</table>
+<div id="version"></div>
+<div id="saveConfig"></div><!--Save-->
+<img id="closeImg" src="./img/close.png">
+</body>
+</html>

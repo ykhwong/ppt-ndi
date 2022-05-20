@@ -1,0 +1,309 @@
+[{
+		"item": "show-checkerboard",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "Show Checkerboard",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "체커보드 표시",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "enable-slide-transition-effect",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "Enable Slide Transition Effect",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "슬라이드 전환 효과 사용",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "include-background",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "Include Background",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "배경 포함",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "customRes",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "Custom Resolution",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "사용자 지정 해상도",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "setRes",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "SET",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "설정",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "config",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "CONFIG",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "구성",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "prevTxt",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "NDI Preview",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "NDI 미리 보기",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "pinTxt",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "ALWAYS<br />ON TOP",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "항상<br />맨 위",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "dll-init-failed",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "DLL init failed.",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "DLL 초기화를 실패했습니다.",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "failed-to-create-listening-svr",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "Failed to create a listening server!",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "리스닝 서버 생성을 실패했습니다.",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "failed-to-access-tempdir",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "Failed to access the temporary directory!",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "임시 디렉터리 접근을 실패했습니다.",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "failed-to-parse-presentation",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "Failed to parse the presentation!",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "프레젠테이션의 구문 분석을 실패했습니다!",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "open-ppt-file",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "In PowerPoint, open a presentation file.",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "PowerPoint에서 프레젠테이션 파일을 여십시오.",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "status",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "Status: ",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "상태: ",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "status-ready",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "READY",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "준비",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "status-error",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "ERROR",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "오류",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "status-ok",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "OK",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "정상",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "status-ppt-start-slideshow",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "In PowerPoint, start the Slide Show.",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "PowerPoint에서 슬라이드 쇼를 시작하십시오.",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "status-ppt-not-found",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "Microsoft PowerPoint not found.",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "Microsoft PowerPoint를 찾을 수 없습니다.",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "status-end-of-slideshow",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "END OF SLIDE SHOW",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "슬라이드 쇼의 끝",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "status-request-complete",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "The request has been completed.",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "요청이 완료되었습니다.",
+				"rev": 0
+			}
+		}
+	},
+	{
+		"item": "no-support-multiple-instances",
+		"lang": {
+			"description": "",
+			"en": {
+				"msg": "PPT NDI does not allow multiple instances for the SlideShow mode!",
+				"rev": 0
+			},
+			"ko": {
+				"msg": "PPT NDI는 슬라이드쇼 모드에 대해 다중 인스턴스를 허용하지 않습니다!",
+				"rev": 0
+			}
+		}
+	}
+]
