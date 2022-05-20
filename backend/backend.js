@@ -24,12 +24,12 @@ app.on('ready', function() {
 	require('@electron/remote/main').initialize();
 
 	const winData = {
-		"home" : {
+		"mode" : {
 			"width" : 600,
 			"height" : 330,
 			"dest" : "client-mode.html"
 		},
-		"control" : {
+		"slideshow" : {
 			"width" : 277,
 			"height" : 430,
 			"dest" : "client-slideshow.html"
@@ -182,7 +182,7 @@ app.on('ready', function() {
 				process.exit(0);
 			} else if (/^--slideshow/i.test(val)) {
 				matched=true;
-				mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, !startAsTray, false);
+				mainWindow2 = createWin(winData.slideshow.width, winData.slideshow.height, false, winData.slideshow.dest, !startAsTray, false);
 				addMainWin2handler(!startAsTray);
 				break;
 			} else if (/^--classic/i.test(val)) {
@@ -200,7 +200,7 @@ app.on('ready', function() {
 	}
 
 	function loadMainWin(showWin) {
-		mainWindow = createWin(winData.home.width, winData.home.height, false, winData.home.dest, showWin, false);
+		mainWindow = createWin(winData.mode.width, winData.mode.height, false, winData.mode.dest, showWin, false);
 		mainWindow.on('closed', function(e) {
 			if (mainWindow2 === null) {
 				mainWindow = null;
@@ -347,7 +347,7 @@ app.on('ready', function() {
 					}
 					break;
 				case "select1":
-					mainWindow2 = createWin(winData.control.width, winData.control.height, false, winData.control.dest, true, false);
+					mainWindow2 = createWin(winData.slideshow.width, winData.slideshow.height, false, winData.slideshow.dest, true, false);
 					addMainWin2handler(true);
 					destroyWin(mainWindow);
 					break;
