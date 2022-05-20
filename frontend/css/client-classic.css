@@ -205,7 +205,7 @@ html, body {
 
 .right img {
 	position: relative;
-	background-image: url('null_slide.png');
+	background-image: url('../img/null_slide.png');
 	background-repeat: repeat;
 	width: 100%;
 	display: block;
@@ -378,7 +378,7 @@ html, body {
 #smaller {
 	width: 35px;
 	height: 35px;
-	background-image: url('smaller.png');
+	background-image: url('../img/smaller.png');
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: 23px;
@@ -387,7 +387,7 @@ html, body {
 #bigger {
 	width: 35px;
 	height: 35px;
-	background-image: url('bigger.png');
+	background-image: url('../img/bigger.png');
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: 23px;
