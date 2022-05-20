@@ -1170,16 +1170,16 @@ $(document).ready(function() {
 	}
 
 	function loadPPTX(file) {
-		let re = new RegExp("\\.(ppt|pptx)\$", "i");
 		if (file === undefined) {
 			$("#fullblack, .cancelBox").hide();
 			return false;
 		}
-		if (!re.exec(file)) {
+		if (! /\\.(ppt|pptx)\$/i.test(file)) {
 			if (/\S/.test(file)) {
 				alertMsg(getLangRsc("ui-classic/only-allowed-filename", configData.lang));
 			}
 			$("#fullblack, .cancelBox").hide();
+			return false;
 		}
 
 		$("#fullblack").show();
