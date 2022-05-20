@@ -4,15 +4,6 @@ $(document).ready(function() {
 	let configData = {
 		"lang": "en"
 	};
-	$("#select1img").click(function() {
-		ipc.send('remote', { name: "select1" });
-	});
-	$("#select2img").click(function() {
-		ipc.send('remote', { name: "select2" });
-	});
-	$("#closeImg").click(function() {
-		ipc.send('remote', { name: "exit" });
-	});
 
 	function reflectConfig() {
 		const configFile = 'config.js';
@@ -37,13 +28,26 @@ $(document).ready(function() {
 		setLangRscDiv("#select2", "ui-main/select2", true, configData.lang);
 	}
 
-	ipc.on('remote' , function(event, data){
-		switch (data.msg) {
-			case "reload":
-				reflectConfig();
-				break;
-		}
-	});
-	
+	function registerEvents() {
+		$("#select1img").click(function() {
+			ipc.send('remote', { name: "select1" });
+		});
+		$("#select2img").click(function() {
+			ipc.send('remote', { name: "select2" });
+		});
+		$("#closeImg").click(function() {
+			ipc.send('remote', { name: "exit" });
+		});
+
+		ipc.on('remote' , function(event, data){
+			switch (data.msg) {
+				case "reload":
+					reflectConfig();
+					break;
+			}
+		});
+	}
+
 	reflectConfig();
+	registerEvents();
 });
