@@ -2,7 +2,7 @@ $(document).ready(function() {
 	const { remote } = require('electron');
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
-	var isTransSet = false;
+	let isTransSet = false;
 
 	function init() {
 		$("html").css({
@@ -34,11 +34,11 @@ $(document).ready(function() {
 		ipc.on('monitor', (event, data) => {
 
 			function updateMon() {
-				var mode = data.mode;
-				var workerinit = data.workerinit;
-				var usebg = data.modeusebg;
-				var dFile = data.file.replace(/\\/g, "/");
-				var dFile2 = dFile;
+				let mode = data.mode;
+				let workerinit = data.workerinit;
+				let usebg = data.modeusebg;
+				let dFile = data.file.replace(/\\/g, "/");
+				let dFile2 = dFile;
 				if (/\/mode2\/Slide\d+\.png/i.test(dFile2)) {
 					dFile2 = dFile2.replace(/\/mode2(\/Slide\d+\.png)/i, "$1");
 				} else {
