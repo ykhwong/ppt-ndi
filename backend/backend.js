@@ -8,11 +8,11 @@ app.disableHardwareAcceleration();
 app.allowRendererProcessReuse = true;
 
 app.on('ready', function() {
-	let mainWindow = null;
-	let mainWindow2 = null;
-	let mainWindow3 = null;
-	let monitorWin = null;
-	let rendererWin = null;
+	let mainWindow = null; // client-mode
+	let mainWindow2 = null; // client-slideshow or client-classic
+	let mainWindow3 = null; // client-config
+	let monitorWin = null; // monitor
+	let rendererWin = null; // renderer
 	let startAsTray = false;
 	let isMainWinShown = false;
 	let isMainWin2shown = false;
