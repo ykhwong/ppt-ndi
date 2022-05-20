@@ -1,7 +1,7 @@
 {
 	"name": "PPT-NDI",
 	"version": "1.0.5",
-	"main": "backend.js",
+	"main": "./backend/backend.js",
 	"author": "ykhwong",
 	"dependencies": {
 		"@electron/remote": "^2.0.4",

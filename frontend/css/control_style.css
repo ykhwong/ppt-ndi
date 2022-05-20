@@ -1,0 +1,132 @@
+
+html, body {
+	width: 100%;
+	height: 100%;
+	background-color: #060621;
+	color: white;
+	-webkit-app-region: drag !important;
+}
+
+#prevTxt {
+	position: fixed;
+	top: 250px;
+	left: 15px;
+	color: #79a9f7;
+}
+
+#slidePreview {
+	position: fixed;
+	top: 275px;
+	left: 15px;
+    width: 200px;
+	height: 125px;
+	border: 3px solid rgb(0, 102, 255);
+}
+
+#closeImg {
+	position: absolute;
+	top: 0px;
+	right: 5px;
+	filter: brightness(0.8);
+}
+
+#closeImg:hover {
+	filter: brightness(1);
+}
+
+#tip, #bigIconImg {
+	-webkit-app-region: drag !important;
+}
+
+#tip {
+	position: fixed;
+	left: 15px;
+	top: 60px;
+}
+
+#bigIconImg {
+	position: fixed;
+	top: 10px;
+	left: 10px;
+}
+
+#bktbl {
+	position: fixed;
+	top: 110px;
+	width: 260px;
+	height: 20px;
+	left: 10px;
+	color: #79a9f7;
+}
+
+#bktbl2 {
+	position: fixed;
+	top: 185px;
+	width: 400px;
+	height: 20px;
+	left: 10px;
+	color: #79a9f7;
+}
+
+#resWidth,
+#resHeight {
+	width: 50px;
+	white-space: nowrap;
+	border-bottom: 1px solid #79a9f7;
+	border-left: none;
+	border-top: none;
+	border-right: none;
+	background: none;
+	height: 20px;
+	font-size: 15px;
+	color: #79a9f7;
+}
+
+#resWidth {
+	text-align: right;
+}
+
+#setRes {
+	background-color: #0066ff;
+	width: 113px;
+	text-align: center;
+}
+
+#config {
+	position: fixed;
+	top: 25px;
+	right: 5px;
+	background-color: black;
+	border: 1px solid grey;
+	color: #79a9f7;
+	width: 80px;
+	text-align: center;
+}
+
+#setRes:hover, #config:hover {
+	filter: brightness(0.5);
+}
+
+#pin {
+	position: fixed;
+	width: 15px;
+	top: 375px;
+	left: 232px;
+	padding: 5px;
+	cursor: pointer;
+}
+
+#pinTxt {
+	position: fixed;
+	font-size: 8px;
+	top: 350px;
+	left: 230px;
+	color: #79a9f7;
+}
+
+#slideRes {
+	position: fixed;
+	top: 250px;
+	left: 90px;
+	color: #79a9f7;
+}

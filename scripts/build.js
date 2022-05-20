@@ -43,8 +43,8 @@ function _prepare() {
 		}
 	}
 
-	if ( ! fs.existsSync(path.join(_WORKDIR, "src")) ) {
-		console.error("Failed to find " + path.join(_WORKDIR, "src"));
+	if ( ! fs.existsSync(path.join(_WORKDIR, "backend", "src")) ) {
+		console.error("Failed to find " + path.join(_WORKDIR, "backend", "src"));
 		_exit(1);
 	}
 
@@ -168,7 +168,7 @@ function _buildWin32() {
 
 	// build PPTNDI lib
 	try {
-		fs.copySync( path.join(_WORKDIR, "src"), "src" );
+		fs.copySync( path.join(_WORKDIR, "backend", "src"), "src" );
 	} catch(err) {
 		console.error(err);
 		_exit(1);
@@ -269,14 +269,12 @@ function _buildWin32() {
 		
 	// copy the resulting file to deploy dir
 	fs.mkdirSync( "deploy/frontend", { recursive: true } );
+	fs.mkdirSync( "deploy/backend/img", { recursive: true } );
 	fs.mkdirSync( "dev/node_modules", { recursive: true } );
-	fs.copySync( path.join(_WORKDIR, "backend.js"), "deploy/backend.js" );
+	fs.copySync( path.join(_WORKDIR, "backend", "backend.js"), "deploy/backend/backend.js" );
 	fs.copySync( path.join(_WORKDIR, "package.json"), "deploy/package.json" );
-	fs.copySync( path.join(_WORKDIR, "big_icon.png"), "deploy/big_icon.png" );
-	fs.copySync( path.join(_WORKDIR, "icon.ico"), "deploy/icon.ico" );
-	fs.copySync( path.join(_WORKDIR, "icon.png"), "deploy/icon.png" );
-	fs.copySync( path.join(_WORKDIR, "iconOrig.png"), "deploy/iconOrig.png" );
-	fs.copySync( path.join(_WORKDIR, "null_slide.png"), "deploy/null_slide.png" );
+	fs.copySync( path.join(_WORKDIR, "backend", "img", "icon.ico"), "deploy/backend/img/icon.ico" );
+	fs.copySync( path.join(_WORKDIR, "backend", "img", "icon.png"), "deploy/backend/img/icon.png" );
 	fs.copySync( path.join(_WORKDIR, "frontend"), "deploy/frontend" );
 
 	process.chdir("./deploy");
@@ -289,7 +287,7 @@ function _buildMac() {
 
 	// build PPTNDI lib
 	try {
-		fs.copySync( path.join(_WORKDIR, "src"), "src" );
+		fs.copySync( path.join(_WORKDIR, "backend", "src"), "src" );
 	} catch(err) {
 		console.error(err);
 		_exit(1);
@@ -312,13 +310,10 @@ function _buildMac() {
 	// copy the resulting file to deploy dir
 	fs.mkdirSync( "deploy/frontend", { recursive: true } );
 	fs.mkdirSync( "dev/node_modules", { recursive: true } );
-	fs.copySync( path.join(_WORKDIR, "backend.js"), "deploy/backend.js" );
+	fs.copySync( path.join(_WORKDIR, "backend", "backend.js"), "deploy/backend.js" );
 	fs.copySync( path.join(_WORKDIR, "package.json"), "deploy/package.json" );
-	fs.copySync( path.join(_WORKDIR, "big_icon.png"), "deploy/big_icon.png" );
-	fs.copySync( path.join(_WORKDIR, "icon.icns"), "deploy/icon.icns" );
-	fs.copySync( path.join(_WORKDIR, "icon.png"), "deploy/icon.png" );
-	fs.copySync( path.join(_WORKDIR, "iconOrig.png"), "deploy/iconOrig.png" );
-	fs.copySync( path.join(_WORKDIR, "null_slide.png"), "deploy/null_slide.png" );
+	fs.copySync( path.join(_WORKDIR, "backend", "img", "icon.icns"), "deploy/backend/img/icon.icns" );
+	fs.copySync( path.join(_WORKDIR, "backend", "img", "icon.png"), "deploy/backend/img/icon.png" );
 	fs.copySync( path.join(_WORKDIR, "frontend"), "deploy/frontend" );
 
 	process.chdir("./deploy");
@@ -334,7 +329,7 @@ function _pack() {
 	let abi;
 
 	if ( process.platform === "win32" ) {
-		const opt='--icon=./deploy/icon.ico --platform=win32 --overwrite --asar --app-copyright="MIT License (github.com/ykhwong/ppt-ndi)"';
+		const opt='--icon=./deploy/backend/img/icon.ico --platform=win32 --overwrite --asar --app-copyright="MIT License (github.com/ykhwong/ppt-ndi)"';
 		try {
 			ver = execSync(".\\dev\\node_modules\\electron\\dist\\electron.exe --version").toString().replace(/\r|\n/g, "");
 			abi = execSync(".\\dev\\node_modules\\electron\\dist\\electron.exe --abi").toString().replace(/\r|\n/g, "");
@@ -352,7 +347,7 @@ function _pack() {
 		}
 		console.log(out.toString());
 	} else if ( process.platform === "darwin" ) {
-		const opt='--icon=./deploy/icon.icns --platform=darwin --overwrite --app-copyright="MIT License (github.com/ykhwong/ppt-ndi)"';
+		const opt='--icon=./deploy/backend/img/icon.icns --platform=darwin --overwrite --app-copyright="MIT License (github.com/ykhwong/ppt-ndi)"';
 
 		try {
 			ver = execSync("./dev/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron --version").toString().replace(/\r|\n/g, "");
