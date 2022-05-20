@@ -168,45 +168,48 @@ $(document).ready(function() {
 				setConfig(false, true);
 			}
 		}
+		$("#version").append(version);
 	}
 
-	$('#closeImg').click(function() {
-		ipc.send('remote', { name: "hideConfig" });
-	});
-	$('#saveConfig').click(function() {
-		setConfig(true);
-	});
+	function registerEvents() {
+		$('#closeImg').click(function() {
+			ipc.send('remote', { name: "hideConfig" });
+		});
+		$('#saveConfig').click(function() {
+			setConfig(true);
+		});
 
-	$(".txtBox").on("click",function(){
-		if ($(".txtBox").is(':focus')) {
+		$(".txtBox").on("click",function(){
+			if ($(".txtBox").is(':focus')) {
+				let myVal = $(this).val();
+				$(this).focus().val("").val(myVal);
+			}
+		});
+		$(".txtBox").keydown(function(e) {
+			if(e.keyCode === 8) {
+				e.preventDefault();
+			}
+		});
+		$(".txtBox").keyup(function(e) {
 			let myVal = $(this).val();
-			$(this).focus().val("").val(myVal);
-		}
-	});
-	$(".txtBox").keydown(function(e) {
-		if(e.keyCode === 8) {
-			e.preventDefault();
-		}
-	});
-	$(".txtBox").keyup(function(e) {
-		let myVal = $(this).val();
-		let chr = String.fromCharCode( e.keyCode );
-		if (e.keyCode >= 48 && e.keyCode <= 57) {
-			// 0 - 9
-			$(this).focus().val("").val(keyCombi + chr);
-		} else if (e.keyCode >= 96 && e.keyCode <= 105) {
-			// 0 - 9 (numpad)
-			$(this).focus().val(keyCombi + (e.keyCode-96).toString());
-		} else if (e.keyCode >= 65 && e.keyCode <= 90) {
-			// a - z
-			$(this).focus().val(keyCombi + chr);
-		} else if (e.keyCode == 8 || e.keyCode == 46) {
-			$(this).focus().val("");
-		} else {
-			//$(this).focus().val("").val(myVal);
-		}
-	});
-	$("#version").append(version);
+			let chr = String.fromCharCode( e.keyCode );
+			if (e.keyCode >= 48 && e.keyCode <= 57) {
+				// 0 - 9
+				$(this).focus().val("").val(keyCombi + chr);
+			} else if (e.keyCode >= 96 && e.keyCode <= 105) {
+				// 0 - 9 (numpad)
+				$(this).focus().val(keyCombi + (e.keyCode-96).toString());
+			} else if (e.keyCode >= 65 && e.keyCode <= 90) {
+				// a - z
+				$(this).focus().val(keyCombi + chr);
+			} else if (e.keyCode == 8 || e.keyCode == 46) {
+				$(this).focus().val("");
+			} else {
+				//$(this).focus().val("").val(myVal);
+			}
+		});
+	}
 
 	init();
+	registerEvents();
 });
