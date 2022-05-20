@@ -636,107 +636,110 @@ $(document).ready(function() {
 		ipc.send('remote', { name: "exit" });
 	}
 
-	ipc.on('remote' , function(event, data){
-		switch (data.msg) {
-			case "exit":
-				cleanupForExit();
-				break;
-			case "reload":
-				reflectConfig();
-				break;
-			case "stdin_write_newline":
-				res.stdin.write("\n");
-				break;
-			case "gotoPrev":
-				handleHook("prev");
-				break;
-			case "gotoNext":
-				handleHook("next");
-				break;
-			case "update_trn":
-				handleHook("tran");
-				break;
-			case "update_black":
-				handleHook("black");
-				break;
-			case "update_white":
-				handleHook("white");
-				break;
-		}
-		return;
-	});
-
-	$('#closeImg').click(function() {
-		cleanupForExit();
-	});
-
-	$('#bk').click(function() {
-		let newVbsContent;
-		let vbsDir = tmpDir + '/wb.vbs';
-		let file = tmpDir + "/Slide.png";
-		if ($("#bk").is(":checked")) {
-			newVbsContent = vbsBg;
-			try {
-				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
-			} catch(e) {
-				alertMsg(getLangRsc("ui-slideshow/failed-to-access-tempdir", configData.lang));
-				return;
+	function registerEvents() {
+		ipc.on('remote' , function(event, data){
+			switch (data.msg) {
+				case "exit":
+					cleanupForExit();
+					break;
+				case "reload":
+					reflectConfig();
+					break;
+				case "stdin_write_newline":
+					res.stdin.write("\n");
+					break;
+				case "gotoPrev":
+					handleHook("prev");
+					break;
+				case "gotoNext":
+					handleHook("next");
+					break;
+				case "update_trn":
+					handleHook("tran");
+					break;
+				case "update_black":
+					handleHook("black");
+					break;
+				case "update_white":
+					handleHook("white");
+					break;
 			}
-		} else {
-			newVbsContent = vbsNoBg;
-			try {
-				fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
-			} catch(e) {
-				alertMsg(getLangRsc("ui-slideshow/failed-to-access-tempdir", configData.lang));
-				return;
-			}
-		}
-		res.stdin.pause();
-		res.kill();
-		res = null;
-		if (fs.existsSync(vbsDir)) {
-			let resX = 0;
-			let resY = 0;
-			if (customSlideX == 0 || customSlideY == 0 || !/\S/.test(customSlideX) || !/\S/.test(customSlideY)) {
-				resX = 0;
-				resY = 0;
-			} else {
-				resX = customSlideX;
-				resY = customSlideY;
-			}
-			res = spawn( 'cscript.exe', [ vbsDir, tmpDir, resX, resY, "//NOLOGO", '' ] );
-			res.stdout.on('data', function(data) {
-				sendNDI(file, data);
-			});
-		} else {
-			alertMsg(getLangRsc("ui-slideshow/failed-to-parse-presentation", configData.lang));
 			return;
-		}
-	});
+		});
 
-	$('#trans_checker').click(function() {
-		if ($("#trans_checker").is(":checked")) {
-			$("#slidePreview").css('background-image', "url('./img/trans_slide.png')");
-		} else {
-			$("#slidePreview").css('background-image', "url('./img/null_slide.png')");
-		}
-	});
-	
-	$('#pin').click(function() {
-		if (pin) {
-			ipc.send('remote', { name: "onTopOff" });
-			$("#pin").attr("src", "./img/pin_grey.png");
-			pin = false;
-		} else {
-			ipc.send('remote', { name: "onTop" });
-			$("#pin").attr("src", "./img/pin_green.png");
-			pin = true;
-		}
-	});
-	
-	$('#config').click(function() {
-		ipc.send('remote', { name: "showConfig" });
-	});
+		$('#closeImg').click(function() {
+			cleanupForExit();
+		});
+
+		$('#bk').click(function() {
+			let newVbsContent;
+			let vbsDir = tmpDir + '/wb.vbs';
+			let file = tmpDir + "/Slide.png";
+			if ($("#bk").is(":checked")) {
+				newVbsContent = vbsBg;
+				try {
+					fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
+				} catch(e) {
+					alertMsg(getLangRsc("ui-slideshow/failed-to-access-tempdir", configData.lang));
+					return;
+				}
+			} else {
+				newVbsContent = vbsNoBg;
+				try {
+					fs.writeFileSync(vbsDir, newVbsContent, 'utf-8');
+				} catch(e) {
+					alertMsg(getLangRsc("ui-slideshow/failed-to-access-tempdir", configData.lang));
+					return;
+				}
+			}
+			res.stdin.pause();
+			res.kill();
+			res = null;
+			if (fs.existsSync(vbsDir)) {
+				let resX = 0;
+				let resY = 0;
+				if (customSlideX == 0 || customSlideY == 0 || !/\S/.test(customSlideX) || !/\S/.test(customSlideY)) {
+					resX = 0;
+					resY = 0;
+				} else {
+					resX = customSlideX;
+					resY = customSlideY;
+				}
+				res = spawn( 'cscript.exe', [ vbsDir, tmpDir, resX, resY, "//NOLOGO", '' ] );
+				res.stdout.on('data', function(data) {
+					sendNDI(file, data);
+				});
+			} else {
+				alertMsg(getLangRsc("ui-slideshow/failed-to-parse-presentation", configData.lang));
+				return;
+			}
+		});
+
+		$('#trans_checker').click(function() {
+			if ($("#trans_checker").is(":checked")) {
+				$("#slidePreview").css('background-image', "url('./img/trans_slide.png')");
+			} else {
+				$("#slidePreview").css('background-image', "url('./img/null_slide.png')");
+			}
+		});
+		
+		$('#pin').click(function() {
+			if (pin) {
+				ipc.send('remote', { name: "onTopOff" });
+				$("#pin").attr("src", "./img/pin_grey.png");
+				pin = false;
+			} else {
+				ipc.send('remote', { name: "onTop" });
+				$("#pin").attr("src", "./img/pin_green.png");
+				pin = true;
+			}
+		});
+		
+		$('#config').click(function() {
+			ipc.send('remote', { name: "showConfig" });
+		});
+	}
 
 	init();
+	registerEvents();
 });
