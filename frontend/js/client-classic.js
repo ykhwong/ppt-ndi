@@ -1174,7 +1174,7 @@ $(document).ready(function() {
 			$("#fullblack, .cancelBox").hide();
 			return false;
 		}
-		if (! /\\.(ppt|pptx)\$/i.test(file)) {
+		if (! /\.(ppt|pptx)$/i.test(file)) {
 			if (/\S/.test(file)) {
 				alertMsg(getLangRsc("ui-classic/only-allowed-filename", configData.lang));
 			}
