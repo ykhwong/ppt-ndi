@@ -9,7 +9,7 @@ The PPT NDI lets you transfer PowerPoint presentations with transparent backgrou
 
 See the [documentation](https://ykhwong.github.io/ppt-ndi) for details.
 
-# Installation
+## Installation
 
 To install the PPT NDI, visit the [download page](https://github.com/ykhwong/ppt-ndi/releases). You can find the newest version at the top of the page. In the Assets, get the installer or archive file.
 
