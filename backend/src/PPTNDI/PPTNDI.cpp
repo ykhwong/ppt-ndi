@@ -35,11 +35,7 @@ extern "C"
 #endif
 int init(void) {
 	#pragma EXPORT
-	if (!NDIlib_initialize()) {
-		// Could not initialize NDI.
-		initSucceeded = false;
-		return 1;
-	}
+	NDIlib_initialize();
 	
 	NDI_send_create_desc.p_ndi_name = ndiName;
 	pNDI_send = NDIlib_send_create(&NDI_send_create_desc);
