@@ -301,7 +301,7 @@ function _buildDarwin() {
 	}
 	try {
 		console.log("Building PPTNDI...");
-		cmd = 'g++ -dynamiclib -o ./src/PPTNDI.dylib ./src/PPTNDI/PPTNDI.cpp "/Library/NDI SDK for macOS/lib/macOS/libndi.dylib"'
+		cmd = 'g++ -dynamiclib -o ./src/PPTNDI.dylib ./src/PPTNDI/PPTNDI.cpp "/Library/NDI SDK for macOS/lib/macOS/libndi.dylib" -rpath .'
 		console.log(cmd);
 		out = execSync(cmd);
 		console.log(out.toString());
@@ -362,9 +362,10 @@ function _pack() {
 			abi = execSync("./dev/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron --abi").toString().replace(/\r|\n/g, "");
 			
 			fs.copySync( path.join(".", "src", "PPTNDI.dylib"), "deploy/PPTNDI.dylib" );
+			fs.copySync( "/Library/NDI SDK for macOS/lib/macOS/libndi.dylib", "deploy/libndi.dylib" );
 			rimraf.sync( "deploy/locales" );
 			fs.copySync( path.join( _TMPDIR, "deploy", "frontend", "i18n" ), "deploy/locales" );
-			
+
 			out = execSync("node dev/node_modules/electron-packager/bin/electron-packager.js ./deploy ppt-ndi --electron-version=" + ver + " " + opt);
 		} catch(e) {
 			console.error(e.stack);
