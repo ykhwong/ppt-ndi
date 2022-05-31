@@ -316,8 +316,9 @@ function _buildDarwin() {
 		
 	// copy the resulting file to deploy dir
 	fs.mkdirSync( "deploy/frontend", { recursive: true } );
+	fs.mkdirSync( "deploy/backend/img", { recursive: true } );
 	fs.mkdirSync( "dev/node_modules", { recursive: true } );
-	fs.copySync( path.join(_WORKDIR, "backend", "backend.js"), "deploy/backend.js" );
+	fs.copySync( path.join(_WORKDIR, "backend", "backend.js"), "deploy/backend/backend.js" );
 	fs.copySync( path.join(_WORKDIR, "package.json"), "deploy/package.json" );
 	fs.copySync( path.join(_WORKDIR, "backend", "img", "icon.icns"), "deploy/backend/img/icon.icns" );
 	fs.copySync( path.join(_WORKDIR, "backend", "img", "icon.png"), "deploy/backend/img/icon.png" );
