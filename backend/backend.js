@@ -3,6 +3,7 @@ const multipleInstance = !app.requestSingleInstanceLock();
 const frontendDir = __dirname + '/../frontend/';
 const debugMode = false;
 let iconFile;
+let trayIconFile;
 let tray = null;
 app.disableHardwareAcceleration();
 app.allowRendererProcessReuse = true;
@@ -66,7 +67,11 @@ app.on('ready', function() {
 		let isVisible = true;
 		let hideShowItem;
 		if (tray === null) {
-			tray = new Tray(iconFile);
+			if ( process.platform === "win32" ) {
+				tray = new Tray(trayIconFile);
+			} else {
+				tray = new Tray(trayIconFile.resize({ width: 16, height: 16 }));
+			}
 		}
 		if (mainWindow2 != null) {
 			isVisible = isMainWin2shown;
@@ -125,8 +130,13 @@ app.on('ready', function() {
 
 		if (process.platform === 'win32') {
 			iconFile = __dirname + '/img/icon.ico';
+			trayIconFile = iconFile;
 		} else {
-			iconFile = __dirname + '/img/icon.png';
+			const nativeImage = require('electron').nativeImage;
+			const image = nativeImage.createFromPath(
+				__dirname + "/img/icon.png"
+			);
+			trayIconFile = image;
 		}
 
 		mainWindow3 = createWin(winData.config.width, winData.config.height, false, winData.config.dest, false, false);
