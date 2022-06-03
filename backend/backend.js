@@ -66,13 +66,18 @@ function init() {
 		trayIconFile = iconFile;
 	} else {
 		const nativeImage = require( 'electron' ).nativeImage;
-		const image = nativeImage.createFromPath(
-			path.join( __dirname, 'img', 'icon.png' )
-		);
-		trayIconFile = image;
+		iconFile = path.join( __dirname, 'img', 'icon.png' );
+		trayIconFile = nativeImage.createFromPath( iconFile );
 	}
 
-	mainWindow3 = createWin(winData.config.width, winData.config.height, false, winData.config.dest, false, false);
+	mainWindow3 = createWin({
+		width: winData.config.width,
+		height: winData.config.height,
+		maximizable: false,
+		winFile: winData.config.dest,
+		showWin: false,
+		isTransparent: false
+	});
 	mainWindow3.on('close', function (event) {
 		event.preventDefault();
 		mainWindow3.hide();
@@ -104,7 +109,14 @@ function init() {
 		if ( process.platform === 'win32' ) {
 			loadMainWin( !startAsTray );
 		} else {
-			mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, !startAsTray, false);
+			mainWindow2 = createWin({
+				width: winData.classic.width,
+				height: winData.classic.height,
+				maximizable: true,
+				winFile: winData.classic.dest,
+				showWin: !startAsTray,
+				isTransparent: false
+			});
 			addMainWin2handler( !startAsTray );
 			registerFocusInfo( mainWindow2 );
 		}
@@ -112,8 +124,22 @@ function init() {
 	loadIpc();
 	sendLoop();
 	refreshTray();
-	monitorWin = createWin(winData.monitor.width, winData.monitor.height, false, winData.monitor.dest, false, true);
-	rendererWin = createWin(winData.renderer.width, winData.renderer.height, false, winData.renderer.dest, debugMode ? true : false, true);
+	monitorWin = createWin({
+		width: winData.monitor.width,
+		height: winData.monitor.height,
+		maximizable: false,
+		winFile: winData.monitor.dest,
+		showWin: false,
+		isTransparent: true
+	});
+	rendererWin = createWin({
+		width: winData.renderer.width,
+		height: winData.renderer.height,
+		maximizable: false,
+		winFile: winData.renderer.dest,
+		showWin: debugMode,
+		isTransparent: true
+	});
 	monitorWin.setAlwaysOnTop( true );
 	monitorWin.on('close', function (event) {
 		event.preventDefault();
@@ -213,12 +239,26 @@ function loadArg() {
 			process.exit(0);
 		} else if (/^--slideshow/i.test(val)) {
 			matched=true;
-			mainWindow2 = createWin(winData.slideshow.width, winData.slideshow.height, false, winData.slideshow.dest, !startAsTray, false);
+			mainWindow2 = createWin({
+				width: winData.slideshow.width,
+				height: winData.slideshow.height,
+				maximizable: false,
+				winFile: winData.slideshow.dest,
+				showWin: !startAsTray,
+				isTransparent: false
+			});
 			addMainWin2handler(!startAsTray);
 			break;
 		} else if (/^--classic/i.test(val)) {
 			matched=true;
-			mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, !startAsTray, false);
+			mainWindow2 = createWin({
+				width: winData.classic.width,
+				height: winData.classic.height,
+				maximizable: true,
+				winFile: winData.classic.dest,
+				showWin: !startAsTray,
+				isTransparent: false
+			});
 			addMainWin2handler(!startAsTray);
 			registerFocusInfo(mainWindow2);
 			break;
@@ -231,7 +271,14 @@ function loadArg() {
 }
 
 function loadMainWin(showWin) {
-	mainWindow = createWin(winData.mode.width, winData.mode.height, false, winData.mode.dest, showWin, false);
+	mainWindow = createWin({
+		width: winData.mode.width,
+		height: winData.mode.height,
+		maximizable: false,
+		winFile: winData.mode.dest,
+		showWin: showWin,
+		isTransparent: false
+	});
 	mainWindow.on('closed', function(e) {
 		if (mainWindow2 === null) {
 			mainWindow = null;
@@ -249,47 +296,46 @@ function loadMainWin(showWin) {
 	mainWindow.on('hide', () => {
 		isMainWinShown = false;
 	});
-	if (showWin) {
+	if ( showWin ) {
 		mainWindow.show();
 	}
 }
 
-function createWin(width, height, maximizable, winFile, showWin, isTransparent) {
+function createWin(winProp) {
 	const { BrowserWindow } = require('electron');
-	let retData;
 	if (debugMode) {
-		maximizable = true;
+		winProp.maximizable = true;
 	}
-	retData = new BrowserWindow({
-		width: width,
-		height: height,
-		minWidth: width,
-		minHeight: height,
+	const retData = new BrowserWindow({
+		width: winProp.width,
+		height: winProp.height,
+		minWidth: winProp.width,
+		minHeight: winProp.height,
 		title: "",
 		icon: iconFile,
 		frame: false,
-		resize: (maximizable ? true : false),
-		maximizable: maximizable,
+		resize: ( winProp.maximizable ? true : false ),
+		maximizable: winProp.maximizable,
 		webPreferences: {
 			webSecurity: false,
 			nodeIntegration: true,
 			enableRemoteModule: true,
 			contextIsolation: false
 		},
-		transparent : isTransparent,
-		backgroundColor: isTransparent ? '#00051336' : '#060621'
+		transparent : winProp.isTransparent,
+		backgroundColor: winProp.isTransparent ? '#00051336' : '#060621'
 	});
 	
 	require("@electron/remote/main").enable(retData.webContents);
-	if (!maximizable) {
-		retData.setMaximumSize(width, height);
+	if ( !maximizable ) {
+		retData.setMaximumSize( width, height );
 	}
-	if (debugMode) {
+	if ( debugMode ) {
 		retData.webContents.openDevTools();
 	}
 
 	retData.loadURL('file://' + __dirname + '/../frontend/' + winFile);
-	if (!showWin) {
+	if ( !showWin ) {
 		retData.hide();
 	} else {
 		retData.focus();
@@ -298,7 +344,7 @@ function createWin(width, height, maximizable, winFile, showWin, isTransparent) 
 }
 
 function addMainWin2handler(showWin) {
-	if (mainWindow2 !== null) {
+	if ( mainWindow2 !== null ) {
 		mainWindow2.on('close', function(e) {
 			loopPaused = true;
 			e.preventDefault();
@@ -375,12 +421,26 @@ function loadIpc() {
 				}
 				break;
 			case "select1":
-				mainWindow2 = createWin(winData.slideshow.width, winData.slideshow.height, false, winData.slideshow.dest, true, false);
+				mainWindow2 = createWin({
+					width: winData.slideshow.width,
+					height: winData.slideshow.height,
+					maximizable: false,
+					winFile: winData.slideshow.dest,
+					showWin: true,
+					isTransparent: false
+				});
 				addMainWin2handler(true);
 				destroyWin([mainWindow]);
 				break;
 			case "select2":
-				mainWindow2 = createWin(winData.classic.width, winData.classic.height, true, winData.classic.dest, true, false);
+				mainWindow2 = createWin({
+					width: winData.classic.width,
+					height: winData.classic.height,
+					maximizable: true,
+					winFile: winData.classic.dest,
+					showWin: true,
+					isTransparent: false
+				});
 				addMainWin2handler(true);
 				registerFocusInfo(mainWindow2);
 				destroyWin([mainWindow]);
@@ -584,17 +644,17 @@ function loadIpc() {
 					}
 				}
 				if (data.func === "init") {
-					let ret = -1;
+					ret = -1;
 					if (typeof remoteVar.lib !== 'undefined') {
 						ret = remoteVar.lib.init();
 					}
 				} else if (data.func === "destroy") {
-					let ret = -1;
+					ret = -1;
 					if (typeof remoteVar.lib !== 'undefined') {
 						ret = remoteVar.lib.destroy();
 					}
 				} else if (data.func === "send") {
-					let ret = -1;
+					ret = -1;
 					if (typeof remoteVar.lib !== 'undefined') {
 						lastImageArgs = data.args;
 						ret = remoteVar.lib.send( ...data.args );
@@ -607,11 +667,7 @@ function loadIpc() {
 			default:
 				break;
 		}
-		if (ret < 0 || ret > 0) {
-			event.returnValue = ret;
-		} else {
-			event.returnValue = 0;
-		}
+		event.returnValue = (ret < 0 || ret > 0) ? ret : 0;
 	});
 }
 
