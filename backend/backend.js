@@ -327,15 +327,16 @@ function createWin(winProp) {
 	});
 	
 	require("@electron/remote/main").enable(retData.webContents);
-	if ( !maximizable ) {
-		retData.setMaximumSize( width, height );
+	if ( !winProp.maximizable ) {
+		retData.setMaximumSize( winProp.width, winProp.height );
 	}
 	if ( debugMode ) {
 		retData.webContents.openDevTools();
 	}
 
-	retData.loadURL('file://' + __dirname + '/../frontend/' + winFile);
-	if ( !showWin ) {
+	retData.loadURL('file://' + __dirname + '/../frontend/' + winProp.winFile);
+
+	if ( !winProp.showWin ) {
 		retData.hide();
 	} else {
 		retData.focus();
@@ -643,22 +644,26 @@ function loadIpc() {
 						console.log("remoteLib failed: " + e);
 					}
 				}
-				if (data.func === "init") {
-					ret = -1;
-					if (typeof remoteVar.lib !== 'undefined') {
-						ret = remoteVar.lib.init();
-					}
-				} else if (data.func === "destroy") {
-					ret = -1;
-					if (typeof remoteVar.lib !== 'undefined') {
-						ret = remoteVar.lib.destroy();
-					}
-				} else if (data.func === "send") {
-					ret = -1;
-					if (typeof remoteVar.lib !== 'undefined') {
-						lastImageArgs = data.args;
-						ret = remoteVar.lib.send( ...data.args );
-					}
+				switch (data.func) {
+					case "init":
+						ret = -1;
+						if (typeof remoteVar.lib !== 'undefined') {
+							ret = remoteVar.lib.init();
+						}
+						break;
+					case "destroy":
+						ret = -1;
+						if (typeof remoteVar.lib !== 'undefined') {
+							ret = remoteVar.lib.destroy();
+						}
+						break;
+					case "send":
+						ret = -1;
+						if (typeof remoteVar.lib !== 'undefined') {
+							lastImageArgs = data.args;
+							ret = remoteVar.lib.send( ...data.args );
+						}
+						break;
 				}
 				break;
 			case "electron-globalShortcut":
