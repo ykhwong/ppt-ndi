@@ -135,6 +135,10 @@ $(document).ready(function() {
 		mustStop = true;
 	}
 
+	function hideCancelBox() {
+		$("#fullblack, .cancelBox").hide();
+	}
+
 	function createNullSlide() {
 		const now = new Date().getTime();
 		const PNG = require('pngjs').PNG;
@@ -396,18 +400,18 @@ $(document).ready(function() {
 					cleanupForTemp(false);
 					tmpDir = preTmpDir;
 					// Error
-					$("#fullblack, .cancelBox").hide();
+					hideCancelBox();
 					break;
 				case "notifyLoaded":
 					// Done
 					loadPPTX_PostProcess(data.pptFile);
-					$("#fullblack, .cancelBox").hide();
+					hideCancelBox();
 					break;
 				case "notifyCanceled":
 					// Canceled
 					cleanupForTemp(false);
 					tmpDir = preTmpDir;
-					$("#fullblack, .cancelBox").hide();		
+					hideCancelBox();		
 					break;
 			}
 		});
@@ -979,13 +983,13 @@ $(document).ready(function() {
 				newMaxSlideNum++;
 			}
 		});
-		if (isCancelTriggered) return;
+		if (isCancelTriggered) { hideCancelBox(); return; }
 		if (fileArr === undefined || fileArr.length == 0) {
 			maxSlideNum = 0;
 			cleanupForTemp(false);
 			tmpDir = preTmpDir;
 			alertMsg(getLangRsc("ui-classic/ppt-not-loaded", configData.lang));
-			$("#fullblack, .cancelBox").hide();
+			hideCancelBox();
 			return;
 		}
 		hiddenSlides = [];
@@ -1024,7 +1028,7 @@ $(document).ready(function() {
 				slideEffects[ls[0].toString()] = obj;
 			}
 		}
-		if (isCancelTriggered) return;
+		if (isCancelTriggered) { hideCancelBox(); return; }
 		fileArr.sort((a, b) => a - b).forEach(file2 => {
 			let rpc = file2;
 			let isHidden = false;
@@ -1054,7 +1058,7 @@ $(document).ready(function() {
 		});
 		$("#slides_grp").html(options);
 		mode1options = options;
-		$("#fullblack, .cancelBox").hide();
+		hideCancelBox();
 		maxSlideNum = newMaxSlideNum;
 		createNullSlide();
 
@@ -1111,7 +1115,6 @@ $(document).ready(function() {
 		let now = new Date().getTime();
 		let newVbsContent;
 		const spawn = require( 'child_process' ).spawn;
-		spawnpid = spawn.pid;
 		preTmpDir = tmpDir;
 		setTmpDir();
 		if (!fs.existsSync(tmpDir)) {
@@ -1133,7 +1136,7 @@ $(document).ready(function() {
 			cleanupForTemp(false);
 			tmpDir = preTmpDir;
 			alertMsg(getLangRsc("ui-classic/failed-to-access-tempdir", configData.lang));
-			$("#fullblack, .cancelBox").hide();
+			hideCancelBox();
 			return;
 		}
 
@@ -1146,6 +1149,8 @@ $(document).ready(function() {
 		}
 		
 		res = spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, tmpDir, resX, resY, '' ] );
+		spawnpid = res.pid;
+
 		$(".cancelBox").show();
 		res.stderr.on('data', (data) => {
 			let myMsg = getLangRsc("ui-classic/failed-to-parse-presentation", configData.lang);
@@ -1159,7 +1164,7 @@ $(document).ready(function() {
 			} else {
 				alertMsg(myMsg + getLangRsc("ui-classic/make-sure-ppt-installed", configData.lang));
 			}
-			$("#fullblack, .cancelBox").hide();
+			hideCancelBox();
 			return;
 		});
 		res.on('close', (code) => {
@@ -1169,14 +1174,14 @@ $(document).ready(function() {
 
 	function loadPPTX(file) {
 		if (file === undefined) {
-			$("#fullblack, .cancelBox").hide();
+			hideCancelBox();
 			return false;
 		}
 		if (! /\.(ppt|pptx)$/i.test(file)) {
 			if (/\S/.test(file)) {
 				alertMsg(getLangRsc("ui-classic/only-allowed-filename", configData.lang));
 			}
-			$("#fullblack, .cancelBox").hide();
+			hideCancelBox();
 			return false;
 		}
 
@@ -1187,7 +1192,7 @@ $(document).ready(function() {
 		} else if (configData.renderer === "Internal") {
 			loadPPTX_Renderer_Internal(file);
 		} else {
-			$("#fullblack, .cancelBox").hide();
+			hideCancelBox();
 		}
 	}
 
