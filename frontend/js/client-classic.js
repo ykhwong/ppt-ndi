@@ -1676,7 +1676,7 @@ $(document).ready(function() {
 			const wrapBox = $('<div/>');
 			const rightBox = $('<div/>').attr('class', 'right').attr('id', 'below');
 			const selectBox = $('<select/>').attr('class', 'image-picker');
-			selectBox.append($('<optgroup/>').attr('label', 'Slides').attr('id', 'slide_grp'));
+			selectBox.append($('<optgroup/>').attr('label', 'Slides').attr('id', 'slides_grp'));
 			rightBox.append(selectBox);
 			wrapBox.append(rightBox);
 
