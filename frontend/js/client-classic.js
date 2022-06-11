@@ -1688,6 +1688,14 @@ $(document).ready(function() {
 				break;
 			}
 		}
+
+		const cancelBox = $('<div>').attr('class', 'cancelBox');
+		cancelBox
+		.append($('<div>').attr('id', 'loadingTxt'))
+		.append($('<div>').attr('id', 'cancel').attr('class', 'button'));
+		$(".lm_goldenlayout")
+		.append($('<div>').attr('id', 'fullblack'))
+		.append(cancelBox);
 	}
 
 	prepare();
