@@ -780,6 +780,7 @@ $(document).ready(function() {
 										return;
 									}
 									const spawn = require( 'child_process' ).spawn;
+									$("#edit_pptx").click();
 									spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, lSlideNo, '' ] );
 								}
 							}));
@@ -1676,8 +1677,8 @@ $(document).ready(function() {
 		`
 			);
 			container.on('resize', function () {
-				if (container.height < 50 ) {
-					container.setSize( container.width, 50 );
+				if (container.height < 150 ) {
+					container.setSize( container.width, 150 );
 				}
 			});
 		});
