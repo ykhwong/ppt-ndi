@@ -1,7 +1,7 @@
 const path = require('path');
 const { app, Menu, Tray, screen, globalShortcut } = require('electron');
 const multipleInstance = !app.requestSingleInstanceLock();
-const debugMode = false;
+const debugLevel = 0; // 0 through 2
 
 let remoteLib = {};
 let remoteVar = {};
@@ -129,7 +129,7 @@ function init() {
 		height: winData.monitor.height,
 		maximizable: false,
 		winFile: winData.monitor.dest,
-		showWin: false,
+		showWin: (debugLevel === 2 ? true : false),
 		isTransparent: true
 	});
 	rendererWin = createWin({
@@ -137,7 +137,7 @@ function init() {
 		height: winData.renderer.height,
 		maximizable: false,
 		winFile: winData.renderer.dest,
-		showWin: debugMode,
+		showWin: (debugLevel === 2 ? true : false),
 		isTransparent: true
 	});
 	monitorWin.setAlwaysOnTop( true );
@@ -303,7 +303,7 @@ function loadMainWin(showWin) {
 
 function createWin(winProp) {
 	const { BrowserWindow } = require('electron');
-	if (debugMode) {
+	if (debugLevel > 0) {
 		winProp.maximizable = true;
 	}
 	const retData = new BrowserWindow({
@@ -330,7 +330,7 @@ function createWin(winProp) {
 	if ( !winProp.maximizable ) {
 		retData.setMaximumSize( winProp.width, winProp.height );
 	}
-	if ( debugMode ) {
+	if ( debugLevel > 0 ) {
 		retData.webContents.openDevTools();
 	}
 
