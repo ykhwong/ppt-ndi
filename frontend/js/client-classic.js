@@ -21,6 +21,7 @@ $(document).ready(function() {
 	let customSlideY = 0;
 	let spawnpid = 0;
 	let belowImgWidth = 180;
+	let belowImgHeight = 100;
 	let hiddenSlides = [];
 	let advanceSlides = {};
 	let slideEffects = {};
@@ -1345,23 +1346,33 @@ $(document).ready(function() {
 		});
 	}
 
+	function resetPreviewSize() {
+		belowImgWidth = 180;
+		belowImgHeight = 100;
+	}
+	
 	function makePreviewSmaller() {
 		belowImgWidth -= 5;
-		if (belowImgWidth < 0) {
-			belowImgWidth = 0;
+		belowImgHeight -= 2.7;
+		if (belowImgWidth < 0 || belowImgHeight < 0) {
+			resetPreviewSize();
 		}
 		$("#below img").css("width", belowImgWidth + "px");
+		$("#below img").css("height", belowImgHeight + "px");
 	}
 
 	function makePreviewBigger() {
 		belowImgWidth += 5;
+		belowImgHeight += 2.7;
 		if (
 		$("#below").height() < $("#below .thumbnail:first").height() ||
 		$("#below").width() < $("#below .thumbnail:first").width()
 		) {
 			belowImgWidth -= 5;
+			belowImgHeight -= 2.7;
 		}
 		$("#below img").css("width", belowImgWidth + "px");
+		$("#below img").css("height", belowImgHeight + "px");
 	}
 
 	function checkTime(i) {
