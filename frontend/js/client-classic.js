@@ -831,6 +831,7 @@ $(document).ready(function() {
 			gotoNext();
 		});
 		$(window).trigger('resize');
+		applyPreviewSize();
 	}
 
 	function cancelLoad() {
@@ -1221,6 +1222,7 @@ $(document).ready(function() {
 			  });
 		}
 		updateScreen(false);
+		applyPreviewSize();
 	}
 
 	function gotoPrev() {
@@ -1350,15 +1352,19 @@ $(document).ready(function() {
 		belowImgWidth = 180;
 		belowImgHeight = 100;
 	}
-	
+
+	function applyPreviewSize() {
+		$("#below img").css("width", belowImgWidth + "px");
+		$("#below img").css("height", belowImgHeight + "px");
+	}
+
 	function makePreviewSmaller() {
 		belowImgWidth -= 5;
 		belowImgHeight -= 2.7;
 		if (belowImgWidth < 0 || belowImgHeight < 0) {
 			resetPreviewSize();
 		}
-		$("#below img").css("width", belowImgWidth + "px");
-		$("#below img").css("height", belowImgHeight + "px");
+		applyPreviewSize();
 	}
 
 	function makePreviewBigger() {
@@ -1371,8 +1377,7 @@ $(document).ready(function() {
 			belowImgWidth -= 5;
 			belowImgHeight -= 2.7;
 		}
-		$("#below img").css("width", belowImgWidth + "px");
-		$("#below img").css("height", belowImgHeight + "px");
+		applyPreviewSize();
 	}
 
 	function checkTime(i) {
