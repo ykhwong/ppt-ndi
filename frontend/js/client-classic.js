@@ -822,6 +822,7 @@ $(document).ready(function() {
 		});
 		$(window).trigger('resize');
 		applyPreviewSize();
+		resetCurNextSize();
 	}
 
 	function cancelLoad() {
@@ -1550,6 +1551,17 @@ $(document).ready(function() {
 		}
 	}
 
+	function resetCurNextSize() {
+		$("#currentScr img, #nextScr img").css("width", "auto");
+		$("#currentScr img").css("height", "calc(" + $($(".lm_content")[0]).css("height") +" - 37px)");
+		$("#nextScr img").css("height", "calc(" + $($(".lm_content")[0]).css("height") +" - 95px)"); // -37 -58px
+		if ( window.innerWidth < $("#nextScr img").width() * 2 + 45 + 58 ) {
+			$("#currentScr img, #nextScr img").css("height", "auto");
+			$("#currentScr img").css("width", window.innerWidth / 2 - 45);
+			$("#nextScr img").css("width", window.innerWidth / 2 - 45 - 58);
+		}
+	}
+
 	function glInit() {
 		let contentPerTab = [/*{
 				type: 'component',
@@ -1634,42 +1646,32 @@ $(document).ready(function() {
 		//});
 
 		glLayout.registerComponent( 'ndiViews', function( container, componentState ){
-			container.getElement().html( `
-			<table class="right" border="0">
-			<tbody>
-			<tr id="rightTop">
-				<td width="50%">
-					<select class="image-picker show-html">
-						<optgroup label="Screen" id="screen_grp">
-						<option id="currentSlideText" data-img-label="CURRENT" data-img-src="./img/null_slide.png" value="Current" disabled>Current</option>
-						</optgroup>
-					</select>
-				</td>
-				<td width="40%" style="vertical-align: top;">
-					<select class="image-picker show-html">
-						<optgroup label="Screen" id="screen_grp">
-						<option id="nextSlideText" data-img-label="NEXT" data-img-src="./img/null_slide.png" value="Next" disabled>Next</option>
-						</optgroup>
-					</select>
-					<div id="buttons">
-						<button type="button" class="button" id="prev">&nbsp;&lt;&nbsp;</button>
-						<button type="button" class="button" id="next">&nbsp;&gt;&nbsp;</button>
-						<button type="button" class="button" id="blk">&nbsp;B&nbsp;</button>
-						<button type="button" class="button" id="wht">&nbsp;W&nbsp;</button>
-						<button type="button" class="button" id="trn">&nbsp;T&nbsp;</button>
-						<button type="button" class="button" id="empty">&nbsp;</button>
-						<button type="button" class="button" id="smaller">&nbsp;</button>
-						<button type="button" class="button" id="bigger">&nbsp;</button>
-					</div>
-					<div id="slideInfo">
-						<div id="slide_cnt" class="slideInfo">SLIDE 0 / 0</div>
-						<div id="current_time" class="slideInfo">00:00 AM</div>
-					</div>
-				</td>
-			</tr>
-			</tbody>
-			</table>
-		` );
+			const currentScr = $('<td/>').attr({ id: 'currentScr', style: 'vertical-border: top;' });
+			const nextScr = $('<td/>').attr({ id: 'nextScr', style: 'vertical-border: top;' });
+			currentScr.append($('<select/>').attr({ class: 'image-picker show-html' })
+				.append($('<optgroup/>').attr({ label: 'Screen', id: 'screen_grp' }))
+				.append($('<option/>').attr({ id: 'currentSlideText', 'data-img-label': 'CURRENT', 'data-img-src': './img/null_slide.png', 'value': 'Current'}).text('Current').prop('disabled', true)));
+			nextScr.append($('<select/>').attr({ class: 'image-picker show-html' })
+				.append($('<optgroup/>').attr({ label: 'Screen', id: 'screen_grp' }))
+				.append($('<option/>').attr({ id: 'nextSlideText', 'data-img-label': 'NEXT', 'data-img-src': './img/null_slide.png', 'value': 'Next'}).text('Next').prop('disabled', true)));
+			nextScr.append($('<div/>').attr({ id: 'buttons' })
+				.append($('<button/>').attr({ type: 'button', class: 'button', id: 'prev' }).html('&nbsp;&lt;&nbsp;'))
+				.append($('<button/>').attr({ type: 'button', class: 'button', id: 'next' }).html('&nbsp;&gt;&nbsp;'))
+				.append($('<button/>').attr({ type: 'button', class: 'button', id: 'blk' }).html('&nbsp;B&nbsp;'))
+				.append($('<button/>').attr({ type: 'button', class: 'button', id: 'wht' }).html('&nbsp;W&nbsp;'))
+				.append($('<button/>').attr({ type: 'button', class: 'button', id: 'trn' }).html('&nbsp;T&nbsp;'))
+				.append($('<button/>').attr({ type: 'button', class: 'button', id: 'empty' }).html('&nbsp;'))
+				.append($('<button/>').attr({ type: 'button', class: 'button', id: 'smaller' }).html('&nbsp'))
+				.append($('<button/>').attr({ type: 'button', class: 'button', id: 'bigger' }).html('&nbsp'))
+			);
+			const wrapBox = $('<div/>');
+			const table = $('<table/>').attr({ class: 'right', border: 0 }).append($('<tbody/>').append($('<tr/>').attr('id', 'rightTop')
+			.append(currentScr).append(nextScr)
+			));
+
+			wrapBox.append(table);
+			container.getElement().html(wrapBox.html());
+
 		});
 
 		glLayout.registerComponent( 'slides', function( container, componentState ){
@@ -1685,6 +1687,7 @@ $(document).ready(function() {
 				if (container.height < 150 ) {
 					container.setSize( container.width, 150 );
 				}
+				resetCurNextSize();
 			});
 		});
 
@@ -1706,6 +1709,8 @@ $(document).ready(function() {
 		.append($('<div/>').attr('id', 'fullblack'))
 		.append(cancelBox);
 		setLangRsc();
+		
+		resetCurNextSize();
 	}
 
 	prepare();

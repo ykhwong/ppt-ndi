@@ -192,23 +192,21 @@ html, body {
 }
 
 .right {
-	position: absolute;
 	left: 3px;
 	border: none;
 	color: #79a9f7;
-	width: 100%;
 	text-align: left;
-	align: left;
 	font-weight: bold;
-	table-layout: fixed;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .right img {
 	position: relative;
 	background-image: url('../img/null_slide.png');
 	background-repeat: repeat;
-	width: 100%;
 	display: block;
+	height: 100px;
 	margin-left: auto;
 	margin-right: auto;
 }
