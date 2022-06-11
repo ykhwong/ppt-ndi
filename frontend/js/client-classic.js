@@ -282,12 +282,6 @@ $(document).ready(function() {
 			}
 
 			function doTrans() {
-				/*
-				if (curSli === prevSli) {
-					return;
-				}
-				*/
-
 				const mergeImages = require('merge-images');
 				stopSlideTransition();
 				mustStop = false;
@@ -347,7 +341,6 @@ $(document).ready(function() {
 			type: 'question',
 			buttons: ['Yes', 'No'],
 			defaultId: 1,
-			//title: '',
 			message: "" + (/\S/.test(msg)?msg:defaultMsg),
 			detail: (/\S/.test(description)?description:defaultDetail)
 		};
@@ -781,7 +774,6 @@ $(document).ready(function() {
 										return;
 									}
 									const spawn = require( 'child_process' ).spawn;
-									$("#edit_pptx").click();
 									spawn( 'cscript.exe', [ "//NOLOGO", "//E:jscript", vbsDir, file, lSlideNo, '' ] );
 								}
 							}));
@@ -824,8 +816,6 @@ $(document).ready(function() {
 		});
 		if ($("#trans_checker").is(":checked")) {
 			$(".right img").css('background-image', "url('./img/trans_slide.png')");
-		} else {
-			//$(".right img").css('background-image', "url('./img/trans.png')");
 		}
 		$("img.image_picker_image:first, img.image_picker_image:eq(1)").click(function() {
 			gotoNext();
@@ -1645,53 +1635,52 @@ $(document).ready(function() {
 
 		glLayout.registerComponent( 'ndiViews', function( container, componentState ){
 			container.getElement().html( `
-				<table class="right" border="0">
-				  <tbody>
-					<tr id="rightTop">
-					  <td width="50%">
-						<select class="image-picker show-html">
-							<optgroup label="Screen" id="screen_grp">
-							<option id="currentSlideText" data-img-label="CURRENT" data-img-src="./img/null_slide.png" value="Current" disabled>Current</option>
-							</optgroup>
-						</select>
-					  </td>
-					  <td width="40%" style="vertical-align: top;">
-						<select class="image-picker show-html">
-							<optgroup label="Screen" id="screen_grp">
-							<option id="nextSlideText" data-img-label="NEXT" data-img-src="./img/null_slide.png" value="Next" disabled>Next</option>
-							</optgroup>
-						</select>
-							<div id="buttons">
-								<button type="button" class="button" id="prev">&nbsp;&lt;&nbsp;</button>
-								<button type="button" class="button" id="next">&nbsp;&gt;&nbsp;</button>
-								<button type="button" class="button" id="blk">&nbsp;B&nbsp;</button>
-								<button type="button" class="button" id="wht">&nbsp;W&nbsp;</button>
-								<button type="button" class="button" id="trn">&nbsp;T&nbsp;</button>
-								<button type="button" class="button" id="empty">&nbsp;</button>
-								<button type="button" class="button" id="smaller">&nbsp;</button>
-								<button type="button" class="button" id="bigger">&nbsp;</button>
-							</div>
-							<div id="slideInfo">
-								<div id="slide_cnt" class="slideInfo">SLIDE 0 / 0</div>
-								<div id="current_time" class="slideInfo">00:00 AM</div>
-							</div>
-					  </td>
-					</tr>
-				  </tbody>
-				</table>
+			<table class="right" border="0">
+			<tbody>
+			<tr id="rightTop">
+				<td width="50%">
+					<select class="image-picker show-html">
+						<optgroup label="Screen" id="screen_grp">
+						<option id="currentSlideText" data-img-label="CURRENT" data-img-src="./img/null_slide.png" value="Current" disabled>Current</option>
+						</optgroup>
+					</select>
+				</td>
+				<td width="40%" style="vertical-align: top;">
+					<select class="image-picker show-html">
+						<optgroup label="Screen" id="screen_grp">
+						<option id="nextSlideText" data-img-label="NEXT" data-img-src="./img/null_slide.png" value="Next" disabled>Next</option>
+						</optgroup>
+					</select>
+					<div id="buttons">
+						<button type="button" class="button" id="prev">&nbsp;&lt;&nbsp;</button>
+						<button type="button" class="button" id="next">&nbsp;&gt;&nbsp;</button>
+						<button type="button" class="button" id="blk">&nbsp;B&nbsp;</button>
+						<button type="button" class="button" id="wht">&nbsp;W&nbsp;</button>
+						<button type="button" class="button" id="trn">&nbsp;T&nbsp;</button>
+						<button type="button" class="button" id="empty">&nbsp;</button>
+						<button type="button" class="button" id="smaller">&nbsp;</button>
+						<button type="button" class="button" id="bigger">&nbsp;</button>
+					</div>
+					<div id="slideInfo">
+						<div id="slide_cnt" class="slideInfo">SLIDE 0 / 0</div>
+						<div id="current_time" class="slideInfo">00:00 AM</div>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+			</table>
 		` );
 		});
 
 		glLayout.registerComponent( 'slides', function( container, componentState ){
-			container.getElement().html( `
-				<div class="right" id="below">
-					<select class="image-picker">
-						<optgroup label="Slides" id="slides_grp">
-						</optgroup>
-					</select>
-				</div>
-		`
-			);
+			const wrapBox = $('<div/>');
+			const rightBox = $('<div/>').attr('class', 'right').attr('id', 'below');
+			const selectBox = $('<select/>').attr('class', 'image-picker');
+			selectBox.append($('<optgroup/>').attr('label', 'Slides').attr('id', 'slide_grp'));
+			rightBox.append(selectBox);
+			wrapBox.append(rightBox);
+
+			container.getElement().html(wrapBox.html());
 			container.on('resize', function () {
 				if (container.height < 150 ) {
 					container.setSize( container.width, 150 );
@@ -1711,10 +1700,10 @@ $(document).ready(function() {
 
 		const cancelBox = $('<div>').attr('class', 'cancelBox');
 		cancelBox
-		.append($('<div>').attr('id', 'loadingTxt'))
-		.append($('<div>').attr('id', 'cancel').attr('class', 'button'));
+		.append($('<div/>').attr('id', 'loadingTxt'))
+		.append($('<div/>').attr('id', 'cancel').attr('class', 'button'));
 		$(".lm_goldenlayout")
-		.append($('<div>').attr('id', 'fullblack'))
+		.append($('<div/>').attr('id', 'fullblack'))
 		.append(cancelBox);
 		setLangRsc();
 	}
