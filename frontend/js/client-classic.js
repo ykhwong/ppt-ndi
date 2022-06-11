@@ -122,10 +122,8 @@ $(document).ready(function() {
 		setLangRscDiv("#monitorAlphaText", "ui-classic/monitorAlphaText", false, configData.lang);
 		setLangRscDiv("#setMonitor", "ui-classic/setMonitor", false, configData.lang);
 		setLangRscDiv("#monitorText", "ui-classic/monitor", false, configData.lang);
-		/*
-		$("#currentSlideText").attr("data-img-label", getLangRsc("ui-classic/currentSlideText", configData.lang));
-		$("#nextSlideText").attr("data-img-label", getLangRsc("ui-classic/nextSlideText", configData.lang));
-		*/
+		//$("#currentSlideText").attr("data-img-label", getLangRsc("ui-classic/currentSlideText", configData.lang));
+		//$("#nextSlideText").attr("data-img-label", getLangRsc("ui-classic/nextSlideText", configData.lang));
 		setLangRscDiv("#loadingTxt", "ui-classic/loadingTxt", false, configData.lang);
 		setLangRscDiv("#cancel", "ui-classic/cancel", false, configData.lang);
 	}
@@ -1696,6 +1694,7 @@ $(document).ready(function() {
 		$(".lm_goldenlayout")
 		.append($('<div>').attr('id', 'fullblack'))
 		.append(cancelBox);
+		setLangRsc();
 	}
 
 	prepare();
