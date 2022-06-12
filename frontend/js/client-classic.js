@@ -1646,8 +1646,8 @@ $(document).ready(function() {
 		//});
 
 		glLayout.registerComponent( 'ndiViews', function( container, componentState ){
-			const currentScr = $('<td/>').attr({ id: 'currentScr', style: 'vertical-border: top;' });
-			const nextScr = $('<td/>').attr({ id: 'nextScr', style: 'vertical-border: top;' });
+			const currentScr = $('<td/>').attr({ id: 'currentScr', style: 'vertical-align: top;' });
+			const nextScr = $('<td/>').attr({ id: 'nextScr', style: 'vertical-align: top;' });
 			currentScr.append($('<select/>').attr({ class: 'image-picker show-html' })
 				.append($('<optgroup/>').attr({ label: 'Screen', id: 'screen_grp' }))
 				.append($('<option/>').attr({ id: 'currentSlideText', 'data-img-label': 'CURRENT', 'data-img-src': './img/null_slide.png', 'value': 'Current'}).text('Current').prop('disabled', true)));
