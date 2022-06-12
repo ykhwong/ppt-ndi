@@ -4,7 +4,7 @@
 #define MyAppPublisher "ykhwong"
 #define MyAppURL "https://github.com/ykhwong/ppt-ndi"
 #define MyAppExeName "ppt-ndi.exe"
-#define MyAppHome "<!-- USERPROFILE PLACEHOLDER -->\ppt_ndi"
+#define MyAppHome "<!-- USERPROFILE PLACEHOLDER -->\ppt-ndi"
 
 [Setup]
 AppId={{B4CE62CD-7E10-4739-A22B-A44B75D2A087}
@@ -16,8 +16,8 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile={#MyAppHome}\ppt-ndi\LICENSE
-InfoBeforeFile={#MyAppHome}\ppt-ndi\scripts\InstIntro.txt
+LicenseFile={#MyAppHome}\LICENSE
+InfoBeforeFile={#MyAppHome}\scripts\InstIntro.txt
 OutputDir={#MyAppHome}
 OutputBaseFilename=pptndi_setup
 SetupIconFile={#MyAppHome}\backend\img\icon.ico
@@ -32,8 +32,8 @@ PrivilegesRequiredOverridesAllowed=commandline
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "{#MyAppHome}\ppt-ndi-win32-x64\ppt-ndi.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyAppHome}\ppt-ndi-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppHome}\tmp\ppt-ndi-win32-x64\ppt-ndi.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyAppHome}\tmp\ppt-ndi-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Dirs]
 Name: "{userappdata}\PPT-NDI";
