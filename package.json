@@ -1,6 +1,6 @@
 {
 	"name": "PPT-NDI",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"main": "./backend/backend.js",
 	"author": "ykhwong",
 	"dependencies": {
