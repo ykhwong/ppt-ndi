@@ -1553,7 +1553,7 @@ $(document).ready(function() {
 
 	function resetCurNextSize() {
 		$("#currentScr img, #nextScr img").css("width", "auto");
-		$("#currentScr img").css("height", "calc(" + $($(".lm_content")[0]).css("height") +" - 37px)");
+		$("#currentScr img").css("height", "calc(" + $($(".lm_content")[0]).css("height") +" - 48px)"); // -37 -11px
 		$("#nextScr img").css("height", "calc(" + $($(".lm_content")[0]).css("height") +" - 95px)"); // -37 -58px
 		if ( window.innerWidth < $("#nextScr img").width() * 2 + 45 + 58 ) {
 			$("#currentScr img, #nextScr img").css("height", "auto");
