@@ -1617,7 +1617,7 @@ $(document).ready(function() {
 				content: [{
 					id: "tab1",
 					name: "tab1",
-					title: "-",
+					title: "Ready",
 					reorderEnabled: false,
 					type: "row",
 					componentName: "test",
@@ -1695,10 +1695,15 @@ $(document).ready(function() {
 
 		for (let i = 0; i < $(".lm_title").length; i++) {
 			let txtObj = $($(".lm_title")[i]);
-			if ( txtObj.text() === "-" ) {
+			if ( txtObj.text() === "Ready" ) {
 				txtObj.attr('id', 'ppt_filename');
-				break;
+				txtObj.parent().css({
+					'background': '#000824',
+					'border-top': '1px solid #0066FF',
+					'color': '#79A9F0'
+				});
 			}
+			txtObj.parent().removeAttr('title');
 		}
 
 		const cancelBox = $('<div>').attr('class', 'cancelBox');
@@ -1709,7 +1714,7 @@ $(document).ready(function() {
 		.append($('<div/>').attr('id', 'fullblack'))
 		.append(cancelBox);
 		setLangRsc();
-		
+
 		resetCurNextSize();
 	}
 
