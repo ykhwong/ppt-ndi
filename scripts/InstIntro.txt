@@ -1,15 +1,13 @@
-PPT NDI v1.0.5
+PPT NDI v1.0.6
 
-PPT NDI transfers PowerPoint presentations via NDI technology released by NewTek. Thanks to the transparency support, it can be also used as a character generator.
+The PPT NDI lets you transfer PowerPoint presentations with transparent background support over NewTek NDI. You don't need additional monitor setups for running, sharing, capturing, and feeding PowerPoint slides. No Chroma/Luma keying is required.
 
-Release Note (Jan 25 2022):
+Release Note (- - 2022):
 
-ADD: Internal renderer (experimental)
-ADD: Support for NDI 5
-ADD: Quick Edit (Classic mode)
+ADD: Support for macOS (experimental)
+FIX: Update NDI to 5.1
+FIX: Cut-off slide sorter
 FIX: Minor bugs
 
-Please also download and open the sample.pptx file to see some examples of the lower thirds:
-https://github.com/ykhwong/ppt-ndi/raw/master/resources/sample.pptx
-
-For more information, please visit https://github.com/ykhwong/ppt-ndi
+Documentation: https://ykhwong.github.io/ppt-ndi
+Lower thirds sample: https://github.com/ykhwong/ppt-ndi/raw/master/resources/sample.pptx
