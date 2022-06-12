@@ -75,6 +75,19 @@ $(document).ready(function() {
 		}
 	}
 
+	function relocateTitlebarElements() {
+		switch (process.platform) {
+			case 'darwin':
+				$("#closeImg").css({ left: "0px" });
+				$("#closeImg").show();
+				break;
+			default:
+				$("#closeImg").css({ right: "5px" });
+				$("#closeImg").show();
+				break;
+		}
+	}
+
 	function runLib() {
 		ffi = ipc.sendSync("require", { lib: "ffi", func: null, args: null });
 		if ( ffi === -1 ) {
@@ -430,6 +443,7 @@ $(document).ready(function() {
 			process.chdir(remote.app.getAppPath().replace(/(\\|\/)resources(\\|\/)app\.asar/, ""));
 		} catch(e) {
 		}
+		relocateTitlebarElements();
 		$.ajaxSetup({
 			async: false
 		});

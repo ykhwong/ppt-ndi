@@ -5,6 +5,13 @@ html, body {
 	background-color: #051336;
 }
 
+#title {
+	position: fixed;
+	color: #79a9f7;
+	left: 7px;
+	top: 5px;
+}
+
 .button {
 	color: #bbaeff;
 	font-weight: bold;
@@ -16,7 +23,6 @@ html, body {
 	padding: 2px;
 	background: rgb(0, 102, 255);
 	cursor:pointer;
-	border-radius: 10%;
 }
 
 .button2 {
@@ -33,18 +39,21 @@ html, body {
 }
 
 #exit {
+	display: none;
 	position: absolute;
 	top: 0px;
 	right: 5px;
 }
 
 #minimize {
+	display: none;
 	position: absolute;
 	top: 0px;
 	right: 82px;
 }
 
 #max_restore {
+	display: none;
 	position: absolute;
 	top: 0px;
 	right: 55px;
@@ -124,29 +133,32 @@ html, body {
 
 #load_pptx {
 	position: fixed;
-	left: 5px;
+	left: 0px;
 	top: 50px;
-	margin-bottom: 20px;
 }
 
 #edit_pptx {
 	position: fixed;
-	left: 70px;
+	left: 75px;
 	top: 50px;
-	width: 52px;
+	width: 42px;
 	height: 22px;
-	margin-bottom: 20px;
 	background-color: #a6200c;
 	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 #reload {
 	position: fixed;
-	left: 70px;
+	left: 75px;
 	top: 85px;
-	width: 52px;
+	width: 42px;
 	height: 22px;
-	margin-bottom: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 #config {
@@ -155,6 +167,15 @@ html, body {
 	top: -1px;
 	width: 20px;
 	height: 17px;
+	display: none;
+	justify-content: center;
+	align-items: center;
+}
+
+#reload img, #config img,
+#load_pptx img,
+#edit_pptx img {
+	cursor:pointer;
 }
 
 #slideInfo {
@@ -216,6 +237,7 @@ html, body {
 }
 
 #slide_res {
+	display: none;
 	position: fixed;
 	top: 1px;
 	min-width: 50px;

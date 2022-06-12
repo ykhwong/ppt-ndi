@@ -7,6 +7,14 @@ html, body {
 	-webkit-app-region: drag !important;
 }
 
+#title {
+	position: fixed;
+	color: #79a9f7;
+	left: 15px;
+	top: 27px;
+	font-weight: bold;
+}
+
 #prevTxt {
 	position: fixed;
 	top: 250px;
@@ -24,6 +32,7 @@ html, body {
 }
 
 #closeImg {
+	display: none;
 	position: absolute;
 	top: 0px;
 	right: 5px;

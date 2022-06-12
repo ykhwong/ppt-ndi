@@ -31,6 +31,19 @@ $(document).ready(function() {
 		return ( key == "" ? "" : keyCombi + key );
 	}
 
+	function relocateTitlebarElements() {
+		switch (process.platform) {
+			case 'darwin':
+				$("#closeImg").css({ left: "0px" });
+				$("#version").css({ left: "auto", right: "30px" });
+				break;
+			default:
+				$("#closeImg").css({ right: "5px" });
+				$("#version").css({ left: "15px" });
+				break;
+		}
+	}
+
 	function loadConfig() {
 		$.getJSON(configPath, function(json) {
 			if (json) {
@@ -114,6 +127,7 @@ $(document).ready(function() {
 
 	function init() {
 		const remote = require('@electron/remote');
+		relocateTitlebarElements();
 		$.ajaxSetup({
 			async: false
 		});

@@ -5,6 +5,21 @@ $(document).ready(function() {
 		"lang": "en"
 	};
 
+	function relocateTitlebarElements() {
+		switch (process.platform) {
+			case 'darwin':
+				$("#closeImg").css({ left: "0px" });
+				break;
+			default:
+				$("#closeImg").css({ right: "5px" });
+				break;
+		}
+	}
+
+	function init() {
+		relocateTitlebarElements();
+	}
+
 	function reflectConfig() {
 		const configFile = 'config.js';
 		let configPath = "";
@@ -48,6 +63,7 @@ $(document).ready(function() {
 		});
 	}
 
+	init();
 	reflectConfig();
 	registerEvents();
 });

@@ -95,6 +95,31 @@ $(document).ready(function() {
 
 		$("#resWidth").val("0");
 		$("#resHeight").val("0");
+		relocateTitlebarElements();
+	}
+
+	function relocateTitlebarElements() {
+		switch (process.platform) {
+			case 'darwin':
+				$("#title").hide();
+				$("#exit").css({ left: "0px" });
+				$("#minimize").css({ left: "50px" });
+				$("#max_restore").css({ left: "77px" });
+				$("#config").css({ right: "5px" });
+				$("#slide_res").css({ right: "50px" });
+				$("#exit, #minimize, #max_restore, #config, #slide_res").show();
+				$("#config").css("display", "flex");
+				break;
+			default:
+				$("#exit").css({ right: "5px" });
+				$("#minimize").css({ right: "82px" });
+				$("#max_restore").css({ right: "55px" });
+				$("#config").css({ right: "120px" });
+				$("#slide_res").css({ right: "160px" });
+				$("#title, #exit, #minimize, #max_restore, #config, #slide_res").show();
+				$("#config").css("display", "flex");
+				break;
+		}
 	}
 
 	function alertMsg(myMsg) {
@@ -109,7 +134,7 @@ $(document).ready(function() {
 	}
 
 	function setLangRsc() {
-		setLangRscDiv("#edit_pptx", "ui-classic/edit_pptx", false, configData.lang);
+		//setLangRscDiv("#edit_pptx", "ui-classic/edit_pptx", false, configData.lang);
 		//setLangRscDiv("#reload", "ui-classic/reload", false, configData.lang);
 		//setLangRscDiv("#config", "ui-classic/config", false, configData.lang);
 		setLangRscDiv("#show-checkerboard", "ui-classic/show-checkerboard", false, configData.lang);
@@ -1490,7 +1515,7 @@ $(document).ready(function() {
 			}
 		});
 	}
-
+	
 	function getMultipleMonitors() {
 		multipleMonitors = ipc.sendSync("monitor", {
 			func: "get"
