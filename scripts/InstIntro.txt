@@ -2,7 +2,7 @@ PPT NDI v1.0.6
 
 The PPT NDI lets you transfer PowerPoint presentations with transparent background support over NewTek NDI. You don't need additional monitor setups for running, sharing, capturing, and feeding PowerPoint slides. No Chroma/Luma keying is required.
 
-Release Note (- - 2022):
+Release Note (Jun 12 2022):
 
 ADD: Support for macOS (experimental)
 FIX: Update NDI to 5.1
