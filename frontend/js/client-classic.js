@@ -1606,7 +1606,7 @@ $(document).ready(function() {
 					componentName: 'ndiViews',
 					componentState: { label: 'B' },
 					title: 'NDI Views',
-					height: 50,
+					height: 48,
 					reorderEnabled: false,
 					isClosable: false
 				},
