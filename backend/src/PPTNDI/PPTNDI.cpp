@@ -35,7 +35,7 @@ NDIlib_send_instance_t pNDI_send;
 const int maxInstance = 5;
 const char *ndiName = "PPTNDI";
 
-#if __APPLE__
+#if __APPLE__ || __linux__
 extern "C"
 #endif
 int init(void) {
@@ -49,7 +49,7 @@ int init(void) {
 			char buffer[15];
 			#ifdef _WIN32
 				sprintf_s(buffer, "%s (%d)", ndiName, i);
-			#elif __APPLE__
+			#elif __APPLE__ || __linux__
 				snprintf(buffer, 15, "%s (%d)", ndiName, i);
 			#endif
 			NDI_send_create_desc.p_ndi_name = buffer;
@@ -69,7 +69,7 @@ int init(void) {
 	return 0;
 }
 
-#if __APPLE__
+#if __APPLE__ || __linux__
 extern "C"
 #endif
 int destroy(void) {
@@ -82,7 +82,7 @@ int destroy(void) {
 	return 0;
 }
 
-#if __APPLE__
+#if __APPLE__ || __linux__
 extern "C"
 #endif
 int send(const char *path, bool trans) {
