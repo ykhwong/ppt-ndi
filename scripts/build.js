@@ -5,6 +5,7 @@ const execSync = require("child_process").execSync;
 const rimraf = require("rimraf");
 const _WORKDIR = process.cwd();
 const _TMPDIR = path.join(_WORKDIR, "/tmp");
+const license = '"MIT License (github.com/ykhwong/ppt-ndi)"';
 
 const _url = {
 	"ndi_sdk": {
@@ -35,10 +36,8 @@ function _prepare() {
 	switch (process.platform) {
 		case "win32":
 		case "darwin":
-			break;
 		case "linux":
-			console.error("Unsupported platform: " + process.platform);
-			_exit(1);
+			break;
 		default:
 			console.error("Unknown or unsupported platform: " + process.platform);
 			_exit(1);
@@ -110,6 +109,14 @@ function _init() {
 				dl2 = wget.download(_url.innoextract.win32, 'innoextract.zip', {});
 			}
 			break;
+		case "linux":
+			console.log("Downloading NDI SDK...");
+			dl1_done = fs.existsSync(path.join(_TMPDIR, 'Install_NDI_SDK_v5_Linux.tar.gz'));
+			dl2_done = true;
+			if ( ! dl1_done ) {
+				dl1 = wget.download(_url.ndi_sdk.linux, 'Install_NDI_SDK_v5_Linux.tar.gz', {});
+			}
+			break;
 		case "darwin":
 			// we assume NDI SDK v5 has been installed already on macOS
 		default:
@@ -153,10 +160,18 @@ function _init() {
 }
 
 function _build() {
-	if ( process.platform === "win32" ) {
-		_buildWin32();
-	} else if ( process.platform === "darwin") {
-		_buildDarwin();
+	switch ( process.platform ) {
+		case 'win32':
+			_buildWin32();
+			break;
+		case 'darwin':
+			_buildDarwin();
+			break;
+		case 'linux':
+			_buildLinux();
+			break;
+		default:
+			break;
 	}
 }
 
@@ -291,7 +306,6 @@ function _buildWin32() {
 }
 
 function _buildDarwin() {
-
 	// build PPTNDI lib
 	try {
 		fs.copySync( path.join(_WORKDIR, "backend", "src"), "src" );
@@ -330,6 +344,49 @@ function _buildDarwin() {
 	fs.copySync("./node_modules/electron-packager", "../dev/node_modules/electron-packager");
 }
 
+function _buildLinux() {
+	// build PPTNDI lib
+	try {
+		fs.copySync( path.join(_WORKDIR, "backend", "src"), "src" );
+		execSync('tar -xzf Install_NDI_SDK_v5_Linux.tar.gz');
+		execSync('echo y | sh Install_NDI_SDK_v5_Linux.sh 1>/dev/null 2>/dev/null');
+		fs.renameSync( 'NDI SDK for Linux', 'NDI-SDK' );
+	} catch(err) {
+		console.error(err);
+		_exit(1);
+	}
+	try {
+		console.log("Building PPTNDI...");
+		cmd = 'g++ -shared -s -fPIC -o ./src/libpptndi.so ./src/PPTNDI/PPTNDI.cpp -L "./NDI-SDK/lib/x86_64-linux-gnu" -l:libndi.so.5.1.1'
+		console.log(cmd);
+		out = execSync(cmd);
+		console.log(out.toString());
+		console.log("Build completed: libpptndi.so");
+		// final output to ./src/libpptndi.so
+	} catch(e) {
+		console.error(e.stack);
+		if (e.stderr) console.error(e.stderr.toString());
+		if (e.stdout) console.error(e.stdout.toString());
+		_exit(1);
+	}
+
+	// copy the resulting file to deploy dir
+	fs.mkdirSync( "deploy/frontend", { recursive: true } );
+	fs.mkdirSync( "deploy/backend/img", { recursive: true } );
+	fs.mkdirSync( "dev/node_modules", { recursive: true } );
+	fs.copySync( path.join(_WORKDIR, "backend", "backend.js"), "deploy/backend/backend.js" );
+	fs.copySync( path.join(_WORKDIR, "package.json"), "deploy/package.json" );
+	fs.copySync( path.join(_WORKDIR, "backend", "img", "icon.icns"), "deploy/backend/img/icon.icns" );
+	fs.copySync( path.join(_WORKDIR, "backend", "img", "icon.png"), "deploy/backend/img/icon.png" );
+	fs.copySync( path.join(_WORKDIR, "frontend"), "deploy/frontend" );
+
+	process.chdir("./deploy");
+	fs.copySync( path.join(_WORKDIR, "node_modules"), "node_modules" );
+	fs.copySync("./node_modules/electron", "../dev/node_modules/electron");
+	fs.copySync("./node_modules/electron-packager", "../dev/node_modules/electron-packager");
+	execSync('chmod 4755 "../dev/node_modules/electron/dist/chrome-sandbox"');
+}
+
 function _pack() {
 	process.chdir( path.join(_WORKDIR, "tmp") );
 	let ver;
@@ -337,7 +394,7 @@ function _pack() {
 	let abi;
 
 	if ( process.platform === "win32" ) {
-		const opt='--icon=./deploy/backend/img/icon.ico --platform=win32 --overwrite --asar --app-copyright="MIT License (github.com/ykhwong/ppt-ndi)"';
+		const opt='--icon=./deploy/backend/img/icon.ico --platform=win32 --overwrite --asar --app-copyright=' + license;
 		try {
 			ver = execSync(".\\dev\\node_modules\\electron\\dist\\electron.exe --version").toString().replace(/\r|\n/g, "");
 			abi = execSync(".\\dev\\node_modules\\electron\\dist\\electron.exe --abi").toString().replace(/\r|\n/g, "");
@@ -355,8 +412,7 @@ function _pack() {
 		}
 		console.log(out.toString());
 	} else if ( process.platform === "darwin" ) {
-		const opt='--icon=./deploy/backend/img/icon.icns --platform=darwin --overwrite --app-copyright="MIT License (github.com/ykhwong/ppt-ndi)"';
-
+		const opt='--icon=./deploy/backend/img/icon.icns --platform=darwin --overwrite --app-copyright=' + license;
 		try {
 			ver = execSync("./dev/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron --version").toString().replace(/\r|\n/g, "");
 			abi = execSync("./dev/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron --abi").toString().replace(/\r|\n/g, "");
@@ -377,6 +433,26 @@ function _pack() {
 			_exit(1);
 		}
 		console.log(out.toString());
+	} else if ( process.platform === "linux" ) {
+		const opt='--platform=linux --overwrite --app-copyright=' + license;
+		try {
+			ver = execSync("./dev/node_modules/electron/dist/electron --no-sandbox --version").toString().replace(/\r|\n/g, "");
+			abi = execSync("./dev/node_modules/electron/dist/electron --no-sandbox --abi").toString().replace(/\r|\n/g, "");
+			
+			fs.copySync( path.join(".", "src", "libpptndi.so"), "deploy/libpptndi.so" );
+			fs.copySync( "./NDI-SDK/lib/x86_64-linux-gnu/libndi.so.5.1.1", "deploy/libndi.so.5.1.1" );
+			rimraf.sync( "deploy/locales" );
+			fs.copySync( path.join( _TMPDIR, "deploy", "frontend", "i18n" ), "deploy/locales" );
+
+			out = execSync("node dev/node_modules/electron-packager/bin/electron-packager.js ./deploy ppt-ndi --electron-version=" + ver + " " + opt);
+		} catch(e) {
+			console.error(e.stack);
+			if (e.stderr) console.error(e.stderr.toString());
+			if (e.stdout) console.error(e.stdout.toString());
+			_exit(1);
+		}
+		console.log(out.toString());
+
 	}
 }
 
