@@ -72,6 +72,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#macos">macOS</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#linux">Linux</a>
+    </li>
     </ul>
                 </li>
               </ul>
@@ -99,6 +101,7 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="development">Development</h1>
+<p>The macOS and Linux build only support classic mode and use the experimental internal renderer limited to simple text and images, though they don't depend on Microsoft PowerPoint.</p>
 <h2 id="windows">Windows</h2>
 <p>For advanced users who want to build the PPT-NDI, please make sure to install:</p>
 <ul>
@@ -122,7 +125,26 @@ npm run build
 <li>Node.js 10 or higher (Use LTS if possible)</li>
 <li>NDI SDK v5</li>
 </ul>
-<p>The macOS build only supports classic mode and uses the experimental internal renderer limited to simple text and images, though it doesn't depend on Microsoft PowerPoint.</p>
+<p>Run the below commands:</p>
+<pre><code class="language-sh">git clone https://github.com/ykhwong/ppt-ndi.git
+cd ppt-ndi
+npm install --save
+npm run build
+</code></pre>
+<h2 id="linux">Linux</h2>
+<p>For advanced users who want to build the PPT-NDI for Linux, please make sure to install:</p>
+<ul>
+<li>Git</li>
+<li>GCC 4.9 or higher</li>
+<li>Python 3</li>
+<li>Node.js 10 or higher (Use LTS if possible)</li>
+</ul>
+<p>Run the below commands:</p>
+<pre><code class="language-sh">git clone https://github.com/ykhwong/ppt-ndi.git
+cd ppt-ndi
+npm install --save
+npm run build
+</code></pre>
               
             </div>
           </div><footer>
