@@ -440,11 +440,11 @@ function _pack() {
 			abi = execSync("./dev/node_modules/electron/dist/electron --no-sandbox --abi").toString().replace(/\r|\n/g, "");
 			
 			fs.copySync( path.join(".", "src", "libpptndi.so"), "deploy/libpptndi.so" );
-			fs.copySync( "./NDI-SDK/lib/x86_64-linux-gnu/libndi.so.5.1.1", "deploy/libndi.so.5.1.1" );
 			rimraf.sync( "deploy/locales" );
 			fs.copySync( path.join( _TMPDIR, "deploy", "frontend", "i18n" ), "deploy/locales" );
 
 			out = execSync("node dev/node_modules/electron-packager/bin/electron-packager.js ./deploy ppt-ndi --electron-version=" + ver + " " + opt);
+			fs.copySync( "./NDI-SDK/lib/x86_64-linux-gnu/libndi.so.5.1.1", "ppt-ndi-linux-x64/libndi.so.5" );
 		} catch(e) {
 			console.error(e.stack);
 			if (e.stderr) console.error(e.stderr.toString());
