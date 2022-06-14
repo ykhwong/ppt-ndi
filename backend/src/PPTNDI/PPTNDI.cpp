@@ -22,6 +22,11 @@ using namespace std;
 
 #include "/Library/NDI SDK for macOS/examples/C++/NDIlib_Send_PNG/picopng.hpp"
 #include </Library/NDI SDK for macOS/include/Processing.NDI.Lib.h>
+#else
+#include <stdio.h>
+#include <stdlib.h>
+#include "../../NDI-SDK/examples/C++/NDIlib_Send_PNG/picopng.hpp"
+#include "../../NDI-SDK/include/Processing.NDI.Lib.h"
 #endif
 
 bool initSucceeded = false;
