@@ -629,7 +629,7 @@ function loadIpc() {
 								libPath = path.join( libPath, 'PPTNDI.dylib' );
 								break;
 							default:
-								libPath = path.join( libPath, 'PPTNDI.so' );
+								libPath = path.join( libPath, 'libpptndi.so' );
 								break;
 						}
 
