@@ -262,6 +262,8 @@ function loadArg() {
 			addMainWin2handler(!startAsTray);
 			registerFocusInfo(mainWindow2);
 			break;
+		} else if (/^--no-sandbox$/.test(val) && process.platform === 'linux') {
+			matched = true;
 		} else if (/^(-[^-]|--\S)/.test(val)) {
 			console.log("Unknown switch: " + val);
 			process.exit(0);
