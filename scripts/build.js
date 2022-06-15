@@ -384,7 +384,6 @@ function _buildLinux() {
 	fs.copySync( path.join(_WORKDIR, "node_modules"), "node_modules" );
 	fs.copySync("./node_modules/electron", "../dev/node_modules/electron");
 	fs.copySync("./node_modules/electron-packager", "../dev/node_modules/electron-packager");
-	execSync('chmod 4755 "../dev/node_modules/electron/dist/chrome-sandbox"');
 }
 
 function _pack() {
@@ -435,6 +434,7 @@ function _pack() {
 		console.log(out.toString());
 	} else if ( process.platform === "linux" ) {
 		const opt='--platform=linux --overwrite --app-copyright=' + license;
+		const data = '#!/bin/sh' + "\n" + './ppt-ndi-core --no-sandbox $@' + "\n";
 		try {
 			ver = execSync("./dev/node_modules/electron/dist/electron --no-sandbox --version").toString().replace(/\r|\n/g, "");
 			abi = execSync("./dev/node_modules/electron/dist/electron --no-sandbox --abi").toString().replace(/\r|\n/g, "");
@@ -445,6 +445,9 @@ function _pack() {
 
 			out = execSync("node dev/node_modules/electron-packager/bin/electron-packager.js ./deploy ppt-ndi --electron-version=" + ver + " " + opt);
 			fs.copySync( "./NDI-SDK/lib/x86_64-linux-gnu/libndi.so.5.1.1", "ppt-ndi-linux-x64/libndi.so.5" );
+			fs.renameSync( './ppt-ndi-linux-x64/ppt-ndi', './ppt-ndi-linux-x64/ppt-ndi-core' );
+			fs.writeFileSync( './ppt-ndi-linux-x64/ppt-ndi', data, { encoding: 'utf8' });
+			fs.chmodSync('./ppt-ndi-linux-x64/ppt-ndi', "755");
 		} catch(e) {
 			console.error(e.stack);
 			if (e.stderr) console.error(e.stderr.toString());
