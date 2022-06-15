@@ -70,20 +70,6 @@ function init() {
 		trayIconFile = nativeImage.createFromPath( iconFile );
 	}
 
-	mainWindow3 = createWin({
-		width: winData.config.width,
-		height: winData.config.height,
-		maximizable: false,
-		winFile: winData.config.dest,
-		showWin: false,
-		isTransparent: false
-	});
-	mainWindow3.on('close', function (event) {
-		event.preventDefault();
-		mainWindow3.hide();
-	});
-	mainWindow3.setAlwaysOnTop(true);
-
 	configPath = configFile;
 	if ( !fs.existsSync(configPath) ) {
 		let appDataPath;
@@ -121,6 +107,21 @@ function init() {
 			registerFocusInfo( mainWindow2 );
 		}
 	}
+
+	mainWindow3 = createWin({
+		width: winData.config.width,
+		height: winData.config.height,
+		maximizable: false,
+		winFile: winData.config.dest,
+		showWin: false,
+		isTransparent: false
+	});
+	mainWindow3.on('close', function (event) {
+		event.preventDefault();
+		mainWindow3.hide();
+	});
+	mainWindow3.setAlwaysOnTop(true);
+
 	loadIpc();
 	sendLoop();
 	refreshTray();
@@ -263,7 +264,7 @@ function loadArg() {
 			registerFocusInfo(mainWindow2);
 			break;
 		} else if (/^--no-sandbox$/.test(val) && process.platform === 'linux') {
-			matched = true;
+			// skip: no-sandbox is part of the atom shell
 		} else if (/^(-[^-]|--\S)/.test(val)) {
 			console.log("Unknown switch: " + val);
 			process.exit(0);
