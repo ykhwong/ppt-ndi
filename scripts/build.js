@@ -290,6 +290,12 @@ function _buildWin32() {
 	}
 		
 	// copy the resulting file to deploy dir
+	if ( fs.existsSync("deploy") ) {
+		fs.rmdirSync("deploy", { recursive: true });
+	}
+	if ( fs.existsSync("dev") ) {
+		fs.rmdirSync("dev", { recursive: true });
+	}
 	fs.mkdirSync( "deploy/frontend", { recursive: true } );
 	fs.mkdirSync( "deploy/backend/img", { recursive: true } );
 	fs.mkdirSync( "dev/node_modules", { recursive: true } );
@@ -329,6 +335,12 @@ function _buildDarwin() {
 	}
 		
 	// copy the resulting file to deploy dir
+	if ( fs.existsSync("deploy") ) {
+		fs.rmdirSync("deploy", { recursive: true });
+	}
+	if ( fs.existsSync("dev") ) {
+		fs.rmdirSync("dev", { recursive: true });
+	}
 	fs.mkdirSync( "deploy/frontend", { recursive: true } );
 	fs.mkdirSync( "deploy/backend/img", { recursive: true } );
 	fs.mkdirSync( "dev/node_modules", { recursive: true } );
@@ -348,9 +360,11 @@ function _buildLinux() {
 	// build PPTNDI lib
 	try {
 		fs.copySync( path.join(_WORKDIR, "backend", "src"), "src" );
-		execSync('tar -xzf Install_NDI_SDK_v5_Linux.tar.gz');
-		execSync('echo y | sh Install_NDI_SDK_v5_Linux.sh 1>/dev/null 2>/dev/null');
-		fs.renameSync( 'NDI SDK for Linux', 'NDI-SDK' );
+		if ( ! fs.existsSync("NDI-SDK") ) {
+			execSync('tar -xzf Install_NDI_SDK_v5_Linux.tar.gz');
+			execSync('echo y | sh Install_NDI_SDK_v5_Linux.sh 1>/dev/null 2>/dev/null');
+			fs.renameSync( 'NDI SDK for Linux', 'NDI-SDK' );
+		}
 	} catch(err) {
 		console.error(err);
 		_exit(1);
@@ -371,6 +385,12 @@ function _buildLinux() {
 	}
 
 	// copy the resulting file to deploy dir
+	if ( fs.existsSync("deploy") ) {
+		fs.rmdirSync("deploy", { recursive: true });
+	}
+	if ( fs.existsSync("dev") ) {
+		fs.rmdirSync("dev", { recursive: true });
+	}
 	fs.mkdirSync( "deploy/frontend", { recursive: true } );
 	fs.mkdirSync( "deploy/backend/img", { recursive: true } );
 	fs.mkdirSync( "dev/node_modules", { recursive: true } );
