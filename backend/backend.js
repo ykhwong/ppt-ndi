@@ -225,33 +225,44 @@ function refreshTray() {
 	});
 }
 
-
+function showHelp() {
+	let out = "\nPPT NDI\n";
+	out += " " + path.basename(process.argv[0]) + " [--slideshow] [--classic] [--load-file=(path)]\n";
+	out += "          [--slideshow] : SlidShow Mode\n";
+	out += "            [--classic] : Classic Mode\n";
+	out += "   [--load-file=(path)] : Open a PowerPoint file (Use with --classic)\n";
+	console.log(out);
+}
 
 function loadArg() {
+	const fs = require( 'fs-extra' );
 	let matched=false;
+	let isClassic = false;
+	let fileToLoad = null;
 	for (let i = 0, len = process.argv.length; i < len; i++) {
 		let val = process.argv[i];
 		if (/^(-h|--help|\/\?)/i.test(val)) {
-			let out = "PPT NDI\n";
-			out += " " + path.basename(process.argv[0]) + " [--slideshow] [--classic]\n";
-			out += "   [--slideshow] : SlidShow Mode\n";
-			out += "     [--classic] : Classic Mode\n";
-			console.log(out);
+			showHelp();
 			process.exit(0);
 		} else if (/^--slideshow/i.test(val)) {
 			matched=true;
-			mainWindow2 = createWin({
-				width: winData.slideshow.width,
-				height: winData.slideshow.height,
-				maximizable: false,
-				winFile: winData.slideshow.dest,
-				showWin: !startAsTray,
-				isTransparent: false
-			});
-			addMainWin2handler(!startAsTray);
-			break;
+			isClassic = false;
 		} else if (/^--classic/i.test(val)) {
 			matched=true;
+			isClassic = true;
+		} else if (/^--load-file=(\S)/i.test(val)) {
+			fileToLoad = val.replace(/^--load-file=/i, "");
+		} else if (/^--no-sandbox$/.test(val) && process.platform === 'linux') {
+			// skip: no-sandbox is part of the atom shell
+		} else if (/^(-[^-]|--\S)/.test(val)) {
+			console.log("Unknown switch: " + val);
+			showHelp();
+			process.exit(1);
+		}
+	}
+
+	if (matched) {
+		if (isClassic) {
 			mainWindow2 = createWin({
 				width: winData.classic.width,
 				height: winData.classic.height,
@@ -262,14 +273,34 @@ function loadArg() {
 			});
 			addMainWin2handler(!startAsTray);
 			registerFocusInfo(mainWindow2);
-			break;
-		} else if (/^--no-sandbox$/.test(val) && process.platform === 'linux') {
-			// skip: no-sandbox is part of the atom shell
-		} else if (/^(-[^-]|--\S)/.test(val)) {
-			console.log("Unknown switch: " + val);
-			process.exit(0);
+			if (fileToLoad) {
+				if (!fs.existsSync(fileToLoad)) {
+					console.log("File not found: " + fileToLoad);
+					showHelp();
+					process.exit(1);
+				}
+				mainWindow2.webContents.on('did-finish-load', () => {
+					setTimeout(function(){
+						mainWindow2.webContents.send('remote', {
+							msg: 'loadFile',
+							file: fileToLoad
+						});
+					}, 500);
+				});
+			}
+		} else {
+			mainWindow2 = createWin({
+				width: winData.slideshow.width,
+				height: winData.slideshow.height,
+				maximizable: false,
+				winFile: winData.slideshow.dest,
+				showWin: !startAsTray,
+				isTransparent: false
+			});
+			addMainWin2handler(!startAsTray);
 		}
 	}
+
 	return matched;
 }
 
