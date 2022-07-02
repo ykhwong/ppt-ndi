@@ -635,6 +635,9 @@ $(document).ready(function() {
 				case "update_white":
 					updateBlkWhtTrn("white");
 					break;
+				case "loadFile":
+					loadPPTX(data.file, 0, 0);
+					break;
 				default:
 					break;
 			}
