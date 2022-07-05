@@ -2,6 +2,7 @@
 *.DS_Store
 *.exe
 *.bat
+*.bak
 *.dll
 /node_modules
 /bin
