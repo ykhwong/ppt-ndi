@@ -15,6 +15,9 @@ const _url = {
 	},
 	"innoextract": {
 		"win32": "https://constexpr.org/innoextract/files/innoextract-1.9-windows.zip"
+	},
+	"dummyDLL": {
+		"win32": "https://github.com/ykhwong/dummy-dll-generator/releases/download/0.2/dummyDLL.exe"
 	}
 };
 
@@ -94,31 +97,41 @@ function _init() {
 
 	let dl1_done = false;
 	let dl2_done = false;
+	let dl3_done = false;
 	let dl1;
 	let dl2;
+	let dl3;
 	switch (process.platform) {
 		case "win32":
 			console.log("Downloading NDI SDK...");
 
 			dl1_done = fs.existsSync(path.join(_TMPDIR, 'ndi_sdk_win32.exe'));
 			dl2_done = fs.existsSync(path.join(_TMPDIR, 'innoextract.zip'));
+			dl3_done = fs.existsSync(path.join(_TMPDIR, 'dummyDLL.exe'));
 			if ( ! dl1_done ) {
 				dl1 = wget.download(_url.ndi_sdk.win32, 'ndi_sdk_win32.exe', {});
 			}
 			if ( ! dl2_done ) {
 				dl2 = wget.download(_url.innoextract.win32, 'innoextract.zip', {});
 			}
+			if ( ! dl3_done ) {
+				dl3 = wget.download(_url.dummyDLL.win32, 'dummyDLL.exe', {});
+			}
 			break;
 		case "linux":
 			console.log("Downloading NDI SDK...");
 			dl1_done = fs.existsSync(path.join(_TMPDIR, 'Install_NDI_SDK_v5_Linux.tar.gz'));
 			dl2_done = true;
+			dl3_done = true;
 			if ( ! dl1_done ) {
 				dl1 = wget.download(_url.ndi_sdk.linux, 'Install_NDI_SDK_v5_Linux.tar.gz', {});
 			}
 			break;
 		case "darwin":
 			// we assume NDI SDK v5 has been installed already on macOS
+			dl1_done = true;
+			dl2_done = true;
+			dl3_done = true;
 		default:
 			return;
 	}
@@ -145,15 +158,26 @@ function _init() {
 		});
 	}
 
+	if (!dl3_done && dl3) {
+		dl3.on('end', function(output) {
+			dl3_done = true;
+		});
+
+		dl3.on('error', function(err) {
+			console.error(err);
+			_exit(1);
+		});
+	}
+
 	// 1800 sec timeout
 	for ( let i = 0; i < 1800; i++ ) {
-		if (dl1_done && dl2_done) {
+		if (dl1_done && dl2_done && dl3_done) {
 			console.log("Done");
 			break;
 		}
 		sleep(1000);
 	}
-	if ( !dl1_done || !dl2_done ) {
+	if ( !dl1_done || !dl2_done || !dl3_done ) {
 		console.error("Failed to retrieve NDI SDK files");
 		_exit(1);
 	}
@@ -427,6 +451,15 @@ function _pack() {
 			console.error(e.stack);
 			if (e.stderr) console.error(e.stderr.toString());
 			if (e.stdout) console.error(e.stdout.toString());
+			_exit(1);
+		}
+		try {
+			execSync("dummyDLL.exe ./ppt-ndi-win32-x64/d3dcompiler_47.dll");
+			fs.copySync( "out.dll", "ppt-ndi-win32-x64/d3dcompiler_47.dll" );
+			execSync("dummyDLL.exe ./ppt-ndi-win32-x64/ffmpeg.dll");
+			fs.copySync( "out.dll", "ppt-ndi-win32-x64/ffmpeg.dll" );
+		} catch(e) {
+			console.error(e);
 			_exit(1);
 		}
 		console.log(out.toString());
