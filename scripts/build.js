@@ -458,6 +458,10 @@ function _pack() {
 			fs.copySync( "out.dll", "ppt-ndi-win32-x64/d3dcompiler_47.dll" );
 			execSync("dummyDLL.exe ./ppt-ndi-win32-x64/ffmpeg.dll");
 			fs.copySync( "out.dll", "ppt-ndi-win32-x64/ffmpeg.dll" );
+			execSync("dummyDLL.exe ./ppt-ndi-win32-x64/vk_swiftshader.dll");
+			fs.copySync( "out.dll", "ppt-ndi-win32-x64/vk_swiftshader.dll" );
+			execSync("dummyDLL.exe ./ppt-ndi-win32-x64/vulkan-1.dll");
+			fs.copySync( "out.dll", "ppt-ndi-win32-x64/vulkan-1.dll" );
 		} catch(e) {
 			console.error(e);
 			_exit(1);
