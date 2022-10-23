@@ -16,7 +16,7 @@
 	},
 	"devDependencies": {
 		"decompress-zip": "^0.3.3",
-		"electron": "^21.0.1",
+		"electron": "^20.3.0",
 		"electron-packager": "^17.0.0",
 		"node-gyp": "^9.1.0",
 		"rimraf": "^3.0.2",
