@@ -114,12 +114,46 @@ Dim newWidth
 Dim newHeight
 
 On Error Resume Next
+
+' Visual bounding box (in pt) of all visible shapes, including rotation and outline.
+' ShapeRange.Export renders this whole area, not just the slide.
+Sub GetBounds(shpRange, ByRef bL, ByRef bT, ByRef bR, ByRef bB)
+	Dim i, s, w, h, rad, rw, rh, cx, cy, lw, vis
+	For i = 1 To shpRange.Count
+		Set s = shpRange(i)
+		Err.Clear
+		vis = s.Visible
+		If Err.Number <> 0 Then vis = True
+		If vis Then
+			w = s.Width
+			h = s.Height
+			rad = s.Rotation * 3.14159265358979 / 180
+			rw = Abs(w * Cos(rad)) + Abs(h * Sin(rad))
+			rh = Abs(w * Sin(rad)) + Abs(h * Cos(rad))
+			lw = 0
+			Err.Clear
+			If s.Line.Visible Then
+				lw = s.Line.Weight / 2
+			End If
+			If Err.Number <> 0 Then lw = 0
+			Err.Clear
+			cx = s.Left + w / 2
+			cy = s.Top + h / 2
+			If cx - rw / 2 - lw < bL Then bL = cx - rw / 2 - lw
+			If cy - rh / 2 - lw < bT Then bT = cy - rh / 2 - lw
+			If cx + rw / 2 + lw > bR Then bR = cx + rw / 2 + lw
+			If cy + rh / 2 + lw > bB Then bB = cy + rh / 2 + lw
+		End If
+	Next
+End Sub
+
 Sub Proc()
 	Dim sl
 	Dim shGroup
 	Dim sngWidth
 	Dim sngHeight
 	Dim origGrpCnt
+	Dim bL, bT, bR, bB, bounds
 	oriGrpCnt = 0
 	With ap.PageSetup
 		sngWidth = .SlideWidth
@@ -145,6 +179,12 @@ Sub Proc()
 				End If
 				Exit Sub
 			End If
+			bL = 0
+			bT = 0
+			bR = sngWidth
+			bB = sngHeight
+			GetBounds shpGroup, bL, bT, bR, bB
+			bounds = Round(bL * 100) & " " & Round(bT * 100) & " " & Round(bR * 100) & " " & Round(bB * 100) & " " & Round(sngWidth * 100) & " " & Round(sngHeight * 100) & " " & newWidth & " " & newHeight
 			If newWidth = 0 Then
 				shpGroup.Export Wscript.Arguments.Item(0) & "/Slide.png", 2, , , 1
 			Else
@@ -159,7 +199,7 @@ Sub Proc()
 		Dim duration
 		entryEffect = ap.Slides(curPos).SlideShowTransition.EntryEffect
 		duration = ap.Slides(curPos).SlideShowTransition.Duration
-		Wscript.Echo "PPTNDI: Sent " & duration & " " & entryEffect & " " & objSlideShow.CurrentShowPosition
+		Wscript.Echo "PPTNDI: Sent " & duration & " " & entryEffect & " " & objSlideShow.CurrentShowPosition & " " & bounds
 	End With
 End Sub
 sub Main()
@@ -354,48 +394,55 @@ var TestFile;
 var opres;
 objPPT = new ActiveXObject("PowerPoint.Application");
 
-function deleteInvisibleTop(sl, sngHeight) {
-	for (var intShape = 1; intShape<=sl.Shapes.Count; intShape++) {
-		var topSize = sl.Shapes(intShape).Top;
-		var heightSize = sl.Shapes(intShape).Height;
-
-		if (sngHeight - topSize <= 0) {
-			sl.Shapes(intShape).Delete();
-		} else if (topSize < 0) {
-			if (sl.Shapes(intShape).Type === 17 || topSize + heightSize <= 0) {
-				sl.Shapes(intShape).Delete();
-			} else {
-				if (sl.Shapes(intShape).Type === 1) {
-					sl.Shapes(intShape).Top = 0;
-					sl.Shapes(intShape).Height = topSize + heightSize;
-				} else {
-					sl.Shapes(intShape).Delete();
-				}
-			}
+// Visual bounding box (in pt) of all visible shapes, including rotation and outline.
+// ShapeRange.Export renders this whole area, not just the slide.
+function getBounds(shpRange, sngWidth, sngHeight) {
+	var b = { l: 0, t: 0, r: sngWidth, b: sngHeight };
+	for (var i = 1; i <= shpRange.Count; i++) {
+		var s = shpRange.Item(i);
+		var vis = true;
+		try { vis = (s.Visible !== 0); } catch (e) {}
+		if (!vis) {
+			continue;
 		}
+		var w = s.Width;
+		var h = s.Height;
+		var rad = s.Rotation * Math.PI / 180;
+		var rw = Math.abs(w * Math.cos(rad)) + Math.abs(h * Math.sin(rad));
+		var rh = Math.abs(w * Math.sin(rad)) + Math.abs(h * Math.cos(rad));
+		var lw = 0;
+		try { if (s.Line.Visible !== 0) { lw = s.Line.Weight / 2; } } catch (e) { lw = 0; }
+		var cx = s.Left + w / 2;
+		var cy = s.Top + h / 2;
+		b.l = Math.min(b.l, cx - rw / 2 - lw);
+		b.t = Math.min(b.t, cy - rh / 2 - lw);
+		b.r = Math.max(b.r, cx + rw / 2 + lw);
+		b.b = Math.max(b.b, cy + rh / 2 + lw);
 	}
+	return b;
 }
 
-function deleteInvisibleLeft(sl, sngWidth) {
-	for (var intShape = 1; intShape<=sl.Shapes.Count; intShape++) {
-		var leftSize = sl.Shapes(intShape).Left;
-		var widthSize = sl.Shapes(intShape).Width;
+// Exports all shapes (without background) and returns the exported area for cropping
+function exportShapes(sl, fn, sngWidth, sngHeight) {
+	var resX = parseInt(WScript.arguments(2), 10);
+	var resY = parseInt(WScript.arguments(3), 10);
+	var shp = sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight );
+	var shpGroup = sl.Shapes.Range();
+	var b = getBounds(shpGroup, sngWidth, sngHeight);
 
-		if (sngWidth - leftSize <= 0) {
-			sl.Shapes(intShape).Delete();
-		} else if (leftSize < 0) {
-			if (sl.Shapes(intShape).Type === 17 || widthSize + leftSize <= 0) {
-				sl.Shapes(intShape).Delete();
-			} else {
-				if (sl.Shapes(intShape).Type === 1) {
-					sl.Shapes(intShape).Left = 0;
-					sl.Shapes(intShape).Width = leftSize + widthSize;
-				} else {
-					sl.Shapes(intShape).Delete();
-				}
-			}
-		}
+	if (resX === 0) {
+		shpGroup.Export(fn, 2, 0, 0, 1);
+	} else {
+		// The scale is relative to the slide size, so the slide area gets the requested size
+		shpGroup.Export(fn, 2, Math.round(resX / 1.33333333), Math.round(resY / 1.33333333), 1);
 	}
+	shp.Delete();
+
+	var vals = [b.l, b.t, b.r, b.b, sngWidth, sngHeight];
+	for (var i = 0; i < vals.length; i++) {
+		vals[i] = Math.round(vals[i] * 100);
+	}
+	return vals.join(" ") + " " + resX + " " + resY;
 }
 
 function proc(ap) {
@@ -430,20 +477,7 @@ function proc(ap) {
 
 		fn = WScript.arguments(1) + "/Slide" + sl.SlideIndex + ".png";
 
-		deleteInvisibleTop(sl,sngHeight);
-		deleteInvisibleLeft(sl, sngWidth);
-		deleteInvisibleTop(sl, sngHeight);
-
-		var shp = sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight );
-		var shpGroup = sl.Shapes.Range();
-
-		if (WScript.arguments(2) === "0") {
-			shpGroup.Export(fn, 2, 0, 0, 1);
-		} else {
-			shpGroup.Export(fn, 2, Math.round(WScript.arguments(2) / 1.33333333), Math.round(WScript.arguments(3) / 1.33333333), 1);
-		}
-
-		shp.Delete();
+		var bounds = exportShapes(sl, fn, sngWidth, sngHeight);
 
 		var fso = new ActiveXObject("Scripting.FileSystemObject");
 		if (fso.FileExists(fn)) {
@@ -454,16 +488,14 @@ function proc(ap) {
 						sl.Shapes(intShape).Delete();
 					}
 				}
-				var shp2 = sl.Shapes.AddTextBox( 1, 0, 0, sngWidth, sngHeight);
-				var shpGroup2 = sl.Shapes.Range();
-				if (WScript.arguments(2) === "0") {
-					shpGroup2.Export(fn, 2, 0, 0, 1);
-				} else {
-					shpGroup2.Export(fn, 2, Math.round(WScript.arguments(2) / 1.33333333), Math.round(WScript.arguments(3) / 1.33333333), 1);
-				}
-				shp2.Delete();
+				bounds = exportShapes(sl, fn, sngWidth, sngHeight);
 			}
 		}
+
+		var objBounds = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(WScript.arguments(1) + "/bounds.dat",8,true);
+		objBounds.WriteLine(sl.SlideIndex + " " + bounds);
+		objBounds.Close();
+		objBounds = null;
 	}
 }
 
