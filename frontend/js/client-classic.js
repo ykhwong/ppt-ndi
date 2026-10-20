@@ -4,6 +4,7 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const cscript = require('./js/cscript').script.classic;
+	const cropSlidesInDir = require('./js/slidecrop').cropSlidesInDir;
 	const runtimeUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe";
 	const vbsBg = cscript.vbsBg;
 	const vbsNoBg = cscript.vbsNoBg;
@@ -916,6 +917,8 @@ $(document).ready(function() {
 			res.on('close', (code) => {
 				let fileArr = [];
 				let options;
+				// Without background, shapes outside the slide enlarge the exported images
+				cropSlidesInDir(tmpDir2);
 				for (let i=1; i<=maxSlideNum; i++) {
 					fileArr.push(i.toString());
 				}
@@ -997,6 +1000,8 @@ $(document).ready(function() {
 		if (tmpDir === "") {
 			return;
 		}
+		// Without background, shapes outside the slide enlarge the exported images
+		cropSlidesInDir(tmpDir);
 		fs.readdirSync(tmpDir).forEach(file2 => {
 			re = new RegExp("^Slide(\\d+)\\.png\$", "i");
 			if (re.exec(file2)) {

@@ -3,6 +3,7 @@ $(document).ready(function() {
 	const ipc = require('electron').ipcRenderer;
 	const fs = require("fs-extra");
 	const cscript = require('./js/cscript').script.slideshow;
+	const cropToSlide = require('./js/slidecrop').cropToSlide;
 	const runtimeUrl = "https://aka.ms/vs/16/release/vc_redist.x64.exe";
 	const vbsBg = cscript.vbsBg;
 	const vbsNoBg = cscript.vbsNoBg;
@@ -195,6 +196,7 @@ $(document).ready(function() {
 		const now = new Date().getTime();
 		const cmd = data.toString();
 		let newSlideIdx;
+		let bounds = null;
 		preFile = tmpDir + "/SlidePre.png";
 		stopSlideTransition();
 		if (/^PPTNDI: Sent /.test(cmd)) {
@@ -202,6 +204,7 @@ $(document).ready(function() {
 			duration = tmpCmd.split(" ")[0].trim();
 			effect = tmpCmd.split(" ")[1].trim();
 			newSlideIdx = tmpCmd.split(" ")[2].trim();
+			bounds = tmpCmd.trim().split(/\s+/).slice(3, 11);
 		} else if(/^PPTNDI: White/.test(cmd)) {
 			file = tmpDir + "/SlideWhite.png";
 			newSlideIdx = "white";
@@ -256,6 +259,9 @@ $(document).ready(function() {
 			if (fd !== undefined) {
 				fs.closeSync(fd);
 			}
+
+			// Without background, shapes outside the slide enlarge the exported image
+			cropToSlide(file, bounds);
 
 			function getMeta(url, callback) {
 				let img = new Image();
